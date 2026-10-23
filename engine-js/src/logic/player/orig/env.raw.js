@@ -1382,7 +1382,7 @@
     if (!node) return "";
     if (node.nodeType === 3) return String(node.data != null ? node.data : node.textContent || "");
     if (HIDDEN_TAGS[tagOf(node)]) return "";
-    kids = node.children;
+    kids = childNodesOf(node);
     if (kids && kids.length) {
       out = "";
       for (i = 0; i < kids.length; i++) out += textOf(kids[i]);
@@ -1459,7 +1459,8 @@
       hyphenate = inheritedCss(el, "hyphens") === "auto";
       h = 0;
       run = "";
-      kids = el.children && el.children.length ? el.children : [{ nodeType: 3, data: textOf(el) }];
+      kids = childNodesOf(el);
+      if (!kids.length) kids = [{ nodeType: 3, data: textOf(el) }];
       for (i = 0; i <= kids.length; i++) {
         if (i < kids.length && (kids[i].nodeType !== 1 || isInline(kids[i]))) {
           run += textOf(kids[i]);
@@ -1502,7 +1503,7 @@
       found = null;
     if (!parent) return 0;
     (function walk(n) {
-      var kids = n.children || [],
+      var kids = childNodesOf(n),
         i,
         c;
       for (i = 0; i < kids.length && found === null; i++) {
@@ -1588,8 +1589,8 @@
     var n, impl;
     impl = {
       appendChild: function (c) {
-        if (!this.children) this.children = [];
-        this.children.push(c);
+        ownChildNodes(this).push(c);
+        syncElementChildren(this);
         if (c) c.parentNode = this;
         if (c && c.tagName === "IFRAME" && c.contentWindow && c.contentWindow !== globalThis) {
           globalThis[0] = c.contentWindow;
@@ -1599,36 +1600,39 @@
         return c;
       },
       insertBefore: function (c, ref) {
-        var i;
+        var i, nodes;
         if (!c) return c;
-        if (!this.children) this.children = [];
-        i = ref ? this.children.indexOf(ref) : -1;
-        if (i < 0) this.children.push(c);
-        else this.children.splice(i, 0, c);
+        nodes = ownChildNodes(this);
+        i = ref ? nodes.indexOf(ref) : -1;
+        if (i < 0) nodes.push(c);
+        else nodes.splice(i, 0, c);
+        syncElementChildren(this);
         c.parentNode = this;
         runScript(c);
         return c;
       },
       removeChild: function (c) {
-        var i;
-        if (!this.children) return c;
-        i = this.children.indexOf(c);
-        if (i >= 0) this.children.splice(i, 1);
+        var nodes = ownChildNodes(this),
+          i = nodes.indexOf(c);
+        if (i >= 0) {
+          nodes.splice(i, 1);
+          syncElementChildren(this);
+        }
         if (c) c.parentNode = null;
         return c;
       },
       contains: function (n) {
-        var i;
+        var i,
+          nodes = childNodesOf(this);
         if (n === this) return true;
-        if (!this.children) return false;
-        for (i = 0; i < this.children.length; i++) {
-          if (this.children[i] === n) return true;
-          if (this.children[i].contains && this.children[i].contains(n)) return true;
+        for (i = 0; i < nodes.length; i++) {
+          if (nodes[i] === n) return true;
+          if (nodes[i].contains && nodes[i].contains(n)) return true;
         }
         return false;
       },
       hasChildNodes: function () {
-        return !!(this.children && this.children.length);
+        return childNodesOf(this).length > 0;
       },
       hasAttributes: function () {
         return !!(this.attributes && this.attributes.length);
@@ -1741,7 +1745,7 @@
       configurable: true,
       enumerable: false,
       get: native("get childNodes", function () {
-        return nodeListFrom(this.children || []);
+        return nodeListFrom(childNodesOf(this));
       }),
     });
     Object.defineProperty(htmlElProto, "firstElementChild", {
@@ -1779,7 +1783,7 @@
       configurable: true,
       enumerable: true,
       get: native("get firstChild", function () {
-        var c = this.children;
+        var c = childNodesOf(this);
         return c && c.length ? c[0] : null;
       }),
     });
@@ -1787,7 +1791,7 @@
       configurable: true,
       enumerable: true,
       get: native("get lastChild", function () {
-        var c = this.children;
+        var c = childNodesOf(this);
         return c && c.length ? c[c.length - 1] : null;
       }),
     });
@@ -1795,14 +1799,14 @@
       configurable: true,
       enumerable: true,
       get: native("get previousSibling", function () {
-        return siblingAt(this, -1);
+        return siblingAt(this, -1, true);
       }),
     });
     Object.defineProperty(htmlElProto, "nextSibling", {
       configurable: true,
       enumerable: true,
       get: native("get nextSibling", function () {
-        return siblingAt(this, 1);
+        return siblingAt(this, 1, true);
       }),
     });
     Object.defineProperty(htmlElProto, "previousElementSibling", {
@@ -2062,10 +2066,29 @@
     return (" " + String((n && n.className) || "") + " ").indexOf(" " + name + " ") >= 0;
   }
 
-  function siblingAt(n, dir) {
+  /* Chrome keeps text nodes in childNodes only; children is the element-only view of it. */
+  function childNodesOf(n) {
+    return (n && (n._ymNodes || n.children)) || [];
+  }
+
+  function ownChildNodes(n) {
+    if (!n.children) n.children = [];
+    if (!n._ymNodes) hide(n, "_ymNodes", n.children.slice());
+    return n._ymNodes;
+  }
+
+  function syncElementChildren(n) {
+    var nodes = n._ymNodes,
+      kids = n.children,
+      i;
+    kids.length = 0;
+    for (i = 0; i < nodes.length; i++) if (nodes[i] && nodes[i].nodeType === 1) kids.push(nodes[i]);
+  }
+
+  function siblingAt(n, dir, anyNode) {
     var p, kids, i;
     p = n && n.parentNode;
-    kids = p && p.children;
+    kids = p && (anyNode ? childNodesOf(p) : p.children);
     if (!kids) return null;
     i = kids.indexOf(n);
     if (i < 0) return null;
