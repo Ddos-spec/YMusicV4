@@ -394,16 +394,6 @@ static int ios_av1_hw(void)
 typedef media_status_t (*mse_mc_get_name_fn)(AMediaCodec *, char **);
 typedef void (*mse_mc_rel_name_fn)(AMediaCodec *, char *);
 
-static int android_decoder_ok(const char *mime)
-{
-    AMediaCodec *c = AMediaCodec_createDecoderByType(mime);
-    int ok = c != NULL;
-    if (c)
-        AMediaCodec_delete(c);
-    __android_log_print(ANDROID_LOG_INFO, "mse-v", "canPlay %s=%d", mime, ok);
-    return ok;
-}
-
 static int android_hw_decoder(const char *mime)
 {
     static mse_mc_get_name_fn get_name;
@@ -452,7 +442,8 @@ static int android_av1_ok(void)
     static int probed, ok;
     if (!probed) {
         probed = 1;
-        ok = android_decoder_ok("video/av01");
+        ok = android_hw_decoder("video/av01") || android_mpc_high();
+        __android_log_print(ANDROID_LOG_INFO, "mse-v", "av1Playable=%d", ok);
     }
     return ok;
 }
