@@ -10,9 +10,12 @@ import io.ymusic.ui.LoginWebViewState
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ObjCSignatureOverride
 import platform.CoreGraphics.CGRectMake
+import platform.Foundation.HTTPMethod
 import platform.Foundation.NSURL
 import platform.Foundation.NSURLRequest
 import platform.WebKit.WKNavigation
+import platform.WebKit.WKNavigationAction
+import platform.WebKit.WKNavigationActionPolicy
 import platform.WebKit.WKNavigationDelegateProtocol
 import platform.WebKit.WKWebView
 import platform.WebKit.WKWebViewConfiguration
@@ -61,8 +64,37 @@ private class LoginNavDelegate(
     private val state: LoginWebViewState,
     private val onPageChanged: () -> Unit,
 ) : NSObject(), WKNavigationDelegateProtocol {
+    private var reissuedUrl: String? = null
+
     // The delegate methods share one ObjC selector family ("webView:…:") — Kotlin sees them as
     // conflicting overloads; the annotation allows the inherited-ObjC collision.
+
+    // The sign-in's final hop (m.youtube.com/signin) is a Universal Link: allowed as a user-gesture
+    // navigation, iOS hands it to the installed YouTube app and the WebView never gets the youtube
+    // cookies. A programmatic loadRequest never opens app links, so re-issue it from code. (The
+    // private "allow without app link" policy value can't cross K/N's strict enum.)
+    @ObjCSignatureOverride
+    override fun webView(
+        webView: WKWebView,
+        decidePolicyForNavigationAction: WKNavigationAction,
+        decisionHandler: (WKNavigationActionPolicy) -> Unit,
+    ) {
+        val request = decidePolicyForNavigationAction.request
+        val url = request.URL
+        val host = url?.host?.lowercase()
+        val isYouTube = host != null && (host == "youtube.com" || host.endsWith(".youtube.com"))
+        val isMainFrame = decidePolicyForNavigationAction.targetFrame?.mainFrame ?: true
+        val urlString = url?.absoluteString
+        if (!isYouTube || !isMainFrame || request.HTTPMethod != "GET" || urlString == reissuedUrl) {
+            if (urlString == reissuedUrl) reissuedUrl = null
+            decisionHandler(WKNavigationActionPolicy.WKNavigationActionPolicyAllow)
+            return
+        }
+        reissuedUrl = urlString
+        decisionHandler(WKNavigationActionPolicy.WKNavigationActionPolicyCancel)
+        webView.loadRequest(request)
+    }
+
     @ObjCSignatureOverride
     override fun webView(webView: WKWebView, didStartProvisionalNavigation: WKNavigation?) {
         state.currentUrl = webView.URL?.absoluteString
