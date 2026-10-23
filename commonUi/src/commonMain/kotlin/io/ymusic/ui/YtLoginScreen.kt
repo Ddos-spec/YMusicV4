@@ -77,12 +77,13 @@ import io.ymusic.ui.resources.switch_account_hint
 import kmpcommon.log.Logger
 import kmpcommon.log.debug
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.stringResource
 import projectcommon.error.Playability
 import projectcommon.error.errorCode
@@ -292,11 +293,13 @@ internal fun YtLoginScreen(
     // Poll the cookie gate while the user signs in. Cookie-only, so polling costs nothing and never
     // disturbs the half-set jar. Stops itself the instant it flips (onComplete pops this screen).
     // The account switcher doesn't poll — the jar is signed in throughout; closing IS completion.
+    // A navigation also wakes it: the hop onto youtube.com is where the auth cookies land.
+    val pageChanged = remember { Channel<Unit>(Channel.CONFLATED) }
     LaunchedEffect(browser, switchAccount) {
         if (browser == null || switchAccount) return@LaunchedEffect
         var done = false
         while (isActive && !done) {
-            delay(LOGIN_POLL_MS)
+            withTimeoutOrNull(LOGIN_POLL_MS) { pageChanged.receive() }
             if (runSuspendCatching { graph.engines.ytLoginStatus() }
                     .onFailure { graph.logger?.fork("login")?.debug { "login poll failed: $it" } }
                     .getOrDefault(false)
@@ -319,7 +322,7 @@ internal fun YtLoginScreen(
                 Text(stringResource(Res.string.signin_unavailable), color = DesignColors.InkMuted)
             }
             url == null -> CenteredBox { CircularProgressIndicator(color = DesignColors.Accent) }
-            else -> browser(url, null, state, {}, Modifier.fillMaxWidth().weight(1f))
+            else -> browser(url, null, state, { pageChanged.trySend(Unit) }, Modifier.fillMaxWidth().weight(1f))
         }
     }
 }
