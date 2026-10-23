@@ -88,6 +88,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
@@ -106,6 +107,8 @@ internal fun FeedbackScreen(graph: AppGraph, onDismiss: () -> Unit) {
     var consented by remember { mutableStateOf(capture == null || reportsEnabled) }
     var report by remember { mutableStateOf<Deferred<String?>?>(null) }
     val deviceId by produceState("", graph) { value = graph.settings.anonymousDeviceId() }
+    val config by remember(graph) { graph.remoteConfig ?: emptyFlow() }.collectAsState(initial = null)
+    val links = AppLinks(config)
     val bundles = graph.runningBundles
     bundles?.engineFlow?.collectAsState()
     bundles?.playerFlow?.collectAsState()
@@ -117,6 +120,8 @@ internal fun FeedbackScreen(graph: AppGraph, onDismiss: () -> Unit) {
         ).joinToString(" · "),
         engine = bundles?.let { "engine ${it.reportedEngine ?: "-"} · player ${it.reportedPlayer ?: "-"}" },
         language = Locale.current.toLanguageTag(),
+        email = links.feedbackEmail,
+        issueUrl = links.feedbackIssue,
     )
     val currentInfo by rememberUpdatedState(info)
     val clipboard = LocalClipboard.current
@@ -202,7 +207,7 @@ internal fun FeedbackScreen(graph: AppGraph, onDismiss: () -> Unit) {
                 val subject = stringResource(Res.string.feedback_email_subject)
                 ContactRow(
                     icon = Icons.Outlined.Email,
-                    title = stringResource(Res.string.feedback_email_title, FEEDBACK_EMAIL),
+                    title = stringResource(Res.string.feedback_email_title, links.feedbackEmail),
                     hint = stringResource(Res.string.feedback_email_hint),
                     onClick = {
                         sendLogs()

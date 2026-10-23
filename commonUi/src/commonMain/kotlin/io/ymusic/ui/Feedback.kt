@@ -10,6 +10,8 @@ internal class FeedbackInfo(
     val app: String,
     val engine: String?,
     val language: String,
+    private val email: String,
+    private val issueUrl: String,
 ) {
     private val lines: String
         get() = listOfNotNull(
@@ -21,17 +23,14 @@ internal class FeedbackInfo(
 
     val text: String get() = "```\n$lines\n```"
 
-    fun githubIssueUrl(): String = "$GITHUB_NEW_ISSUE_URL?body=${percentEncode(prefill(text))}"
+    fun githubIssueUrl(): String = "$issueUrl${if ('?' in issueUrl) '&' else '?'}body=${percentEncode(prefill(text))}"
 
     fun mailtoUrl(subject: String): String =
-        "mailto:$FEEDBACK_EMAIL?subject=${percentEncode(subject)}&body=${percentEncode(prefill(lines))}"
+        "mailto:$email?subject=${percentEncode(subject)}&body=${percentEncode(prefill(lines))}"
 
     /** Leaves room above the info for the user's own words. */
     private fun prefill(info: String): String = "\n\n---\n$info"
 }
-
-internal const val FEEDBACK_EMAIL = "contact@ymusic.io"
-private const val GITHUB_NEW_ISSUE_URL = "https://github.com/ymusic-io/YMusicV4/issues/new"
 
 /** Every byte but RFC 3986 unreserved — `+` stays encoded, which form decoders would read as a space. */
 private fun percentEncode(value: String): String = buildString {

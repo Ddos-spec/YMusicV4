@@ -108,7 +108,6 @@ import io.ymusic.dynamicengine.yt.resolveLink
 import io.ymusic.player.PlayableItem
 import io.ymusic.player.VideoQualityState
 import io.ymusic.player.showsVideo
-import io.ymusic.remoteconfig.RemoteConfigData
 import io.ymusic.settings.AppSettings
 import io.ymusic.settings.flow
 import io.ymusic.settings.put
@@ -898,15 +897,14 @@ private fun AppRoot(
                                     // Donate and Telegram are actions, not screens.
                                     when (s) {
                                         AppSection.Donate -> graph.openDonation?.invoke()
-                                        AppSection.Telegram -> uriHandler.openUri(
-                                            (config ?: RemoteConfigData.DEFAULTS).telegramUrl,
-                                        )
+                                        AppSection.Telegram -> uriHandler.openUri(AppLinks(config).telegram)
                                         else -> openSection(s)
                                     }
                                     scope.launch { drawer.close() }
                                 },
                                 premium = premium,
                                 showDonate = graph.openDonation != null,
+                                websiteUrl = AppLinks(config).website,
                                 updates = graph.updates,
                                 onCheckUpdate = graph.updates?.let {
                                     {

@@ -625,7 +625,11 @@ class YMusicApplication : Application() {
             stats = shared.stats,
             updates = shared.updates,
             premium = premium,
-            openDonation = { resumedActivity?.get()?.let(SupportApp::openDonation) },
+            openDonation = {
+                resumedActivity?.get()?.let { activity ->
+                    SupportApp.openDonation(activity, shared.remoteConfig.config.value.donationUrl, rootLogger)
+                }
+            },
             api = shared.api,
             remoteConfig = shared.remoteConfig.config,
             mediaStore = shared.mediaStore,

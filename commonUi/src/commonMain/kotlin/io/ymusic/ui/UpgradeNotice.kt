@@ -15,8 +15,6 @@ import io.ymusic.ui.resources.upgraded_message
 import io.ymusic.ui.resources.upgraded_view_changelog
 import org.jetbrains.compose.resources.getString
 
-private const val FallbackChangelogUrl = "https://github.com/ymusic-io/YMusicV4/blob/master/CHANGELOG.md"
-
 /**
  * Whether this launch is the first of a newer version. Decided once per process from the last recorded
  * launch; a fresh install (an empty settings store) is never "updated", while an install that predates
@@ -53,8 +51,7 @@ internal fun UpgradeSnackbar(graph: AppGraph, snackbarHostState: SnackbarHostSta
             duration = SnackbarDuration.Long,
         )
         if (result == SnackbarResult.ActionPerformed) {
-            val config = graph.remoteConfig?.replayCache?.lastOrNull()
-            uriHandler.openUri(config?.changelogUrl ?: FallbackChangelogUrl)
+            uriHandler.openUri(AppLinks(graph.remoteConfig?.replayCache?.lastOrNull()).changelog)
         }
     }
 }

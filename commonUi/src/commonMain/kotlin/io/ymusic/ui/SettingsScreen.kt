@@ -213,8 +213,9 @@ fun SettingsScreen(graph: AppGraph, signedIn: Boolean = false, onLogin: () -> Un
             }
             val config by remember(graph) { graph.remoteConfig ?: emptyFlow() }.collectAsState(initial = null)
             config?.changelogUrl?.let { LinkRow(Res.string.settings_changelog, it) }
-            LinkRow(Res.string.settings_source_code, SourceCodeUrl)
-            LinkRow(Res.string.settings_terms, TermsUrl)
+            val links = AppLinks(config)
+            LinkRow(Res.string.settings_source_code, links.sourceCode)
+            LinkRow(Res.string.settings_terms, links.terms)
             LicensesRow()
         }
         SettingsSection(Res.string.settings_debug) {
@@ -320,9 +321,6 @@ private fun AudioFocusRow(graph: AppGraph) {
         }
     }
 }
-
-private const val SourceCodeUrl = "https://github.com/ymusic-io/YMusicV4"
-private const val TermsUrl = "https://github.com/ymusic-io/YMusicV4/blob/master/TERMS.md"
 
 @Composable
 private fun LinkRow(label: StringResource, url: String) {

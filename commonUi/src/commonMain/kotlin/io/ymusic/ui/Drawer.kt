@@ -46,8 +46,6 @@ private val BrandGreenInk: Color @Composable get() = if (DesignColors.isDark) Co
 private val BrandGreenBg: Color @Composable get() = if (DesignColors.isDark) Color(0xFF11301C) else Color(0xFFEAFAF0)
 private val BrandGreenBorder: Color @Composable get() = if (DesignColors.isDark) Color(0xFF1D4A2C) else Color(0xFFCDEED9)
 
-private const val WebsiteUrl = "https://ymusic.io"
-
 /** The navigation drawer (design/final/drawer.html): brand header + three nav sections. */
 @Composable
 fun AppDrawer(
@@ -64,6 +62,7 @@ fun AppDrawer(
     premium: Boolean = false,
     /** Lists Donate (only where a donation screen exists). */
     showDonate: Boolean = false,
+    websiteUrl: String = AppLinks(null).website,
 ) {
     ModalDrawerSheet(
         modifier = Modifier.width(300.dp),
@@ -73,7 +72,7 @@ fun AppDrawer(
         Column(Modifier.fillMaxHeight()) {
             val updateStatus = updates?.status?.collectAsState()?.value
             val updateWaiting = updateStatus is AppUpdateStatus.Offered
-            DrawerHeader(appVersion, premium, onCheckUpdate, updateWaiting)
+            DrawerHeader(appVersion, premium, onCheckUpdate, updateWaiting, websiteUrl)
             HorizontalDivider(color = DesignColors.Divider)
             Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(vertical = 8.dp)) {
                 AppSection.entries
@@ -96,7 +95,7 @@ fun AppDrawer(
 }
 
 @Composable
-private fun DrawerHeader(appVersion: String?, premium: Boolean, onCheckUpdate: (() -> Unit)?, updateWaiting: Boolean) {
+private fun DrawerHeader(appVersion: String?, premium: Boolean, onCheckUpdate: (() -> Unit)?, updateWaiting: Boolean, websiteUrl: String) {
     Column(Modifier.fillMaxWidth().padding(start = 18.dp, end = 18.dp, top = 16.dp, bottom = 13.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Image(
@@ -146,7 +145,7 @@ private fun DrawerHeader(appVersion: String?, premium: Boolean, onCheckUpdate: (
                     }
                 }
             }
-            HeaderLink("ymusic.io") { uriHandler.openUri(WebsiteUrl) }
+            HeaderLink("ymusic.io") { uriHandler.openUri(websiteUrl) }
         }
     }
 }
