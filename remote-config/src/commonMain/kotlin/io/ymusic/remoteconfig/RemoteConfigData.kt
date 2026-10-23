@@ -120,10 +120,22 @@ data class AppUpdate(
 data class RemoteConfigData(
     val variableA: Int = 0,
     val featureX: Boolean = false,
-    /** The drawer's "Telegram announcements" link. */
-    val telegramUrl: String = "https://t.me/ymusic_io",
-    /** Settings › About's "Changelog" link; null hides the row. */
+    /** The drawer's "Telegram announcements" link; null = the app's built-in one. */
+    val telegramUrl: String? = null,
+    /** Settings › About's "Changelog" link; null hides the row (the "updated" notice uses the app's built-in one). */
     val changelogUrl: String? = null,
+    /** The drawer header's website link; null = the app's built-in one. */
+    val websiteUrl: String? = null,
+    /** The Feedback screen's email address; null = the app's built-in one. */
+    val feedbackEmail: String? = null,
+    /** The Feedback screen's "new issue" page (the info is added as a `body` query parameter); null = the app's built-in one. */
+    val feedbackIssueUrl: String? = null,
+    /** Settings › About's "Source code" link; null = the app's built-in one. */
+    val sourceCodeUrl: String? = null,
+    /** Settings › About's "Terms" link; null = the app's built-in one. */
+    val termsUrl: String? = null,
+    /** Where "Donate" opens when the supporter app isn't installed; null = its store page. */
+    val donationUrl: String? = null,
     /** The official download site, where a failed or impossible in-app update sends the user. */
     val downloadPageUrl: String? = null,
     val appUpdate: AppUpdate? = null,
@@ -140,6 +152,12 @@ data class RemoteConfigData(
         private const val KEY_FEATURE_X = "featureX"
         private const val KEY_TELEGRAM_URL = "telegramUrl"
         private const val KEY_CHANGELOG_URL = "changelogUrl"
+        private const val KEY_WEBSITE_URL = "websiteUrl"
+        private const val KEY_FEEDBACK_EMAIL = "feedbackEmail"
+        private const val KEY_FEEDBACK_ISSUE_URL = "feedbackIssueUrl"
+        private const val KEY_SOURCE_CODE_URL = "sourceCodeUrl"
+        private const val KEY_TERMS_URL = "termsUrl"
+        private const val KEY_DONATION_URL = "donationUrl"
         private const val KEY_DOWNLOAD_PAGE_URL = "downloadPageUrl"
         private const val KEY_APP_UPDATE = "appUpdate"
         private const val KEY_ENGINE_JS = "engineJs"
@@ -159,8 +177,14 @@ data class RemoteConfigData(
             return RemoteConfigData(
                 variableA = features?.intOrNull(KEY_VARIABLE_A) ?: DEFAULTS.variableA,
                 featureX = features?.boolOrNull(KEY_FEATURE_X) ?: DEFAULTS.featureX,
-                telegramUrl = features?.stringOrNull(KEY_TELEGRAM_URL) ?: DEFAULTS.telegramUrl,
+                telegramUrl = features?.stringOrNull(KEY_TELEGRAM_URL),
                 changelogUrl = features?.stringOrNull(KEY_CHANGELOG_URL),
+                websiteUrl = features?.stringOrNull(KEY_WEBSITE_URL),
+                feedbackEmail = features?.stringOrNull(KEY_FEEDBACK_EMAIL),
+                feedbackIssueUrl = features?.stringOrNull(KEY_FEEDBACK_ISSUE_URL),
+                sourceCodeUrl = features?.stringOrNull(KEY_SOURCE_CODE_URL),
+                termsUrl = features?.stringOrNull(KEY_TERMS_URL),
+                donationUrl = features?.stringOrNull(KEY_DONATION_URL),
                 downloadPageUrl = features?.stringOrNull(KEY_DOWNLOAD_PAGE_URL),
                 appUpdate = root.objectOrNull(KEY_APP_UPDATE)?.let(AppUpdate::from),
                 engineJs = root.objectOrNull(KEY_ENGINE_JS)?.let(BundleVersion::from),
@@ -174,8 +198,14 @@ data class RemoteConfigData(
             name(KEY_FEATURES).beginObject()
             name(KEY_VARIABLE_A).value(data.variableA)
             name(KEY_FEATURE_X).value(data.featureX)
-            name(KEY_TELEGRAM_URL).value(data.telegramUrl)
+            data.telegramUrl?.let { name(KEY_TELEGRAM_URL).value(it) }
             data.changelogUrl?.let { name(KEY_CHANGELOG_URL).value(it) }
+            data.websiteUrl?.let { name(KEY_WEBSITE_URL).value(it) }
+            data.feedbackEmail?.let { name(KEY_FEEDBACK_EMAIL).value(it) }
+            data.feedbackIssueUrl?.let { name(KEY_FEEDBACK_ISSUE_URL).value(it) }
+            data.sourceCodeUrl?.let { name(KEY_SOURCE_CODE_URL).value(it) }
+            data.termsUrl?.let { name(KEY_TERMS_URL).value(it) }
+            data.donationUrl?.let { name(KEY_DONATION_URL).value(it) }
             data.downloadPageUrl?.let { name(KEY_DOWNLOAD_PAGE_URL).value(it) }
             endObject()
             data.appUpdate?.let { name(KEY_APP_UPDATE).value(it) }
