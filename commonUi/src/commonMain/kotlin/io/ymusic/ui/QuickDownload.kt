@@ -114,6 +114,7 @@ internal fun QuickDownloadHost(graph: AppGraph, pending: YtFeedItem?, format: Do
     val saved = graph.quickDownload.collectAsState().value
     val preset = if (format != null && format != saved.format) saved.copy(format = format, height = null) else saved
     val snackbar = LocalSnackbar.current
+    val scans = LocalScanController.current
     val added = stringResource(Res.string.download_added)
     val alreadyDownloaded = video.id in LocalAvailableOffline.current
     var confirmed by remember(video.id) { mutableStateOf(false) }
@@ -123,7 +124,7 @@ internal fun QuickDownloadHost(graph: AppGraph, pending: YtFeedItem?, format: Do
     }
     LaunchedEffect(video) {
         val gated = graph.mediaStore != null && graph.libraryFolderPicker != null
-        if (!gated || hasUsableDownloadLocation(graph) || pickDownloadFolder(graph, snackbar)) {
+        if (!gated || hasUsableDownloadLocation(graph) || pickDownloadFolder(graph, snackbar, scans)) {
             downloads.enqueue(preset.request(video, graph.mp3SourceBitrate()))
             snackbar(added)
         }

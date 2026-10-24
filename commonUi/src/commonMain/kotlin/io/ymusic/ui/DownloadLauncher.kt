@@ -58,6 +58,7 @@ internal fun DownloadDialogHost(graph: AppGraph, pending: YtFeedItem?, onDismiss
     val downloads = graph.downloads ?: return
     val video = pending ?: return
     val snackbar = LocalSnackbar.current
+    val scans = LocalScanController.current
 
     // Gate: the saved download location must still point at a Library folder. If it's unset — or its
     // folder was removed/excluded — go straight to the OS folder picker; a pick sets the location (this
@@ -69,7 +70,7 @@ internal fun DownloadDialogHost(graph: AppGraph, pending: YtFeedItem?, onDismiss
         when (usable) {
             null -> return // validating — render nothing yet
             false -> {
-                LaunchedEffect(video) { if (!pickDownloadFolder(graph, snackbar)) onDismiss() }
+                LaunchedEffect(video) { if (!pickDownloadFolder(graph, snackbar, scans)) onDismiss() }
                 return
             }
             true -> Unit // fall through to the format dialog
@@ -101,7 +102,7 @@ internal fun DownloadDialogHost(graph: AppGraph, pending: YtFeedItem?, onDismiss
     val alreadyDownloaded = video.id in LocalAvailableOffline.current
     var confirming by remember(video.id) { mutableStateOf(false) }
     val onDownload = { if (alreadyDownloaded) confirming = true else start() }
-    val onPickLocation: () -> Unit = { scope.launch { pickDownloadFolder(graph, snackbar) } }
+    val onPickLocation: () -> Unit = { scope.launch { pickDownloadFolder(graph, snackbar, scans) } }
     val onRetry: () -> Unit = { scope.launch { state.load(log) } }
     // Signed out: sign in, then reopen these options for a fresh probe under the account.
     val signIn = LocalSignInResolver.current?.takeIf { !it.signedIn }
