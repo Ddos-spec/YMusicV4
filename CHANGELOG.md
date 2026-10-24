@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 4.0.12
 
 ### NEW
 - Share YouTube videos, playlists, channels and albums as a link, from their rows, the queue, Now Playing, video details and the playlist page, through the system share sheet on Android and iOS ([#45](https://github.com/ymusic-io/YMusicV4/issues/45), [#19](https://github.com/ymusic-io/YMusicV4/issues/19), [#38](https://github.com/ymusic-io/YMusicV4/issues/38), [#34](https://github.com/ymusic-io/YMusicV4/issues/34), [bb47fdbc3](https://github.com/ymusic-io/YMusicV4/commit/bb47fdbc3996ef21f7f632b34396239c75cca4ad), [1b1f38c54](https://github.com/ymusic-io/YMusicV4/commit/1b1f38c54337a535c24486cc0a3cd80f9490b0f1), [6ab637c6f](https://github.com/ymusic-io/YMusicV4/commit/6ab637c6f428a13bf4cfd34bcdd93fe33bed59c3), [c46da11a5](https://github.com/ymusic-io/YMusicV4/commit/c46da11a5108c5b49dbd80502476cbb23352a170), [057bc5ef4](https://github.com/ymusic-io/YMusicV4/commit/057bc5ef46ad68780ae88594001160b04e5111ac))
