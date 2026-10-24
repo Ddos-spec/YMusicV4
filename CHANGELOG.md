@@ -14,6 +14,7 @@
 - Subscribe / Unsubscribe from a channel row's menu when signed in ([bb47fdbc3](https://github.com/ymusic-io/YMusicV4/commit/bb47fdbc3996ef21f7f632b34396239c75cca4ad))
 
 ### FIXED
+- Android: playback crashed on some phones, mostly on Android 15 and custom ROMs, while setting the cover art for the media notification ([#75](https://github.com/ymusic-io/YMusicV4/issues/75), [#49](https://github.com/ymusic-io/YMusicV4/issues/49), [135b8830c](https://github.com/ymusic-io/YMusicV4/commit/135b8830cddbabb67ea11484a700ab7b9125823c))
 - macOS 11: the app crashed at launch ([#54](https://github.com/ymusic-io/YMusicV4/issues/54), [8f5c41c32](https://github.com/ymusic-io/YMusicV4/commit/8f5c41c32ce1fdd195ae0d3b84a86d14e672d308))
 - iOS: YouTube sign-in never finished when the YouTube app was installed ([594e70005](https://github.com/ymusic-io/YMusicV4/commit/594e7000569ac4bcf4adfde93d5f6f1d016b882f))
 - Android: 1080p and higher videos dropped frames, froze while the audio played on, and heated up phones without a hardware AV1 decoder ([#52](https://github.com/ymusic-io/YMusicV4/issues/52), [e1a2ffdc1](https://github.com/ymusic-io/YMusicV4/commit/e1a2ffdc1964de2bfb803237f0262b04b74dbc12))
