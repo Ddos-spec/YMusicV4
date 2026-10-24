@@ -228,6 +228,14 @@ class DownloadService(
         }
     }
 
+    /** Point a completed task at its file's new uri, after the file was renamed or moved outside the service. */
+    suspend fun relocate(id: String, fileUri: String) {
+        val task = store.get(id)?.takeIf { it.state == DownloadState.COMPLETED } ?: return
+        val bytes = task.totalBytes ?: task.downloadedBytes
+        store.updateCompleted(id, fileUri, bytes, now())
+        _changes.emit(DownloadChange.Completed(id, fileUri, bytes))
+    }
+
     /** Global pause: hold the whole queue — stop every active download and every queued task. */
     fun pauseAll() {
         command(null) {
