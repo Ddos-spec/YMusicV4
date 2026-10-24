@@ -87,6 +87,9 @@ type MoviePlayer = {
   "getPlaybackQuality"(): string;
   "getUserPlaybackQualityPreference"(): string;
   "getAvailableQualityData"(): unknown;
+  "getAvailableAudioTracks"?(): unknown;
+  "getAudioTrack"?(): unknown;
+  "setAudioTrack"?(track: unknown): unknown;
   "loadVideoById"(id: string | Record<string, unknown>): unknown;
   "getVideoData"(): Record<string, unknown>;
   "preloadVideoByPlayerVars"(
@@ -164,6 +167,11 @@ function bindPlaybackQualityChange(player: MoviePlayer): void {
   player["addEventListener"]("onPlaybackQualityChange", function () {
     notifyCatalog();
   });
+}
+
+function bindAudioTrackChange(player: MoviePlayer): void {
+  player["addEventListener"]("onPlaybackAudioChange", notifyCatalog);
+  player["addEventListener"]("onVideoDataChange", notifyCatalog);
 }
 
 function bindStateChange(player: MoviePlayer): void {
@@ -284,6 +292,7 @@ function bindMoviePlayerApi(): void {
   iframeListenBound = true;
   bindPictureSize(player);
   bindPlaybackQualityChange(player);
+  bindAudioTrackChange(player);
   bindStateChange(player);
   bindVideoProgress(player);
   bindHtmlMediaEvents();
@@ -1487,7 +1496,24 @@ class Player {
       "qualities": this.qualityOptions(),
       "caption": selectedCaptionVss(),
       "captionTracks": captionTrackRows(),
+      "audioTrack": selectedAudioTrackId(player),
+      "audioTracks": audioTrackRows(player),
     };
+  }
+
+  setAudioTrack(id: string): void {
+    const player = moviePlayer();
+    if (!player) throw new JsEngineErrorImpl("setAudioTrack: no movie_player", "E20085");
+    const tracks = availableAudioTracks(player);
+    for (let i = 0; i < tracks.length; i++) {
+      const track = tracks[i]!;
+      if (track["id"] === id && player["setAudioTrack"]) {
+        player["setAudioTrack"](track);
+        notifyCatalog();
+        return;
+      }
+    }
+    throw new JsEngineErrorImpl("setAudioTrack: no audio track " + id, "E20162");
   }
 
   status(): Record<string, unknown> {
@@ -1540,6 +1566,50 @@ class Player {
   }
 }
 
+function availableAudioTracks(player: MoviePlayer): Record<string, unknown>[] {
+  const list = player["getAvailableAudioTracks"] ? player["getAvailableAudioTracks"]() : null;
+  const out: Record<string, unknown>[] = [];
+  if (!Array.isArray(list)) return out;
+  for (let i = 0; i < list.length; i++) {
+    const track = asRec(list[i]);
+    if (track && typeof track["id"] === "string") out.push(track);
+  }
+  return out;
+}
+
+/** base.js minifies the field holding a track's {id, name, isDefault}, so it is found by shape. */
+function audioTrackInfo(track: Record<string, unknown>): Record<string, unknown> | null {
+  for (const key in track) {
+    const info = asRec(track[key]);
+    if (info && typeof info["name"] === "string" && typeof info["isDefault"] === "boolean")
+      return info;
+  }
+  return null;
+}
+
+/** Empty for a single-track video: there is nothing to pick. */
+function audioTrackRows(player: MoviePlayer): Record<string, unknown>[] {
+  const tracks = availableAudioTracks(player);
+  const rows: Record<string, unknown>[] = [];
+  if (tracks.length < 2) return rows;
+  for (let i = 0; i < tracks.length; i++) {
+    const info = audioTrackInfo(tracks[i]!);
+    if (!info) return [];
+    rows.push({
+      "id": tracks[i]!["id"],
+      "displayName": info["name"],
+      "isDefault": info["isDefault"],
+    });
+  }
+  return rows;
+}
+
+function selectedAudioTrackId(player: MoviePlayer): string | null {
+  const track = asRec(player["getAudioTrack"] ? player["getAudioTrack"]() : null);
+  const id = track ? track["id"] : null;
+  return typeof id === "string" ? id : null;
+}
+
 const ytPlayer = new Player();
 
 export function initPlayer(): Promise<Record<string, unknown>> {
@@ -1563,6 +1633,10 @@ export function setPlayerQuality(quality: string, audioOnly: boolean): void {
 
 export function mintPlayerPo(videoId: string): Promise<Record<string, unknown>> {
   return ytPlayer.mintPo(videoId);
+}
+
+export function setPlayerAudioTrack(id: string): void {
+  ytPlayer.setAudioTrack(id);
 }
 
 export function playPlayer(): void {

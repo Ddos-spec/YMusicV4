@@ -1,7 +1,7 @@
 // App-facing player commands. init warms the singleton WEB player; load stamps the video id and
 // calls loadVideoById (returns immediately). Host observes:
 //   listen/player/status  — event groups: progress | state | picture
-//   listen/player/catalog — qualities
+//   listen/player/catalog — qualities, captions, audio tracks
 // play/pause/seek/stop are playVideo/pauseVideo/seekTo/stopVideo.
 
 import { onAccept } from "../transport";
@@ -15,6 +15,7 @@ import {
   pausePlayer,
   playPlayer,
   seekPlayer,
+  setPlayerAudioTrack,
   setPlayerLoop,
   setPlayerQuality,
   setPlayerSpeed,
@@ -187,6 +188,18 @@ onAccept(
     const audioOnly = a["audioOnly"] === true;
     setPlayerQuality(quality, audioOnly);
     const p = out.writeObjectAsJson({ "ok": true, "quality": quality, "audioOnly": audioOnly });
+    if (p) await p;
+  }),
+);
+
+onAccept(
+  "player/setAudioTrack",
+  commandHandler(async (src, out) => {
+    const a = await src.readJsonObject();
+    const id = String(a["id"] ?? "");
+    if (!id) throw new JsEngineErrorImpl("player/setAudioTrack missing id", "E20163");
+    setPlayerAudioTrack(id);
+    const p = out.writeObjectAsJson({ "ok": true, "id": id });
     if (p) await p;
   }),
 );
