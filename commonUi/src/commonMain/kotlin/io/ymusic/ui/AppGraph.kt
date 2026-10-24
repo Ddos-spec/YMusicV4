@@ -130,8 +130,6 @@ class AppGraph(
     val revealInFolder: (suspend (uri: String) -> Unit)? = null,
     /** Opens the system share sheet with a text (a link). Null = the UI copies it to the clipboard instead. */
     val shareText: ((text: String) -> Unit)? = null,
-    /** Opens the system share sheet with a media file by its uri; null hides "Share" on local files. */
-    val shareFile: ((uri: String, mimeType: String) -> Unit)? = null,
     /** Renames downloaded files in place (Downloads' "Rename"); null hides the action. */
     val fileRenaming: FileRenaming? = null,
     /** Display version for the drawer header (e.g. "4.0.1 · arm64"); null hides the line. */

@@ -636,14 +636,7 @@ class YMusicApplication : Application() {
             shareText = { text ->
                 startShare(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text))
             },
-            shareFile = { uri, mimeType ->
-                startShare(
-                    Intent(Intent.ACTION_SEND)
-                        .setType(mimeType)
-                        .putExtra(Intent.EXTRA_STREAM, android.net.Uri.parse(uri))
-                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION),
-                )
-            },
+            fileRenaming = AndroidFileRenaming(contentResolver),
             api = shared.api,
             remoteConfig = shared.remoteConfig.config,
             mediaStore = shared.mediaStore,
