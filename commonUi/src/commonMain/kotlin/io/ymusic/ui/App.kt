@@ -1225,6 +1225,7 @@ private fun AppRoot(
             }
             CompositionLocalProvider(
                 LocalSnackbar provides showSnackbar,
+                LocalScanController provides scanController,
                 LocalDownloadLauncher provides downloadLauncher,
                 LocalAvailableOffline provides availableOffline,
                 LocalYtPlaylistActions provides ytPlaylistActions,

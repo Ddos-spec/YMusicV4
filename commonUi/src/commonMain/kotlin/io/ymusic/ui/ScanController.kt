@@ -36,23 +36,39 @@ internal class ScanController(private val scope: CoroutineScope, private val log
     private val _summaries = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val summaries: SharedFlow<String> = _summaries.asSharedFlow()
 
-    /** Start [action] unless one is already running; its summary (or error) surfaces on [summaries]. */
+    private val queued = mutableListOf<ScanAction>()
+
+    /** Start [action], or queue it behind the running scan; each one's summary (or error) surfaces on [summaries]. */
     fun start(action: ScanAction) {
-        if (running) return
+        if (running) {
+            queued += action
+            return
+        }
         running = true
-        scanned = null
         scope.launch {
             try {
-                action { count -> scanned = count }?.let { _summaries.tryEmit(summaryOf(it)) }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                log?.captureError(e, "library scan failed")
-                _summaries.tryEmit(getString(Res.string.library_scan_failed, e.errorCode() ?: e.message ?: "$e"))
+                var next: ScanAction? = action
+                while (next != null) {
+                    run(next)
+                    next = if (queued.isEmpty()) null else queued.removeAt(0)
+                }
             } finally {
+                queued.clear()
                 running = false
                 scanned = null
             }
+        }
+    }
+
+    private suspend fun run(action: ScanAction) {
+        scanned = null
+        try {
+            action { count -> scanned = count }?.let { _summaries.tryEmit(summaryOf(it)) }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            log?.captureError(e, "library scan failed")
+            _summaries.tryEmit(getString(Res.string.library_scan_failed, e.errorCode() ?: e.message ?: "$e"))
         }
     }
 }
