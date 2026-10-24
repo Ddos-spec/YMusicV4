@@ -555,6 +555,7 @@
     <string name="video_details_delete_message">Трајно избрисати ваш коментар и све одговоре на њега?</string>
     <string name="video_details_deleted">Коментар је избрисан</string>
     <string name="menu_details_comments">Детаљи и коментари</string>
+    <string name="menu_search_lyrics">Претражи текст песме</string>
     <string name="menu_speed_pitch">Брзина и висина тона</string>
     <string name="link_open_failed">Није могуће отворити: %1$s</string>
     <string name="sort_manual">Ручно</string>

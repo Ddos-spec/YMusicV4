@@ -550,6 +550,7 @@
     <string name="video_details_delete_message">Yorumunuz ve tüm yanıtları kalıcı olarak silinsin mi?</string>
     <string name="video_details_deleted">Yorum silindi</string>
     <string name="menu_details_comments">Ayrıntılar ve yorumlar</string>
+    <string name="menu_search_lyrics">Şarkı sözlerini ara</string>
     <string name="menu_speed_pitch">Hız ve perde</string>
     <string name="link_open_failed">Açılamıyor: %1$s</string>
     <string name="sort_manual">Manuel</string>

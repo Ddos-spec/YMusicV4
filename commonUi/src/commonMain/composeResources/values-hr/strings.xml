@@ -555,6 +555,7 @@
     <string name="video_details_delete_message">Trajno izbrisati vaš komentar i sve odgovore na njega?</string>
     <string name="video_details_deleted">Komentar izbrisan</string>
     <string name="menu_details_comments">Detalji i komentari</string>
+    <string name="menu_search_lyrics">Traži tekst pjesme</string>
     <string name="menu_speed_pitch">Brzina i visina tona</string>
     <string name="link_open_failed">Nije moguće otvoriti: %1$s</string>
     <string name="sort_manual">Ručno</string>

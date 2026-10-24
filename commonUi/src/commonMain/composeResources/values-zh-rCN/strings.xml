@@ -545,6 +545,7 @@
     <string name="video_details_delete_message">要永久删除你的评论及其所有回复吗？</string>
     <string name="video_details_deleted">评论已删除</string>
     <string name="menu_details_comments">详情和评论</string>
+    <string name="menu_search_lyrics">搜索歌词</string>
     <string name="menu_speed_pitch">速度和音调</string>
     <string name="link_open_failed">无法打开：%1$s</string>
     <string name="sort_manual">手动</string>

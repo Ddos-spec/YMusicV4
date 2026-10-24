@@ -550,6 +550,7 @@
     <string name="video_details_delete_message">Skrap jou kommentaar en al sy antwoorde permanent?</string>
     <string name="video_details_deleted">Kommentaar geskrap</string>
     <string name="menu_details_comments">Besonderhede en kommentaar</string>
+    <string name="menu_search_lyrics">Soek lirieke</string>
     <string name="menu_speed_pitch">Spoed en toonhoogte</string>
     <string name="link_open_failed">Kan nie oopmaak nie: %1$s</string>
     <string name="sort_manual">Handmatig</string>

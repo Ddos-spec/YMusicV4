@@ -550,6 +550,7 @@
     <string name="video_details_delete_message">Да се изтрият ли окончателно коментарът ви и всички отговори към него?</string>
     <string name="video_details_deleted">Коментарът е изтрит</string>
     <string name="menu_details_comments">Подробности и коментари</string>
+    <string name="menu_search_lyrics">Търсене на текста</string>
     <string name="menu_speed_pitch">Скорост и тон</string>
     <string name="link_open_failed">Не може да се отвори: %1$s</string>
     <string name="sort_manual">Ръчно</string>

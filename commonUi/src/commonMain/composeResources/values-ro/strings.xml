@@ -555,6 +555,7 @@
     <string name="video_details_delete_message">Ștergi definitiv comentariul și toate răspunsurile la acesta?</string>
     <string name="video_details_deleted">Comentariu șters</string>
     <string name="menu_details_comments">Detalii și comentarii</string>
+    <string name="menu_search_lyrics">Caută versurile</string>
     <string name="menu_speed_pitch">Viteză și tonalitate</string>
     <string name="link_open_failed">Nu se poate deschide: %1$s</string>
     <string name="sort_manual">Manual</string>

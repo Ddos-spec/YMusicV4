@@ -560,6 +560,7 @@
     <string name="video_details_delete_message">Trvale smazat váš komentář a všechny odpovědi na něj?</string>
     <string name="video_details_deleted">Komentář smazán</string>
     <string name="menu_details_comments">Podrobnosti a komentáře</string>
+    <string name="menu_search_lyrics">Vyhledat text písně</string>
     <string name="menu_speed_pitch">Rychlost a výška tónu</string>
     <string name="link_open_failed">Nelze otevřít: %1$s</string>
     <string name="sort_manual">Ručně</string>

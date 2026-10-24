@@ -68,6 +68,7 @@ import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.GraphicEq
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Lyrics
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Speed
@@ -113,6 +114,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -183,6 +185,7 @@ import io.ymusic.ui.resources.menu_details_comments
 import io.ymusic.ui.resources.menu_go_to_album
 import io.ymusic.ui.resources.menu_go_to_artist
 import io.ymusic.ui.resources.menu_reload_player
+import io.ymusic.ui.resources.menu_search_lyrics
 import io.ymusic.ui.resources.menu_speed_pitch
 import io.ymusic.ui.resources.menu_start_radio
 import io.ymusic.ui.resources.playback_add_folder_again
@@ -1353,6 +1356,7 @@ private fun PlayerMoreMenu(coordinator: PlaybackCoordinator) {
     val shareVideoId by produceState<String?>(null, current) {
         value = current?.let { queueVideoIds(coordinator.graph, listOf(it)).firstOrNull() }
     }
+    val uriHandler = LocalUriHandler.current
     val ytPlaylists = LocalYtPlaylistActions.current
     val shareYoutube = LocalShareYoutube.current
     val snackbar = LocalSnackbar.current
@@ -1393,7 +1397,13 @@ private fun PlayerMoreMenu(coordinator: PlaybackCoordinator) {
                     }
                 }
             }
-            if (video != null || ytPlaylists != null || shareVideoId != null) MoreMenuDivider()
+            if (current != null) {
+                MoreMenuItem(Icons.Outlined.Lyrics, stringResource(Res.string.menu_search_lyrics)) {
+                    uriHandler.openUri(lyricsSearchUrl(current))
+                    open = false
+                }
+            }
+            if (ytPlaylists != null || current != null) MoreMenuDivider()
             MoreMenuItem(
                 Icons.Outlined.Speed,
                 stringResource(Res.string.menu_speed_pitch),
@@ -1460,6 +1470,13 @@ private fun PlayerMoreMenu(coordinator: PlaybackCoordinator) {
     if (eqOpen) {
         EqualizerFxSheet(coordinator.graph, onDismiss = { eqOpen = false })
     }
+}
+
+/** A YouTube item's artist is the uploading channel, which only muddies the search. */
+private fun lyricsSearchUrl(item: PlayableItem): String {
+    val artist = (item as? PlayableItem.LocalMedia)?.artist
+    val query = listOfNotNull(artist, item.displayTitle, "lyrics").joinToString(" ")
+    return "https://www.google.com/search?q=${percentEncode(query)}"
 }
 
 /** 3dp track, orange fill, 13dp orange thumb; the m:ss / h:mm:ss labels underneath. */

@@ -550,6 +550,7 @@
     <string name="video_details_delete_message">আপনার মন্তব্য এবং এর সব উত্তর স্থায়ীভাবে মুছবেন?</string>
     <string name="video_details_deleted">মন্তব্য মুছে ফেলা হয়েছে</string>
     <string name="menu_details_comments">বিবরণ ও মন্তব্য</string>
+    <string name="menu_search_lyrics">গানের কথা খুঁজুন</string>
     <string name="menu_speed_pitch">গতি ও পিচ</string>
     <string name="link_open_failed">খোলা যাচ্ছে না: %1$s</string>
     <string name="sort_manual">ম্যানুয়াল</string>

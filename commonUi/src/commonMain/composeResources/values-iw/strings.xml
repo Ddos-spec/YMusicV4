@@ -555,6 +555,7 @@
     <string name="video_details_delete_message">למחוק לצמיתות את התגובה שלך ואת כל התשובות לה?</string>
     <string name="video_details_deleted">התגובה נמחקה</string>
     <string name="menu_details_comments">פרטים ותגובות</string>
+    <string name="menu_search_lyrics">חיפוש מילות השיר</string>
     <string name="menu_speed_pitch">מהירות וגובה צליל</string>
     <string name="link_open_failed">לא ניתן לפתוח: %1$s</string>
     <string name="sort_manual">ידני</string>

@@ -550,6 +550,7 @@
     <string name="video_details_delete_message">Permanenteng i-delete ang iyong komento at lahat ng sagot dito?</string>
     <string name="video_details_deleted">Na-delete ang komento</string>
     <string name="menu_details_comments">Mga detalye at komento</string>
+    <string name="menu_search_lyrics">Hanapin ang lyrics</string>
     <string name="menu_speed_pitch">Bilis at pitch</string>
     <string name="link_open_failed">Hindi mabuksan: %1$s</string>
     <string name="sort_manual">Manual</string>

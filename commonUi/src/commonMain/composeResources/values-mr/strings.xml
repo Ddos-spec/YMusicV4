@@ -550,6 +550,7 @@
     <string name="video_details_delete_message">तुमची टिप्पणी आणि तिची सर्व उत्तरे कायमची हटवायची?</string>
     <string name="video_details_deleted">टिप्पणी हटवली</string>
     <string name="menu_details_comments">तपशील आणि टिप्पण्या</string>
+    <string name="menu_search_lyrics">गाण्याचे बोल शोधा</string>
     <string name="menu_speed_pitch">वेग आणि पिच</string>
     <string name="link_open_failed">उघडता येत नाही: %1$s</string>
     <string name="sort_manual">मॅन्युअल</string>

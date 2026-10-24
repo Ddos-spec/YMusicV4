@@ -641,6 +641,7 @@
     <string name="link_queued_next">سيتم تشغيله تاليًا</string>
     <string name="link_queued_last">تمت الإضافة إلى نهاية قائمة الانتظار</string>
     <string name="menu_details_comments">التفاصيل والتعليقات</string>
+    <string name="menu_search_lyrics">البحث عن الكلمات</string>
     <string name="menu_speed_pitch">السرعة وطبقة الصوت</string>
     <string name="playlist_menu_import_device">استيراد من الجهاز</string>
     <string name="playlist_menu_backup">نسخ قوائم التشغيل احتياطيًا</string>

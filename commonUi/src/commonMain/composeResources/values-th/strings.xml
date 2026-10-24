@@ -545,6 +545,7 @@
     <string name="video_details_delete_message">ลบความคิดเห็นของคุณและการตอบกลับทั้งหมดอย่างถาวรไหม</string>
     <string name="video_details_deleted">ลบความคิดเห็นแล้ว</string>
     <string name="menu_details_comments">รายละเอียดและความคิดเห็น</string>
+    <string name="menu_search_lyrics">ค้นหาเนื้อเพลง</string>
     <string name="menu_speed_pitch">ความเร็วและระดับเสียง</string>
     <string name="link_open_failed">เปิดไม่ได้: %1$s</string>
     <string name="sort_manual">กำหนดเอง</string>

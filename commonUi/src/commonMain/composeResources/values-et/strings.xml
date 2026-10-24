@@ -550,6 +550,7 @@
     <string name="video_details_delete_message">Kas kustutada sinu kommentaar ja kõik selle vastused jäädavalt?</string>
     <string name="video_details_deleted">Kommentaar kustutatud</string>
     <string name="menu_details_comments">Üksikasjad ja kommentaarid</string>
+    <string name="menu_search_lyrics">Otsi laulusõnu</string>
     <string name="menu_speed_pitch">Kiirus ja helikõrgus</string>
     <string name="link_open_failed">Ei saa avada: %1$s</string>
     <string name="sort_manual">Käsitsi</string>

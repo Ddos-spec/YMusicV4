@@ -550,6 +550,7 @@
     <string name="video_details_delete_message">ನಿಮ್ಮ ಕಾಮೆಂಟ್ ಮತ್ತು ಅದರ ಎಲ್ಲಾ ಪ್ರತ್ಯುತ್ತರಗಳನ್ನು ಶಾಶ್ವತವಾಗಿ ಅಳಿಸಬೇಕೇ?</string>
     <string name="video_details_deleted">ಕಾಮೆಂಟ್ ಅಳಿಸಲಾಗಿದೆ</string>
     <string name="menu_details_comments">ವಿವರಗಳು ಮತ್ತು ಕಾಮೆಂಟ್‌ಗಳು</string>
+    <string name="menu_search_lyrics">ಹಾಡಿನ ಸಾಹಿತ್ಯ ಹುಡುಕಿ</string>
     <string name="menu_speed_pitch">ವೇಗ ಮತ್ತು ಪಿಚ್</string>
     <string name="link_open_failed">ತೆರೆಯಲು ಸಾಧ್ಯವಿಲ್ಲ: %1$s</string>
     <string name="sort_manual">ಹಸ್ತಚಾಲಿತ</string>

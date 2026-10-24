@@ -545,6 +545,7 @@
     <string name="video_details_delete_message">要永久刪除你的留言及所有回覆嗎？</string>
     <string name="video_details_deleted">已刪除留言</string>
     <string name="menu_details_comments">詳細資料和留言</string>
+    <string name="menu_search_lyrics">搜尋歌詞</string>
     <string name="menu_speed_pitch">速度和音高</string>
     <string name="link_open_failed">無法開啟：%1$s</string>
     <string name="sort_manual">手動</string>

@@ -555,6 +555,7 @@
     <string name="video_details_delete_message">Vols suprimir permanentment el teu comentari i totes les respostes?</string>
     <string name="video_details_deleted">Comentari suprimit</string>
     <string name="menu_details_comments">Detalls i comentaris</string>
+    <string name="menu_search_lyrics">Cerca la lletra</string>
     <string name="menu_speed_pitch">Velocitat i to</string>
     <string name="link_open_failed">No es pot obrir: %1$s</string>
     <string name="sort_manual">Manual</string>

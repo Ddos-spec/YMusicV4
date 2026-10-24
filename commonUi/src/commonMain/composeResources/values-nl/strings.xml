@@ -550,6 +550,7 @@
     <string name="video_details_delete_message">Je reactie en alle antwoorden erop definitief verwijderen?</string>
     <string name="video_details_deleted">Reactie verwijderd</string>
     <string name="menu_details_comments">Details en reacties</string>
+    <string name="menu_search_lyrics">Songtekst zoeken</string>
     <string name="menu_speed_pitch">Snelheid en toonhoogte</string>
     <string name="link_open_failed">Kan niet openen: %1$s</string>
     <string name="sort_manual">Handmatig</string>

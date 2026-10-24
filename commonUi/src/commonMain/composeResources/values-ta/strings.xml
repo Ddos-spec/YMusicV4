@@ -550,6 +550,7 @@
     <string name="video_details_delete_message">உங்கள் கருத்தையும் அதன் எல்லாப் பதில்களையும் நிரந்தரமாக நீக்கவா?</string>
     <string name="video_details_deleted">கருத்து நீக்கப்பட்டது</string>
     <string name="menu_details_comments">விவரங்களும் கருத்துகளும்</string>
+    <string name="menu_search_lyrics">பாடல் வரிகளைத் தேடு</string>
     <string name="menu_speed_pitch">வேகமும் சுருதியும்</string>
     <string name="link_open_failed">திறக்க முடியவில்லை: %1$s</string>
     <string name="sort_manual">கைமுறை</string>

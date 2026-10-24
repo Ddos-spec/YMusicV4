@@ -550,6 +550,7 @@
     <string name="video_details_delete_message">अपनी टिप्पणी और उसके सभी जवाब हमेशा के लिए मिटाएं?</string>
     <string name="video_details_deleted">टिप्पणी मिटा दी गई</string>
     <string name="menu_details_comments">जानकारी और टिप्पणियां</string>
+    <string name="menu_search_lyrics">गाने के बोल खोजें</string>
     <string name="menu_speed_pitch">स्पीड और पिच</string>
     <string name="link_open_failed">खोला नहीं जा सका: %1$s</string>
     <string name="sort_manual">मैन्युअल</string>

@@ -550,6 +550,7 @@
     <string name="video_details_delete_message">ඔබගේ අදහස සහ එහි සියලු පිළිතුරු ස්ථිරවම මකන්නද?</string>
     <string name="video_details_deleted">අදහස මකන ලදී</string>
     <string name="menu_details_comments">විස්තර සහ අදහස්</string>
+    <string name="menu_search_lyrics">ගී පද සොයන්න</string>
     <string name="menu_speed_pitch">වේගය සහ තාරතාව</string>
     <string name="link_open_failed">විවෘත කළ නොහැක: %1$s</string>
     <string name="sort_manual">අතින්</string>

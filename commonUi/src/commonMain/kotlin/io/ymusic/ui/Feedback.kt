@@ -33,7 +33,7 @@ internal class FeedbackInfo(
 }
 
 /** Every byte but RFC 3986 unreserved — `+` stays encoded, which form decoders would read as a space. */
-private fun percentEncode(value: String): String = buildString {
+internal fun percentEncode(value: String): String = buildString {
     for (byte in value.encodeToByteArray()) {
         val code = byte.toInt() and 0xFF
         val char = code.toChar()
