@@ -7,6 +7,7 @@ import io.ymusic.dynamicengine.DynamicEngineManager
 import io.ymusic.imageloader.ImageLoader
 import io.ymusic.mediastore.BetterMediaStore
 import io.ymusic.player.LoopMode
+import io.ymusic.player.PlayableItem
 import io.ymusic.player.Player
 import io.ymusic.remoteconfig.ApiService
 import io.ymusic.remoteconfig.RemoteConfigData
@@ -258,6 +259,9 @@ class AppGraph(
      */
     val pip = PipCoordinator(player, settings)
 
+    /** Uris readable only through a temporary grant ("Open with" a file), kept out of Play again, which outlives the grant. */
+    val temporaryUris = MutableStateFlow<Set<String>>(emptySet())
+
     /** Per process, so the notice outlives an activity recreation. */
     internal val upgradeNotice by lazy { UpgradeNotice(settings, appVersionCode) }
 
@@ -271,7 +275,9 @@ class AppGraph(
     init {
         // Process-lifetime like the graph itself: every queue is recorded, whatever screen is up.
         playHistory?.takeUnless { guest }?.let {
-            PlayAgainRecorder(player, it.playAgain, logger?.fork("play-again"))
+            PlayAgainRecorder(player, it.playAgain, logger?.fork("play-again")) { item ->
+                item is PlayableItem.LocalMedia && item.uri in temporaryUris.value
+            }
                 .start(CoroutineScope(SupervisorJob() + Dispatchers.Default))
         }
         // Here, not in App: Android Auto can start playback without the UI ever composing.

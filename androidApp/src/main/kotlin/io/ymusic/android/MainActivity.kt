@@ -64,6 +64,7 @@ import kmpcommon.uri.Uri
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.ref.WeakReference
@@ -546,6 +547,7 @@ class MainActivity : FragmentActivity() {
                 graph.logger?.log(Logger.Level.WARN, "open-with display name failed", e)
                 null
             }
+            graph.temporaryUris.update { it + uri.toString() }
             graph.player.setQueue(listOf(PlayableItem.LocalMedia(uri = uri.toString(), title = title)))
             graph.pip.nowPlayingOpen.value = true
         }

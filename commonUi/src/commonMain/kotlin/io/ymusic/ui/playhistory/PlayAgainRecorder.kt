@@ -18,13 +18,15 @@ import kotlin.time.TimeSource
 /**
  * Keeps [store] in step with the player: every queue (one [QueueState.queueId]) is a "Play again"
  * session, written when it starts, when its items or current item change, when playback pauses, every
- * [PROGRESS_EVERY] while playing, and one last time when another queue replaces it.
+ * [PROGRESS_EVERY] while playing, and one last time when another queue replaces it. Items [isTemporary]
+ * picks are left out of the saved queue, and a queue of only those is not saved at all.
  * Exactly one recorder per player — [start] it from the composition root, not per screen.
  */
 class PlayAgainRecorder(
     private val player: Player,
     private val store: PlayAgainStore,
     private val log: Logger?,
+    private val isTemporary: (PlayableItem) -> Boolean = { false },
 ) {
     private class Snapshot(val queue: QueueState, val session: PlayAgainSession, val playing: Boolean)
 
@@ -37,7 +39,8 @@ class PlayAgainRecorder(
         scope.launch {
             var current: Snapshot? = null
             try {
-                combine(player.queue, player.progress, player.status) { queue, progress, status ->
+                combine(player.queue, player.progress, player.status) { playerQueue, progress, status ->
+                    val queue = playerQueue.persistable() ?: return@combine null
                     val item = queue.currentItem ?: return@combine null
                     val live = progress.isLive || (item as? PlayableItem.YtMedia)?.live == true
                     val stripStart = PlayAgainSession.stripStart(queue.currentIndex, queue.items.size)
@@ -80,6 +83,14 @@ class PlayAgainRecorder(
                 current?.let { withContext(NonCancellable) { write(it) } }
             }
         }
+    }
+
+    private fun QueueState.persistable(): QueueState? {
+        if (currentIndex < 0 || items.none(isTemporary)) return this
+        val kept = items.filterNot(isTemporary)
+        if (kept.isEmpty()) return null
+        val keptBefore = items.subList(0, currentIndex).count { !isTemporary(it) }
+        return copy(items = kept, currentIndex = keptBefore.coerceAtMost(kept.lastIndex))
     }
 
     /** A track change: the progress flow may still carry the previous item's play-head. */
