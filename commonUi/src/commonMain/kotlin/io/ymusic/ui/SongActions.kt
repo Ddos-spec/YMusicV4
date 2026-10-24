@@ -39,14 +39,19 @@ internal val LocalShareYoutube = compositionLocalOf<((kind: String, id: String) 
 /** The app-wide [SongActions], for screens that need more than a menu's request (e.g. a follow-up after a delete). */
 internal val LocalSongActions = compositionLocalOf<SongActions?> { null }
 
-/** The YouTube web link of a video / playlist / channel with youtube.com swapped for the app's own domain;
- *  null when the id has no www.youtube.com page (a YouTube Music browse id such as an album's MPREb…). */
-internal fun youtubeShareLink(kind: String, id: String): String? = when (kind) {
-    YtFeedItem.KIND_VIDEO -> "watch?v=$id"
-    YtFeedItem.KIND_PLAYLIST -> id.removePrefix("VL").takeUnless { it.startsWith("MPRE") || it.startsWith("FE") }?.let { "playlist?list=$it" }
-    YtFeedItem.KIND_CHANNEL -> id.takeIf { it.startsWith("UC") }?.let { "channel/$it" }
-    else -> null
-}?.let { "https://www.ymusicapp.com/$it" }
+/** The YouTube web link of a video / playlist / channel with youtube.com swapped for the app's own domain. A
+ *  YouTube Music browse id (an album's MPREb…) has no www page and keeps its music.youtube.com url as is. */
+internal fun youtubeShareLink(kind: String, id: String): String? {
+    if (kind == YtFeedItem.KIND_PLAYLIST && (id.startsWith("MPRE") || id.startsWith("FE"))) {
+        return "https://music.youtube.com/browse/$id"
+    }
+    return when (kind) {
+        YtFeedItem.KIND_VIDEO -> "watch?v=$id"
+        YtFeedItem.KIND_PLAYLIST -> "playlist?list=${id.removePrefix("VL")}"
+        YtFeedItem.KIND_CHANNEL -> id.takeIf { it.startsWith("UC") }?.let { "channel/$it" }
+        else -> null
+    }?.let { "https://www.ymusicapp.com/$it" }
+}
 
 /**
  * The song-menu actions shared by every screen listing songs (Library, Library search, Downloads, the
