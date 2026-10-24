@@ -6,7 +6,7 @@ import io.ymusic.remoteconfig.RemoteConfigData
 internal class AppLinks(config: RemoteConfigData?) {
     val website: String = config?.websiteUrl ?: "https://ymusic.io"
     val telegram: String = config?.telegramUrl ?: "https://t.me/ymusic_io"
-    val feedbackEmail: String = config?.feedbackEmail ?: "contact@ymusic.io"
+    val feedbackEmail: String = config?.feedbackEmail ?: "feedback@ymusic.io"
     val feedbackIssue: String = config?.feedbackIssueUrl ?: "https://github.com/ymusic-io/YMusicV4/issues/new"
     val sourceCode: String = config?.sourceCodeUrl ?: "https://github.com/ymusic-io/YMusicV4"
     val terms: String = config?.termsUrl ?: "https://github.com/ymusic-io/YMusicV4/blob/master/TERMS.md"

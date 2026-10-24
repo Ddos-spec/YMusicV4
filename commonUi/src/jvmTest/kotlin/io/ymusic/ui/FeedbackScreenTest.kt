@@ -88,7 +88,7 @@ class FeedbackScreenTest {
             assertTrue("Device ID: " in clipboard.text!!, "copied: ${clipboard.text}")
 
             onNodeWithText("Open an issue on GitHub").performClick()
-            onNodeWithText("Email contact@ymusic.io").performClick()
+            onNodeWithText("Email feedback@ymusic.io").performClick()
             waitUntil(timeoutMillis = 5_000) { uriHandler.opened.size == 2 }
             waitForIdle()
             assertEquals(1, captures, "one report per visit")
