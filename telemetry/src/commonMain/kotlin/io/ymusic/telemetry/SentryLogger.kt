@@ -1,9 +1,7 @@
 package io.ymusic.telemetry
 
-import io.sentry.kotlin.multiplatform.Attachment
 import io.sentry.kotlin.multiplatform.Sentry
 import io.sentry.kotlin.multiplatform.log.SentryLogLevel
-import io.sentry.kotlin.multiplatform.protocol.Breadcrumb
 import kmpcommon.log.Crumb
 import kmpcommon.log.CrumbLogger
 import kmpcommon.log.Logger
@@ -11,15 +9,13 @@ import kotlinx.coroutines.CancellationException
 import projectcommon.error.CodedError
 import projectcommon.error.NETWORK_CODE
 import projectcommon.error.codedError
-import projectcommon.log.FileAttachment
 import projectcommon.log.trailMark
 
 /**
  * The app's root [Logger] over Sentry: an INFO+ [log] is a Sentry Log (attributes = the crumb-tag
  * path + the trail's merged props), every [captureError] a Sentry event (the ignored categories
  * excepted: an INFO log) whose grouping comes from the coded error — else exception
- * type + tag path — applied by [applyYMusicTelemetry]'s `beforeSend` off the tags set here
- * (`Scope` exposes no fingerprint).
+ * type + tag path — applied by [applyYMusicTelemetry]'s `beforeSend` off the tags set here.
  */
 class SentryLogger private constructor(crumbs: List<Crumb>) : CrumbLogger(crumbs) {
 
@@ -82,21 +78,7 @@ class SentryLogger private constructor(crumbs: List<Crumb>) : CrumbLogger(crumbs
             sendLog(Logger.Level.INFO, text, error, trailPath, mergedProps(trail))
             return
         }
-        Sentry.captureException(error) { scope ->
-            scope.setTag(TRAIL_TAG, trailPath)
-            coded?.code?.let { scope.setTag(CODE_TAG, it) }
-            // The trail rendered as this event's closing breadcrumbs — one row per hop, props as
-            // data — right where the reader already is, in step with every other crumb.
-            for (c in trail) scope.addBreadcrumb(Breadcrumb(message = c.tag, data = c.prop?.let(::HashMap)))
-            message?.let { scope.setExtra("capture.message", it) }
-            prop?.forEach { (k, v) ->
-                when (v) {
-                    is FileAttachment -> scope.addAttachment(Attachment(v.path, v.filename, v.contentType))
-                    is ByteArray -> scope.addAttachment(Attachment(v, k))
-                    else -> scope.setContext("capture.$k", v)
-                }
-            }
-        }
+        captureTrailedError(error, trail, trailPath, coded?.code, message, prop)
     }
 
     private fun Logger.Level.toSentryLogLevel(): SentryLogLevel = when (this) {
@@ -134,3 +116,14 @@ class SentryLogger private constructor(crumbs: List<Crumb>) : CrumbLogger(crumbs
         private const val STACK_CAP = 2000
     }
 }
+
+/** Sends [error] as an event: [trailPath] and [code] as the grouping tags, every [trail] hop a
+ *  breadcrumb stamped with its own time, [message] and [prop] as extras/contexts/attachments. */
+internal expect fun captureTrailedError(
+    error: Throwable,
+    trail: List<Crumb>,
+    trailPath: String,
+    code: String?,
+    message: String?,
+    prop: Map<String, Any>?,
+)

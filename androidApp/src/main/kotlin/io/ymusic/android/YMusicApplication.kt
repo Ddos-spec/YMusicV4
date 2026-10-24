@@ -260,7 +260,7 @@ class YMusicApplication : Application() {
         // off, so nothing is ever sent before the user opted in.
         if (BuildConfig.SENTRY_DSN.isNotEmpty()) {
             bindCrashReporting(appScope, settings.flow(AppSettings.crashReports)) {
-                Sentry.init {
+                Sentry.initWithPlatformOptions {
                     it.applyYMusicTelemetry()
                     it.dsn = BuildConfig.SENTRY_DSN
                     // The commit in the release traces an event to git history (no source upload).
