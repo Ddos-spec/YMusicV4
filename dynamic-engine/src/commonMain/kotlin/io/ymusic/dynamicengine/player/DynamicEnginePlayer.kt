@@ -123,6 +123,15 @@ class DynamicEnginePlayer private constructor(
         ) { it.skipValue() }
     }
 
+    /** Switches to one of the catalog's `audioTracks` (a dub or the original language) by its `id`. */
+    suspend fun setAudioTrack(id: String, logger: Logger? = null) {
+        engine.jsonCommand(
+            "player/setAudioTrack",
+            { w -> w.name("id").value(id) },
+            logger,
+        ) { it.skipValue() }
+    }
+
     suspend fun setLoop(enable: Boolean, logger: Logger? = null) {
         engine.jsonCommand(
             "player/setLoop",
