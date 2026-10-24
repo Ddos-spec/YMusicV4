@@ -556,6 +556,7 @@
     <string name="video_details_delete_message">Excluir permanentemente seu comentário e todas as respostas?</string>
     <string name="video_details_deleted">Comentário excluído</string>
     <string name="menu_details_comments">Detalhes e comentários</string>
+    <string name="menu_search_lyrics">Pesquisar letra</string>
     <string name="menu_speed_pitch">Velocidade e tom</string>
     <string name="link_open_failed">Não foi possível abrir: %1$s</string>
     <string name="sort_manual">Manual</string>

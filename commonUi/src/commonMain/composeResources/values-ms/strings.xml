@@ -546,6 +546,7 @@
     <string name="video_details_delete_message">Padamkan ulasan anda dan semua balasannya secara kekal?</string>
     <string name="video_details_deleted">Ulasan dipadamkan</string>
     <string name="menu_details_comments">Butiran dan ulasan</string>
+    <string name="menu_search_lyrics">Cari lirik</string>
     <string name="menu_speed_pitch">Kelajuan dan pic</string>
     <string name="link_open_failed">Tidak dapat membuka: %1$s</string>
     <string name="sort_manual">Manual</string>

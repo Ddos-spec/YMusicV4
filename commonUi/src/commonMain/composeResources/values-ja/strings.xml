@@ -546,6 +546,7 @@
     <string name="video_details_delete_message">コメントとそのすべての返信を完全に削除しますか？</string>
     <string name="video_details_deleted">コメントを削除しました</string>
     <string name="menu_details_comments">詳細とコメント</string>
+    <string name="menu_search_lyrics">歌詞を検索</string>
     <string name="menu_speed_pitch">速度とピッチ</string>
     <string name="link_open_failed">開けません: %1$s</string>
     <string name="sort_manual">手動</string>

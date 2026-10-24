@@ -551,6 +551,7 @@
     <string name="video_details_delete_message">तपाईंको टिप्पणी र यसका सबै जवाफहरू स्थायी रूपमा मेटाउने हो?</string>
     <string name="video_details_deleted">टिप्पणी मेटाइयो</string>
     <string name="menu_details_comments">विवरण र टिप्पणीहरू</string>
+    <string name="menu_search_lyrics">गीतका शब्द खोज्नुहोस्</string>
     <string name="menu_speed_pitch">गति र पिच</string>
     <string name="link_open_failed">खोल्न सकिएन: %1$s</string>
     <string name="sort_manual">म्यानुअल</string>

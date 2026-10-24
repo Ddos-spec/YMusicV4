@@ -561,6 +561,7 @@
     <string name="video_details_delete_message">Natrvalo odstrániť váš komentár a všetky odpovede naň?</string>
     <string name="video_details_deleted">Komentár odstránený</string>
     <string name="menu_details_comments">Podrobnosti a komentáre</string>
+    <string name="menu_search_lyrics">Vyhľadať text piesne</string>
     <string name="menu_speed_pitch">Rýchlosť a výška tónu</string>
     <string name="link_open_failed">Nedá sa otvoriť: %1$s</string>
     <string name="sort_manual">Ručne</string>

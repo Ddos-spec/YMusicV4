@@ -551,6 +551,7 @@
     <string name="video_details_delete_message">Şərhiniz və bütün cavabları həmişəlik silinsin?</string>
     <string name="video_details_deleted">Şərh silindi</string>
     <string name="menu_details_comments">Təfərrüatlar və şərhlər</string>
+    <string name="menu_search_lyrics">Mahnı sözlərini axtar</string>
     <string name="menu_speed_pitch">Sürət və ton</string>
     <string name="link_open_failed">Açmaq mümkün olmadı: %1$s</string>
     <string name="sort_manual">Əl ilə</string>

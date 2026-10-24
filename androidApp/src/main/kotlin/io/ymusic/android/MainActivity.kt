@@ -4,11 +4,13 @@ import android.Manifest
 import android.app.KeyguardManager
 import android.app.PictureInPictureParams
 import android.content.ActivityNotFoundException
+import android.content.ContentResolver
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.provider.Settings
 import android.util.Rational
 import androidx.activity.SystemBarStyle
@@ -39,6 +41,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import io.ymusic.player.PlayableItem
 import io.ymusic.player.VideoSize
 import io.ymusic.settings.AppSettings
 import io.ymusic.settings.flow
@@ -56,6 +59,7 @@ import io.ymusic.ui.resources.folder_picker_disabled
 import io.ymusic.ui.resources.folder_picker_missing
 import io.ymusic.ui.resources.folder_picker_open_settings
 import io.ymusic.ui.startupFailedMessage
+import kmpcommon.log.Logger
 import kmpcommon.uri.Uri
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -521,10 +525,36 @@ class MainActivity : FragmentActivity() {
         if (intent?.action != Intent.ACTION_VIEW && intent?.action != ACTION_OPEN_LINK) return
         // Reopened from Recents: the task's original link intent comes back, already handled.
         if (intent.flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY != 0) return
+        val data = intent.data
+        if (intent.action == Intent.ACTION_VIEW && data?.scheme == ContentResolver.SCHEME_CONTENT) {
+            playFile(data)
+            return
+        }
         val url = intent.dataString ?: return
         val action = intent.getStringExtra(EXTRA_LINK_ACTION)?.let { name -> LinkAction.entries.firstOrNull { it.name == name } }
         IncomingLinks.open(url, action ?: LinkAction.OPEN)
     }
+
+    /** An audio or video file opened from another app ("Open with"): played as a queue of one. */
+    private fun playFile(uri: android.net.Uri) {
+        lifecycleScope.launch {
+            // A failed startup is already reported by the boot screen; there is no player to hand the file to.
+            val graph = runCatching { (application as YMusicApplication).graphAsync().await() }.getOrNull() ?: return@launch
+            val title = try {
+                withContext(Dispatchers.IO) { displayName(uri) }?.substringBeforeLast('.')
+            } catch (e: Exception) {
+                graph.logger?.log(Logger.Level.WARN, "open-with display name failed", e)
+                null
+            }
+            graph.player.setQueue(listOf(PlayableItem.LocalMedia(uri = uri.toString(), title = title)))
+            graph.pip.nowPlayingOpen.value = true
+        }
+    }
+
+    private fun displayName(uri: android.net.Uri): String? =
+        contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) cursor.getString(0) else null
+        }
 
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

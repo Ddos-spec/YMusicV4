@@ -556,6 +556,7 @@
     <string name="video_details_delete_message">Supprimer définitivement votre commentaire et toutes ses réponses ?</string>
     <string name="video_details_deleted">Commentaire supprimé</string>
     <string name="menu_details_comments">Détails et commentaires</string>
+    <string name="menu_search_lyrics">Rechercher les paroles</string>
     <string name="menu_speed_pitch">Vitesse et tonalité</string>
     <string name="link_open_failed">Impossible d’ouvrir : %1$s</string>
     <string name="sort_manual">Manuel</string>

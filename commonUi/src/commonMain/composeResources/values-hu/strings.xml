@@ -551,6 +551,7 @@
     <string name="video_details_delete_message">Véglegesen törlöd a hozzászólásodat és az összes rá érkezett választ?</string>
     <string name="video_details_deleted">Hozzászólás törölve</string>
     <string name="menu_details_comments">Részletek és hozzászólások</string>
+    <string name="menu_search_lyrics">Dalszöveg keresése</string>
     <string name="menu_speed_pitch">Sebesség és hangmagasság</string>
     <string name="link_open_failed">Nem nyitható meg: %1$s</string>
     <string name="sort_manual">Kézi</string>

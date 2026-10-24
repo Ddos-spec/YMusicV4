@@ -681,6 +681,7 @@
     <string name="link_queued_next">Буде відтворено наступним</string>
     <string name="link_queued_last">Додано в кінець черги</string>
     <string name="menu_details_comments">Опис і коментарі</string>
+    <string name="menu_search_lyrics">Шукати текст пісні</string>
     <string name="menu_speed_pitch">Швидкість і тон</string>
     <string name="playlist_menu_import_device">Імпортувати з пристрою</string>
     <string name="playlist_menu_backup">Створити резервну копію плейлистів</string>

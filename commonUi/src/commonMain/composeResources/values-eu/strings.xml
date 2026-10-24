@@ -551,6 +551,7 @@
     <string name="video_details_delete_message">Zure iruzkina eta haren erantzun guztiak betiko ezabatu nahi dituzu?</string>
     <string name="video_details_deleted">Iruzkina ezabatu da</string>
     <string name="menu_details_comments">Xehetasunak eta iruzkinak</string>
+    <string name="menu_search_lyrics">Bilatu letra</string>
     <string name="menu_speed_pitch">Abiadura eta tonua</string>
     <string name="link_open_failed">Ezin da ireki: %1$s</string>
     <string name="sort_manual">Eskuz</string>

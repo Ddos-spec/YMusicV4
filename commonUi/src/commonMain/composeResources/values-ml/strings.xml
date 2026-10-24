@@ -551,6 +551,7 @@
     <string name="video_details_delete_message">നിങ്ങളുടെ കമന്റും അതിന്റെ എല്ലാ മറുപടികളും ശാശ്വതമായി ഇല്ലാതാക്കണോ?</string>
     <string name="video_details_deleted">കമന്റ് ഇല്ലാതാക്കി</string>
     <string name="menu_details_comments">വിശദാംശങ്ങളും കമന്റുകളും</string>
+    <string name="menu_search_lyrics">വരികൾ തിരയുക</string>
     <string name="menu_speed_pitch">വേഗതയും പിച്ചും</string>
     <string name="link_open_failed">തുറക്കാനാകുന്നില്ല: %1$s</string>
     <string name="sort_manual">മാനുവൽ</string>

@@ -124,13 +124,14 @@ fun PlaylistDownloadScreen(graph: AppGraph, session: PlaylistDownloadSession, on
     val languages = rememberYtLanguages(graph)
     val scope = rememberCoroutineScope()
     val snackbar = LocalSnackbar.current
+    val scans = LocalScanController.current
     val count = videos.count { it.id in session.checked && !it.live }
     var confirming by remember { mutableStateOf<List<YtFeedItem>?>(null) }
     val startDownload: (List<YtFeedItem>) -> Unit = { picked ->
         val preset = session.preset
         scope.launch {
             val gated = graph.mediaStore != null && graph.libraryFolderPicker != null
-            if (gated && !hasUsableDownloadLocation(graph) && !pickDownloadFolder(graph, snackbar)) return@launch
+            if (gated && !hasUsableDownloadLocation(graph) && !pickDownloadFolder(graph, snackbar, scans)) return@launch
             val mp3SourceBitrate = graph.mp3SourceBitrate()
             val positions = videos.withIndex().associate { (index, video) -> video.id to index + 1 }
             picked.forEach { video ->
@@ -163,7 +164,7 @@ fun PlaylistDownloadScreen(graph: AppGraph, session: PlaylistDownloadSession, on
                     languages,
                     ffmpegAvailable = downloads.ffmpegAvailable,
                     locationName = locationName,
-                    onPickLocation = { scope.launch { pickDownloadFolder(graph, snackbar) } },
+                    onPickLocation = { scope.launch { pickDownloadFolder(graph, snackbar, scans) } },
                     libraryStore = graph.mediaStore,
                 )
             }

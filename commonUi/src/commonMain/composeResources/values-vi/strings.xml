@@ -647,6 +647,7 @@
     <string name="link_queued_next">Sẽ phát tiếp theo</string>
     <string name="link_queued_last">Đã thêm vào cuối danh sách phát</string>
     <string name="menu_details_comments">Chi tiết &amp; bình luận</string>
+    <string name="menu_search_lyrics">Tìm lời bài hát</string>
     <string name="menu_speed_pitch">Tốc độ &amp; cao độ</string>
     <string name="playlist_menu_import_device">Nhập từ thiết bị</string>
     <string name="playlist_menu_backup">Sao lưu danh sách phát</string>

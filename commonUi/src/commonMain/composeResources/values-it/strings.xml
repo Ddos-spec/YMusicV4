@@ -556,6 +556,7 @@
     <string name="video_details_delete_message">Eliminare definitivamente il tuo commento e tutte le sue risposte?</string>
     <string name="video_details_deleted">Commento eliminato</string>
     <string name="menu_details_comments">Dettagli e commenti</string>
+    <string name="menu_search_lyrics">Cerca il testo</string>
     <string name="menu_speed_pitch">Velocità e intonazione</string>
     <string name="link_open_failed">Impossibile aprire: %1$s</string>
     <string name="sort_manual">Manuale</string>

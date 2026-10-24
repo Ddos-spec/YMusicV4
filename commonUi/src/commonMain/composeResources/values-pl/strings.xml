@@ -561,6 +561,7 @@
     <string name="video_details_delete_message">Trwale usunąć komentarz i wszystkie odpowiedzi na niego?</string>
     <string name="video_details_deleted">Usunięto komentarz</string>
     <string name="menu_details_comments">Szczegóły i komentarze</string>
+    <string name="menu_search_lyrics">Szukaj tekstu piosenki</string>
     <string name="menu_speed_pitch">Prędkość i wysokość</string>
     <string name="link_open_failed">Nie można otworzyć: %1$s</string>
     <string name="sort_manual">Ręcznie</string>

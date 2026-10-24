@@ -551,6 +551,7 @@
     <string name="video_details_delete_message">Ma rabtaa inaad si joogto ah u tirtirto faalladaada iyo dhammaan jawaabaheeda?</string>
     <string name="video_details_deleted">Faallada waa la tirtiray</string>
     <string name="menu_details_comments">Faahfaahin iyo faallooyin</string>
+    <string name="menu_search_lyrics">Raadi erayada heesta</string>
     <string name="menu_speed_pitch">Xawaaraha iyo teembada</string>
     <string name="link_open_failed">Lama furi karo: %1$s</string>
     <string name="sort_manual">Gacan ku samays</string>

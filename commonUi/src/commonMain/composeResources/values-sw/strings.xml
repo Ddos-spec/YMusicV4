@@ -551,6 +551,7 @@
     <string name="video_details_delete_message">Ungependa kufuta kabisa maoni yako na majibu yake yote?</string>
     <string name="video_details_deleted">Maoni yamefutwa</string>
     <string name="menu_details_comments">Maelezo na maoni</string>
+    <string name="menu_search_lyrics">Tafuta maneno ya wimbo</string>
     <string name="menu_speed_pitch">Kasi na kiimbo</string>
     <string name="link_open_failed">Imeshindwa kufungua: %1$s</string>
     <string name="sort_manual">Mwenyewe</string>

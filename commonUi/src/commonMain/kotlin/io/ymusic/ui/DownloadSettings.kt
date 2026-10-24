@@ -64,6 +64,7 @@ private fun DownloadLocationRow(graph: AppGraph) {
     if (graph.mediaStore == null) return
     val scope = rememberCoroutineScope()
     val snackbar = LocalSnackbar.current
+    val scans = LocalScanController.current
     val name = rememberDownloadLocationName(graph)
 
     // No dialog: tapping goes straight to the OS folder picker (adds the folder to the Library and
@@ -72,7 +73,7 @@ private fun DownloadLocationRow(graph: AppGraph) {
         title = stringResource(Res.string.menu_download_location),
         value = name ?: stringResource(Res.string.download_location_not_set),
     ) {
-        scope.launch { pickDownloadFolder(graph, snackbar) }
+        scope.launch { pickDownloadFolder(graph, snackbar, scans) }
     }
 }
 
@@ -98,14 +99,18 @@ internal fun rememberDownloadLocationName(graph: AppGraph): String? {
 /**
  * Open the folder picker, register the chosen folder in the Library, and set it as
  * [AppSettings.downloadLocation]. Returns true iff a folder was chosen (false = no picker, canceled, or a
- * read-only folder, which [snackbar] explains).
+ * read-only folder, which [snackbar] explains). The pick only registers the bucket, so the folder is then
+ * scanned on [scans] — music already in it would otherwise stay hidden until a manual rescan.
  * The picker hands back the folder's uri, so this works whether the folder is new, already present,
  * empty, or nested — no guessing which bucket appeared.
  */
-internal suspend fun pickDownloadFolder(graph: AppGraph, snackbar: (String) -> Unit): Boolean {
+internal suspend fun pickDownloadFolder(graph: AppGraph, snackbar: (String) -> Unit, scans: ScanController?): Boolean {
     val pick = graph.libraryFolderPicker ?: return false
     val uri = pick() ?: return false // canceled
-    return assignDownloadFolder(graph, uri, snackbar)
+    if (!assignDownloadFolder(graph, uri, snackbar)) return false
+    val rescan = graph.rescanLibrary
+    if (rescan != null && scans != null) scans.start { onProgress -> rescan(uri, onProgress) }
+    return true
 }
 
 /** Why a folder can't hold downloads, from [AppGraph.probeDownloadFolder]'s test write. */

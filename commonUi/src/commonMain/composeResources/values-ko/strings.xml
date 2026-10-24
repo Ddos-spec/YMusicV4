@@ -546,6 +546,7 @@
     <string name="video_details_delete_message">댓글과 모든 답글을 영구적으로 삭제할까요?</string>
     <string name="video_details_deleted">댓글을 삭제했습니다</string>
     <string name="menu_details_comments">세부정보 및 댓글</string>
+    <string name="menu_search_lyrics">가사 검색</string>
     <string name="menu_speed_pitch">속도 및 음높이</string>
     <string name="link_open_failed">열 수 없음: %1$s</string>
     <string name="sort_manual">수동</string>

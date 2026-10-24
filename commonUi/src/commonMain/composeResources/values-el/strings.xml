@@ -551,6 +551,7 @@
     <string name="video_details_delete_message">Να διαγραφεί οριστικά το σχόλιό σας και όλες οι απαντήσεις του;</string>
     <string name="video_details_deleted">Το σχόλιο διαγράφηκε</string>
     <string name="menu_details_comments">Λεπτομέρειες και σχόλια</string>
+    <string name="menu_search_lyrics">Αναζήτηση στίχων</string>
     <string name="menu_speed_pitch">Ταχύτητα και τονικότητα</string>
     <string name="link_open_failed">Δεν είναι δυνατό το άνοιγμα: %1$s</string>
     <string name="sort_manual">Χειροκίνητα</string>

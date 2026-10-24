@@ -546,6 +546,7 @@
     <string name="video_details_delete_message">Hapus komentar Anda beserta semua balasannya secara permanen?</string>
     <string name="video_details_deleted">Komentar dihapus</string>
     <string name="menu_details_comments">Detail dan komentar</string>
+    <string name="menu_search_lyrics">Cari lirik</string>
     <string name="menu_speed_pitch">Kecepatan dan nada</string>
     <string name="link_open_failed">Tidak dapat membuka: %1$s</string>
     <string name="sort_manual">Manual</string>

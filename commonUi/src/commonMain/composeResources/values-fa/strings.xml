@@ -551,6 +551,7 @@
     <string name="video_details_delete_message">نظر شما و همه پاسخ‌های آن برای همیشه حذف شود؟</string>
     <string name="video_details_deleted">نظر حذف شد</string>
     <string name="menu_details_comments">جزئیات و نظرات</string>
+    <string name="menu_search_lyrics">جستجوی متن آهنگ</string>
     <string name="menu_speed_pitch">سرعت و زیر و بمی</string>
     <string name="link_open_failed">باز نمی‌شود: %1$s</string>
     <string name="sort_manual">دستی</string>

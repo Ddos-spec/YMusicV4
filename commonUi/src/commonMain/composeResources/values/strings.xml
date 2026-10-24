@@ -676,6 +676,7 @@
     <string name="link_queued_next">Will play next</string>
     <string name="link_queued_last">Added to the end of the queue</string>
     <string name="menu_details_comments">Details &amp; comments</string>
+    <string name="menu_search_lyrics">Search lyrics</string>
     <string name="menu_speed_pitch">Speed &amp; pitch</string>
     <string name="playlist_menu_import_device">Import from device</string>
     <string name="playlist_menu_backup">Back up playlists</string>
