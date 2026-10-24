@@ -250,9 +250,21 @@ static void mse_apply_host_frame(int x, int y, int w, int h)
 
 static jboolean (*mse_jawt_get_awt)(JNIEnv *, JAWT *);
 
+/* Never @protocol(JAWT_SurfaceLayers): it emits a second copy of libawt_lwawt's protocol, and
+   macOS 11's libobjc SIGBUSes rewriting its ref in read-only __DATA_CONST at System.load. */
+static int mse_is_surface_layers(id sl)
+{
+    return sl && [sl respondsToSelector:@selector(layer)] && [sl respondsToSelector:@selector(windowLayer)];
+}
+
 static int jawt_bind(void)
 {
     void *h;
+    if (mse_jawt_get_awt)
+        return 1;
+    /* Kotlin System.loadLibrary("jawt") already mapped it; macOS 11's dyld doesn't match the
+       leaf name against its @rpath install name, so the dlopen below is only a fallback. */
+    mse_jawt_get_awt = (jboolean (*)(JNIEnv *, JAWT *))dlsym(RTLD_DEFAULT, "JAWT_GetAWT");
     if (mse_jawt_get_awt)
         return 1;
     h = dlopen("libjawt.dylib", RTLD_LAZY | RTLD_GLOBAL);
@@ -357,7 +369,7 @@ static NSWindow *mse_awt_nswindow(JNIEnv *env, jobject awt)
     dsi = ds->GetDrawingSurfaceInfo(ds);
     if (dsi) {
         sl = (__bridge id<JAWT_SurfaceLayers>)dsi->platformInfo;
-        if (sl && [(NSObject *)sl conformsToProtocol:@protocol(JAWT_SurfaceLayers)])
+        if (mse_is_surface_layers(sl))
             v = mse_content_view(sl.windowLayer);
         ds->FreeDrawingSurfaceInfo(dsi);
     }
@@ -747,7 +759,7 @@ void *mse_vt_attach_component(void *envp, void *component)
         return NULL;
     }
     sl = (__bridge id<JAWT_SurfaceLayers>)dsi->platformInfo;
-    if (![(NSObject *)sl conformsToProtocol:@protocol(JAWT_SurfaceLayers)]) {
+    if (!mse_is_surface_layers(sl)) {
         mse_critf(MSE_LOG_WARN, "mse-v jawt platformInfo is not SurfaceLayers");
         ds->FreeDrawingSurfaceInfo(dsi);
         ds->Unlock(ds);
