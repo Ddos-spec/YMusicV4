@@ -180,7 +180,7 @@ fun PlaylistDownloadScreen(graph: AppGraph, session: PlaylistDownloadSession, on
         }
         HorizontalDivider(color = DesignColors.Divider)
         Box(
-            Modifier.fillMaxWidth().navigationBarsPadding().padding(DesignSpacing.Space16),
+            Modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = LocalMiniPlayerInset.current).padding(DesignSpacing.Space16),
             contentAlignment = Alignment.Center,
         ) {
             Button(
