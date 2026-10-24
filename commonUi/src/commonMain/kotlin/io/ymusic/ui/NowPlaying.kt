@@ -1348,7 +1348,11 @@ private fun PlayerMoreMenu(coordinator: PlaybackCoordinator) {
     var playbackOpen by remember { mutableStateOf(false) }
     var eqOpen by remember { mutableStateOf(false) }
     var detailsOpen by remember { mutableStateOf(false) }
-    val video = player.queue.collectAsState().value.currentItem as? PlayableItem.YtMedia
+    val current = player.queue.collectAsState().value.currentItem
+    val video = current as? PlayableItem.YtMedia
+    val shareVideoId by produceState<String?>(null, current) {
+        value = current?.let { queueVideoIds(coordinator.graph, listOf(it)).firstOrNull() }
+    }
     val ytPlaylists = LocalYtPlaylistActions.current
     val shareYoutube = LocalShareYoutube.current
     val snackbar = LocalSnackbar.current
@@ -1372,11 +1376,12 @@ private fun PlayerMoreMenu(coordinator: PlaybackCoordinator) {
                         open = false
                     }
                 }
-                if (shareYoutube != null) {
-                    MoreMenuItem(Icons.Outlined.Share, stringResource(Res.string.cd_share)) {
-                        shareYoutube(YtFeedItem.KIND_VIDEO, video.videoId)
-                        open = false
-                    }
+            }
+            val shareId = shareVideoId
+            if (shareYoutube != null && shareId != null) {
+                MoreMenuItem(Icons.Outlined.Share, stringResource(Res.string.cd_share)) {
+                    shareYoutube(YtFeedItem.KIND_VIDEO, shareId)
+                    open = false
                 }
             }
             if (ytPlaylists != null) {
@@ -1388,7 +1393,7 @@ private fun PlayerMoreMenu(coordinator: PlaybackCoordinator) {
                     }
                 }
             }
-            if (video != null || ytPlaylists != null) MoreMenuDivider()
+            if (video != null || ytPlaylists != null || shareVideoId != null) MoreMenuDivider()
             MoreMenuItem(
                 Icons.Outlined.Speed,
                 stringResource(Res.string.menu_speed_pitch),
