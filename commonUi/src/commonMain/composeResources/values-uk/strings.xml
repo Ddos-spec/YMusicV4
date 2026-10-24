@@ -571,4 +571,8 @@
     <string name="dialog_save">Зберегти</string>
     <string name="upgraded_message">YMusic оновлено до %1$s</string>
     <string name="upgraded_view_changelog">Список змін</string>
+    <string name="menu_go_to_artist">Перейти до виконавця</string>
+    <string name="menu_go_to_album">Перейти до альбому</string>
+    <string name="link_copied">Посилання скопійовано</string>
+    <string name="download_other_format">Завантажити в іншому форматі</string>
 </resources>

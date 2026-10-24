@@ -561,4 +561,8 @@
     <string name="dialog_save">Speichern</string>
     <string name="upgraded_message">YMusic wurde auf %1$s aktualisiert</string>
     <string name="upgraded_view_changelog">Änderungen ansehen</string>
+    <string name="menu_go_to_artist">Gehe zu Interpret</string>
+    <string name="menu_go_to_album">Gehe zu Album</string>
+    <string name="link_copied">Link kopiert</string>
+    <string name="download_other_format">In anderem Format herunterladen</string>
 </resources>

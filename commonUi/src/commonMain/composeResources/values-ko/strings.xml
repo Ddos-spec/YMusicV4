@@ -556,4 +556,8 @@
     <string name="dialog_save">저장</string>
     <string name="upgraded_message">YMusic이 %1$s(으)로 업데이트되었습니다</string>
     <string name="upgraded_view_changelog">변경 내역 보기</string>
+    <string name="menu_go_to_artist">아티스트 보기</string>
+    <string name="menu_go_to_album">앨범 보기</string>
+    <string name="link_copied">링크가 복사되었습니다</string>
+    <string name="download_other_format">다른 형식으로 다운로드</string>
 </resources>

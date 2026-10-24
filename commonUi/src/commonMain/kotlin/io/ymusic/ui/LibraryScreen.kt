@@ -96,6 +96,7 @@ import io.ymusic.ui.resources.Res
 import io.ymusic.ui.resources.add_to_playlist_new
 import io.ymusic.ui.resources.cd_add_to_playlist
 import io.ymusic.ui.resources.cd_back
+import io.ymusic.ui.resources.cd_share
 import io.ymusic.ui.resources.delete_from_disk_confirm
 import io.ymusic.ui.resources.delete_from_disk_message
 import io.ymusic.ui.resources.delete_from_disk_title
@@ -123,6 +124,8 @@ import io.ymusic.ui.resources.library_unavailable
 import io.ymusic.ui.resources.menu_delete_playlist
 import io.ymusic.ui.resources.menu_download_location
 import io.ymusic.ui.resources.menu_exclude_folder
+import io.ymusic.ui.resources.menu_go_to_album
+import io.ymusic.ui.resources.menu_go_to_artist
 import io.ymusic.ui.resources.menu_include_folder
 import io.ymusic.ui.resources.menu_play
 import io.ymusic.ui.resources.menu_remove
@@ -281,26 +284,17 @@ fun LibraryScreen(graph: AppGraph, coordinator: PlaybackCoordinator) {
                 tab = LibraryTab.Folders
                 folderReveal.value = null
             }
-            // "Remove from disk": the menu only REQUESTS; the deletion runs from the dialog's
-            // confirm, and the store row goes only after the file did (itemsChanges reloads the UI).
-            var confirmDelete by remember { mutableStateOf<MediaStoreItem?>(null) }
-            val requestDelete: ((MediaStoreItem) -> Unit)? =
-                graph.deleteFromDisk?.let { { item -> confirmDelete = item } }
-            confirmDelete?.let { doomed ->
-                DeleteFromDiskDialog(
-                    doomed,
-                    onDismiss = { confirmDelete = null },
-                    log = graph.logger?.fork("library"),
-                    delete = {
-                        graph.deleteFromDisk!!.invoke(doomed)
-                        store.deleteItem(doomed.id, hard = true)
-                    },
-                )
-            }
-            // "Add to playlist": the menu only opens the picker; the store mutation runs from there.
-            var addToPlaylist by remember { mutableStateOf<MediaStoreItem?>(null) }
-            addToPlaylist?.let { song ->
-                AddToPlaylistDialog(store, song, onDismiss = { addToPlaylist = null })
+            // "Go to artist/album" from anywhere: open that group's tab drilled into it, then clear the request.
+            val groupReveal = LocalLibraryGroupReveal.current
+            var revealGroup by remember { mutableStateOf<LibraryGroupReveal?>(null) }
+            LaunchedEffect(groupReveal?.value) {
+                val request = groupReveal?.value ?: return@LaunchedEffect
+                revealGroup = request
+                tab = when (request.kind) {
+                    LibraryGroupKind.Artist -> LibraryTab.Artists
+                    LibraryGroupKind.Album -> LibraryTab.Albums
+                }
+                groupReveal.value = null
             }
             // Keeps each tab's saveable state (folder path, scroll) while another tab is showing.
             val tabStateHolder = rememberSaveableStateHolder()
@@ -313,11 +307,7 @@ fun LibraryScreen(graph: AppGraph, coordinator: PlaybackCoordinator) {
                     LibraryTabRow(tab, tabDrag) { tab = it }
                     HorizontalDivider(color = DesignColors.Divider)
                 }
-                CompositionLocalProvider(
-                    LocalLibraryReveal provides reveal,
-                    LocalLibraryDelete provides requestDelete,
-                    LocalAddToPlaylist provides { song -> addToPlaylist = song },
-                ) {
+                CompositionLocalProvider(LocalLibraryReveal provides reveal) {
                     val openDrawer = LocalOpenNavDrawer.current
                     SwipeTabSwitcher(
                         tab,
@@ -370,6 +360,8 @@ fun LibraryScreen(graph: AppGraph, coordinator: PlaybackCoordinator) {
                                         coordinator,
                                         sortId = "artists",
                                         settings = graph.settings,
+                                        reveal = revealGroup?.takeIf { it.kind == LibraryGroupKind.Artist },
+                                        onRevealHandled = { revealGroup = null },
                                     ) { it.artist }
                                 }
                                 LibraryTab.Albums -> if (loaded.songs.isEmpty()) {
@@ -382,6 +374,8 @@ fun LibraryScreen(graph: AppGraph, coordinator: PlaybackCoordinator) {
                                         coordinator,
                                         sortId = "albums",
                                         settings = graph.settings,
+                                        reveal = revealGroup?.takeIf { it.kind == LibraryGroupKind.Album },
+                                        onRevealHandled = { revealGroup = null },
                                     ) { it.album }
                                 }
                                 LibraryTab.Genres -> if (loaded.songs.isEmpty()) {
@@ -810,7 +804,7 @@ private val MediaStoreBucket.displayName: String get() = aliasName?.takeIf(Strin
  *  on explicit confirm. A failed delete keeps the dialog open with the error (the row stays — the
  *  store is only touched after the file is gone). */
 @Composable
-private fun DeleteFromDiskDialog(
+internal fun DeleteFromDiskDialog(
     item: MediaStoreItem,
     onDismiss: () -> Unit,
     log: Logger?,
@@ -1290,7 +1284,7 @@ private fun DeletePlaylistDialog(name: String, onDismiss: () -> Unit, delete: su
  *  plus a "New playlist…" row. Picking a playlist appends [song] and closes; "New playlist…" swaps to
  *  the name dialog, then creates + appends. */
 @Composable
-private fun AddToPlaylistDialog(store: BetterMediaStore, song: MediaStoreItem, onDismiss: () -> Unit) {
+internal fun AddToPlaylistDialog(store: BetterMediaStore, song: MediaStoreItem, onDismiss: () -> Unit) {
     val scope = rememberCoroutineScope()
     var lists by remember { mutableStateOf<List<Playlist>?>(null) }
     var creating by remember { mutableStateOf(false) }
@@ -1517,8 +1511,8 @@ internal fun SongRow(song: MediaStoreItem, coordinator: PlaybackCoordinator? = n
     }
 }
 
-/** The song-row overflow menu: play this one, queue it next / last, and (in the Library tabs, for a
- *  song that lives in a folder) reveal it in the Folders tab. */
+/** The local song overflow menu (the legacy app's song menu): play, queue, playlist, go to artist /
+ *  album, reveal in its folder, share and remove from disk — each shown only where its host provides it. */
 @Composable
 private fun songActions(song: MediaStoreItem, coordinator: PlaybackCoordinator): ItemActions {
     val play = stringResource(Res.string.menu_play)
@@ -1534,6 +1528,11 @@ private fun songActions(song: MediaStoreItem, coordinator: PlaybackCoordinator):
     val addToPlaylist = LocalAddToPlaylist.current
     val removeFromPlaylist = LocalPlaylistRemove.current
     val removeFromHistory = LocalRemoveFromPlayHistory.current
+    val goToGroup = LocalGoToLibraryGroup.current
+    val goToArtist = stringResource(Res.string.menu_go_to_artist)
+    val goToAlbum = stringResource(Res.string.menu_go_to_album)
+    val share = LocalShareSong.current
+    val shareLabel = stringResource(Res.string.cd_share)
     return ItemActions(
         buildList {
             add(play to { coordinator.playLocalSingle(song) })
@@ -1542,7 +1541,12 @@ private fun songActions(song: MediaStoreItem, coordinator: PlaybackCoordinator):
             if (addToPlaylist != null) add(addToPlaylistLabel to { addToPlaylist(song) })
             if (removeFromPlaylist != null) add(removeFromPlaylistLabel to { removeFromPlaylist(song) })
             if (removeFromHistory != null) add(removeFromTopTracks to { removeFromHistory(song) })
+            if (goToGroup != null) {
+                add(goToArtist to { goToGroup(LibraryGroupKind.Artist, song) })
+                add(goToAlbum to { goToGroup(LibraryGroupKind.Album, song) })
+            }
             if (reveal != null && song.bucketId != null) add(showInFolder to { reveal(song) })
+            if (share != null) add(shareLabel to { share(song) })
             if (requestDelete != null) add(removeFromDisk to { requestDelete(song) })
         },
     )
@@ -1559,10 +1563,21 @@ private fun GroupedList(
     coordinator: PlaybackCoordinator,
     sortId: String,
     settings: SettingsStore,
+    reveal: LibraryGroupReveal? = null,
+    onRevealHandled: () -> Unit = {},
     keyOf: (MediaStoreItem) -> String?,
 ) {
     // Saveable: the opened artist/album/genre survives the tab leaving composition.
     var group by rememberSaveable { mutableStateOf<String?>(null) }
+    val listState = rememberLazyListState()
+    val gridState = rememberLazyGridState()
+    LaunchedEffect(reveal) {
+        if (reveal == null) return@LaunchedEffect
+        group = reveal.name.takeIf(String::isNotBlank) ?: unknownLabel
+        listState.scrollToItem(0)
+        gridState.scrollToItem(0)
+        onRevealHandled()
+    }
     // Grouping 10k songs is real CPU work — done off-main, with the previous grouping (or nothing
     // on first entry) showing until the fresh one lands.
     var groups by remember { mutableStateOf<List<Pair<String, List<MediaStoreItem>>>?>(null) }
@@ -1574,8 +1589,6 @@ private fun GroupedList(
         }
     }
     val grouped = groups
-    val listState = rememberLazyListState()
-    val gridState = rememberLazyGridState()
     val sort = rememberSortState(sortId, settings)
     val songSort = rememberSortState("$sortId.songs", settings)
     if (grouped == null) {

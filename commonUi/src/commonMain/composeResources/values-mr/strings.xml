@@ -561,4 +561,8 @@
     <string name="dialog_save">जतन करा</string>
     <string name="upgraded_message">YMusic %1$s वर अपडेट झाले</string>
     <string name="upgraded_view_changelog">बदल पहा</string>
+    <string name="menu_go_to_artist">कलाकाराकडे जा</string>
+    <string name="menu_go_to_album">अल्बमकडे जा</string>
+    <string name="link_copied">लिंक कॉपी केली</string>
+    <string name="download_other_format">दुसऱ्या फॉरमॅटमध्ये डाउनलोड करा</string>
 </resources>

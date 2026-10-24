@@ -566,4 +566,8 @@
     <string name="dialog_save">Spremi</string>
     <string name="upgraded_message">YMusic je ažuriran na %1$s</string>
     <string name="upgraded_view_changelog">Pogledaj popis promjena</string>
+    <string name="menu_go_to_artist">Idi na izvođača</string>
+    <string name="menu_go_to_album">Idi na album</string>
+    <string name="link_copied">Poveznica kopirana</string>
+    <string name="download_other_format">Preuzmi u drugom formatu</string>
 </resources>

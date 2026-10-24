@@ -556,4 +556,8 @@
     <string name="dialog_save">儲存</string>
     <string name="upgraded_message">YMusic 已更新至 %1$s</string>
     <string name="upgraded_view_changelog">查看更新紀錄</string>
+    <string name="menu_go_to_artist">前往演出者</string>
+    <string name="menu_go_to_album">前往專輯</string>
+    <string name="link_copied">已複製連結</string>
+    <string name="download_other_format">以其他格式下載</string>
 </resources>

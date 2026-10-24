@@ -63,6 +63,7 @@ import io.ymusic.dynamicengine.yt.YtSection
 import io.ymusic.dynamicengine.yt.YtSectionHeader
 import io.ymusic.ui.resources.Res
 import io.ymusic.ui.resources.cd_download
+import io.ymusic.ui.resources.cd_share
 import io.ymusic.ui.resources.cd_sort
 import io.ymusic.ui.resources.error_captcha
 import io.ymusic.ui.resources.error_disk_full
@@ -782,6 +783,7 @@ private fun itemActions(item: YtFeedItem, coordinator: PlaybackCoordinator): Ite
     val removeFromTopTracks = LocalRemoveFromTopTracks.current
     val ytPlaylists = LocalYtPlaylistActions.current
     val removeFromYtPlaylist = LocalRemoveFromYtPlaylist.current
+    val share = LocalShareVideo.current
     return ItemActions(
         if (item.kind == YtFeedItem.KIND_VIDEO) {
             buildList {
@@ -798,6 +800,7 @@ private fun itemActions(item: YtFeedItem, coordinator: PlaybackCoordinator): Ite
                         add(stringResource(Res.string.quick_download_menu, quickPreset.label()) to { downloadLauncher.quickLaunch(item) })
                     }
                 }
+                if (share != null) add(stringResource(Res.string.cd_share) to { share(item.id) })
                 if (removeFromYtPlaylist != null && item.removeToken != null) {
                     add(stringResource(Res.string.menu_remove_from_playlist) to { removeFromYtPlaylist(item) })
                 }

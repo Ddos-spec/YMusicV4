@@ -556,4 +556,8 @@
     <string name="dialog_save">保存</string>
     <string name="upgraded_message">YMusic を %1$s にアップデートしました</string>
     <string name="upgraded_view_changelog">変更履歴を見る</string>
+    <string name="menu_go_to_artist">アーティストへ移動</string>
+    <string name="menu_go_to_album">アルバムへ移動</string>
+    <string name="link_copied">リンクをコピーしました</string>
+    <string name="download_other_format">別の形式でダウンロード</string>
 </resources>

@@ -561,4 +561,8 @@
     <string name="dialog_save">Kaydet</string>
     <string name="upgraded_message">YMusic %1$s sürümüne güncellendi</string>
     <string name="upgraded_view_changelog">Değişiklikleri gör</string>
+    <string name="menu_go_to_artist">Sanatçıya git</string>
+    <string name="menu_go_to_album">Albüme git</string>
+    <string name="link_copied">Bağlantı kopyalandı</string>
+    <string name="download_other_format">Başka biçimde indir</string>
 </resources>

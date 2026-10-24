@@ -561,4 +561,8 @@
     <string name="dialog_save">ذخیره</string>
     <string name="upgraded_message">YMusic به نسخهٔ %1$s به‌روز شد</string>
     <string name="upgraded_view_changelog">مشاهدهٔ تغییرات</string>
+    <string name="menu_go_to_artist">رفتن به هنرمند</string>
+    <string name="menu_go_to_album">رفتن به آلبوم</string>
+    <string name="link_copied">پیوند کپی شد</string>
+    <string name="download_other_format">دانلود با قالبی دیگر</string>
 </resources>

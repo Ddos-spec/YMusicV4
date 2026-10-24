@@ -93,6 +93,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -126,6 +127,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import io.ymusic.mediastore.model.MediaStoreItem
 import io.ymusic.player.LoopMode
 import io.ymusic.player.PlayableItem
 import io.ymusic.player.PlaybackState
@@ -165,6 +167,7 @@ import io.ymusic.ui.resources.cd_repeat_all
 import io.ymusic.ui.resources.cd_repeat_off
 import io.ymusic.ui.resources.cd_repeat_one
 import io.ymusic.ui.resources.cd_rewind10
+import io.ymusic.ui.resources.cd_share
 import io.ymusic.ui.resources.cd_shuffle
 import io.ymusic.ui.resources.cd_unlock_rotation
 import io.ymusic.ui.resources.download_audio_track
@@ -175,8 +178,11 @@ import io.ymusic.ui.resources.error_supervised_account
 import io.ymusic.ui.resources.ic_sponsor_block
 import io.ymusic.ui.resources.menu_add_to_playlist
 import io.ymusic.ui.resources.menu_details_comments
+import io.ymusic.ui.resources.menu_go_to_album
+import io.ymusic.ui.resources.menu_go_to_artist
 import io.ymusic.ui.resources.menu_reload_player
 import io.ymusic.ui.resources.menu_speed_pitch
+import io.ymusic.ui.resources.menu_start_radio
 import io.ymusic.ui.resources.playback_add_folder_again
 import io.ymusic.ui.resources.playback_botguard_failed
 import io.ymusic.ui.resources.playback_failed
@@ -190,6 +196,7 @@ import io.ymusic.ui.resources.queue_end
 import io.ymusic.ui.resources.queue_load_failed
 import io.ymusic.ui.resources.queue_load_more
 import io.ymusic.ui.resources.queue_loading_more
+import io.ymusic.ui.resources.queue_next
 import io.ymusic.ui.resources.queue_save_as_yt_playlist
 import io.ymusic.ui.resources.remove_from_queue
 import io.ymusic.ui.resources.retry
@@ -1843,11 +1850,71 @@ private fun QueueRowContent(
                 onClick = { menuOpen = true },
             )
             DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(Res.string.remove_from_queue)) },
-                    onClick = { coordinator.player.removeAt(index); menuOpen = false },
-                )
+                queueItemActions(coordinator, index, item, current).entries.forEach { (label, action) ->
+                    DropdownMenuItem(
+                        text = { Text(label) },
+                        onClick = {
+                            menuOpen = false
+                            action()
+                        },
+                    )
+                }
             }
         }
     }
+}
+
+/** A queue row's menu (the legacy app's queue item menu): a local file gets the song actions, a YouTube
+ *  video the video ones; both can jump next in line or leave the queue. */
+@Composable
+private fun queueItemActions(coordinator: PlaybackCoordinator, index: Int, item: PlayableItem, current: Boolean): ItemActions {
+    val player = coordinator.player
+    val playNext = stringResource(Res.string.queue_next)
+    val removeFromQueue = stringResource(Res.string.remove_from_queue)
+    val addToPlaylistLabel = stringResource(Res.string.menu_add_to_playlist)
+    val shareLabel = stringResource(Res.string.cd_share)
+    val song by produceState<MediaStoreItem?>(null, item) {
+        val mediaId = (item as? PlayableItem.LocalMedia)?.mediaId ?: return@produceState
+        value = coordinator.graph.mediaStore?.findItem(mediaId)
+    }
+    val addSongToPlaylist = LocalAddToPlaylist.current
+    val goToGroup = LocalGoToLibraryGroup.current
+    val goToArtist = stringResource(Res.string.menu_go_to_artist)
+    val goToAlbum = stringResource(Res.string.menu_go_to_album)
+    val shareSong = LocalShareSong.current
+    val shareVideo = LocalShareVideo.current
+    val ytPlaylists = LocalYtPlaylistActions.current
+    val downloadLauncher = LocalDownloadLauncher.current
+    val startRadio = stringResource(Res.string.menu_start_radio)
+    val download = stringResource(Res.string.cd_download)
+    return ItemActions(
+        buildList {
+            val video = coordinator.downloadable(item)
+            if (video != null) add(startRadio to { coordinator.playNow(video) })
+            if (!current) {
+                add(
+                    playNext to {
+                        val currentIndex = player.queue.value.currentIndex
+                        if (currentIndex >= 0) player.move(index, if (index > currentIndex) currentIndex + 1 else currentIndex)
+                    },
+                )
+            }
+            when (item) {
+                is PlayableItem.LocalMedia -> song?.let { local ->
+                    if (addSongToPlaylist != null) add(addToPlaylistLabel to { addSongToPlaylist(local) })
+                    if (goToGroup != null) {
+                        add(goToArtist to { goToGroup(LibraryGroupKind.Artist, local) })
+                        add(goToAlbum to { goToGroup(LibraryGroupKind.Album, local) })
+                    }
+                    if (shareSong != null) add(shareLabel to { shareSong(local) })
+                }
+                is PlayableItem.YtMedia -> {
+                    if (ytPlaylists != null) add(addToPlaylistLabel to { ytPlaylists.addToPlaylist(item.videoId) })
+                    if (video != null && downloadLauncher != null) add(download to { downloadLauncher.launch(video) })
+                    if (shareVideo != null) add(shareLabel to { shareVideo(item.videoId) })
+                }
+            }
+            add(removeFromQueue to { player.removeAt(index) })
+        },
+    )
 }

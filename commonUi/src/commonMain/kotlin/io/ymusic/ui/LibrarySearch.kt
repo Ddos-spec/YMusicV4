@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -84,6 +85,31 @@ fun LibrarySearchScreen(
     onSearchOnline: (String) -> Unit,
 ) {
     LaunchedEffect(session) { session.collectItems() }
+    val unknownArtist = stringResource(Res.string.unknown_artist)
+    val unknownAlbum = stringResource(Res.string.unknown_album)
+    // "Go to artist/album" drills in place, like tapping a matched artist/album row.
+    val goToGroup: (LibraryGroupKind, MediaStoreItem) -> Unit = { kind, song ->
+        val (keyOf, unknown) = when (kind) {
+            LibraryGroupKind.Artist -> MediaStoreItem::artist to unknownArtist
+            LibraryGroupKind.Album -> MediaStoreItem::album to unknownAlbum
+        }
+        val name = keyOf(song)?.takeIf(String::isNotBlank)
+        session.drill = (name ?: unknown) to session.all.filter { keyOf(it)?.takeIf(String::isNotBlank) == name }
+    }
+    CompositionLocalProvider(LocalGoToLibraryGroup provides goToGroup) {
+        LibrarySearchContent(session, coordinator, onBack, onSearchOnline, unknownArtist, unknownAlbum)
+    }
+}
+
+@Composable
+private fun LibrarySearchContent(
+    session: LibrarySearchSession,
+    coordinator: PlaybackCoordinator,
+    onBack: () -> Unit,
+    onSearchOnline: (String) -> Unit,
+    unknownArtist: String,
+    unknownAlbum: String,
+) {
     Column(Modifier.fillMaxSize()) {
         SearchInputBar(
             value = session.field,
@@ -109,8 +135,6 @@ fun LibrarySearchScreen(
             }
             else -> {
                 val songs = session.all.filter { it.title.contains(query, ignoreCase = true) }
-                val unknownArtist = stringResource(Res.string.unknown_artist)
-                val unknownAlbum = stringResource(Res.string.unknown_album)
                 val artists = groupMatches(session.all, query, unknownArtist) { it.artist }
                 val albums = groupMatches(session.all, query, unknownAlbum) { it.album }
                 BoxWithConstraints(Modifier.fillMaxSize()) {

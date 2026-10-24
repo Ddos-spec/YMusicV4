@@ -561,4 +561,8 @@
     <string name="dialog_save">Mentés</string>
     <string name="upgraded_message">A YMusic frissült erre: %1$s</string>
     <string name="upgraded_view_changelog">Változások megtekintése</string>
+    <string name="menu_go_to_artist">Ugrás az előadóhoz</string>
+    <string name="menu_go_to_album">Ugrás az albumhoz</string>
+    <string name="link_copied">Link másolva</string>
+    <string name="download_other_format">Letöltés más formátumban</string>
 </resources>

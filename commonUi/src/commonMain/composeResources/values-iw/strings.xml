@@ -566,4 +566,8 @@
     <string name="dialog_save">שמירה</string>
     <string name="upgraded_message">YMusic עודכן לגרסה %1$s</string>
     <string name="upgraded_view_changelog">הצגת רשימת השינויים</string>
+    <string name="menu_go_to_artist">עבור לאומן</string>
+    <string name="menu_go_to_album">עבור לאלבום</string>
+    <string name="link_copied">הקישור הועתק</string>
+    <string name="download_other_format">הורדה בפורמט אחר</string>
 </resources>

@@ -561,4 +561,8 @@
     <string name="dialog_save">Salvesta</string>
     <string name="upgraded_message">YMusic uuendati versioonile %1$s</string>
     <string name="upgraded_view_changelog">Vaata muudatusi</string>
+    <string name="menu_go_to_artist">Mine artisti juurde</string>
+    <string name="menu_go_to_album">Mine albumisse</string>
+    <string name="link_copied">Link kopeeritud</string>
+    <string name="download_other_format">Laadi alla teises vormingus</string>
 </resources>

@@ -715,4 +715,8 @@
     <string name="dialog_save">حفظ</string>
     <string name="upgraded_message">تم تحديث YMusic إلى %1$s</string>
     <string name="upgraded_view_changelog">عرض سجل التغييرات</string>
+    <string name="menu_go_to_artist">الذهاب إلى الفنان</string>
+    <string name="menu_go_to_album">الذهاب إلى الألبوم</string>
+    <string name="link_copied">تم نسخ الرابط</string>
+    <string name="download_other_format">التنزيل بتنسيق آخر</string>
 </resources>

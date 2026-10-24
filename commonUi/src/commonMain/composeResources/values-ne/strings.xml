@@ -561,4 +561,8 @@
     <string name="dialog_save">सेभ गर्नुहोस्</string>
     <string name="upgraded_message">YMusic %1$s मा अद्यावधिक भयो</string>
     <string name="upgraded_view_changelog">परिवर्तनहरू हेर्नुहोस्</string>
+    <string name="menu_go_to_artist">कलाकारमा जानुहोस्</string>
+    <string name="menu_go_to_album">एल्बममा जानुहोस्</string>
+    <string name="link_copied">लिङ्क प्रतिलिपि गरियो</string>
+    <string name="download_other_format">अर्को ढाँचामा डाउनलोड गर्नुहोस्</string>
 </resources>

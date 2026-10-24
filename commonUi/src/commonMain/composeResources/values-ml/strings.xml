@@ -561,4 +561,8 @@
     <string name="dialog_save">സംരക്ഷിക്കുക</string>
     <string name="upgraded_message">YMusic %1$s-ലേക്ക് അപ്‌ഡേറ്റ് ചെയ്‌തു</string>
     <string name="upgraded_view_changelog">മാറ്റങ്ങൾ കാണുക</string>
+    <string name="menu_go_to_artist">ആർട്ടിസ്റ്റിലേക്ക് പോകുക</string>
+    <string name="menu_go_to_album">ആൽബത്തിലേക്ക് പോകുക</string>
+    <string name="link_copied">ലിങ്ക് പകർത്തി</string>
+    <string name="download_other_format">മറ്റൊരു ഫോർമാറ്റിൽ ഡൗൺലോഡ് ചെയ്യുക</string>
 </resources>

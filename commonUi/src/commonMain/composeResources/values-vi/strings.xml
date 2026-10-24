@@ -695,4 +695,8 @@
     <string name="dialog_save">Lưu</string>
     <string name="upgraded_message">YMusic đã được cập nhật lên %1$s</string>
     <string name="upgraded_view_changelog">Xem nhật ký thay đổi</string>
+    <string name="menu_go_to_artist">Đến nghệ sĩ</string>
+    <string name="menu_go_to_album">Đến album</string>
+    <string name="link_copied">Đã sao chép liên kết</string>
+    <string name="download_other_format">Tải xuống ở định dạng khác</string>
 </resources>

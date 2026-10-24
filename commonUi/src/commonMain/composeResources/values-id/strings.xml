@@ -556,4 +556,8 @@
     <string name="dialog_save">Simpan</string>
     <string name="upgraded_message">YMusic diperbarui ke %1$s</string>
     <string name="upgraded_view_changelog">Lihat catatan perubahan</string>
+    <string name="menu_go_to_artist">Buka artis</string>
+    <string name="menu_go_to_album">Buka album</string>
+    <string name="link_copied">Link disalin</string>
+    <string name="download_other_format">Download dalam format lain</string>
 </resources>
