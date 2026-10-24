@@ -72,7 +72,7 @@ private suspend fun cameraGranted(): Boolean = suspendCancellableCoroutine { con
 }
 
 @OptIn(ExperimentalForeignApi::class)
-private fun topViewController(): UIViewController? {
+internal fun topViewController(): UIViewController? {
     var vc = UIApplication.sharedApplication.keyWindow?.rootViewController
     while (vc?.presentedViewController != null) {
         vc = vc?.presentedViewController
