@@ -1,5 +1,32 @@
 # Changelog
 
+## Unreleased
+
+### NEW
+- Share YouTube videos, playlists, channels and albums as a link, from their rows, the queue, Now Playing, video details and the playlist page, through the system share sheet on Android and iOS ([#45](https://github.com/ymusic-io/YMusicV4/issues/45), [#19](https://github.com/ymusic-io/YMusicV4/issues/19), [#38](https://github.com/ymusic-io/YMusicV4/issues/38), [#34](https://github.com/ymusic-io/YMusicV4/issues/34), [bb47fdbc3](https://github.com/ymusic-io/YMusicV4/commit/bb47fdbc3996ef21f7f632b34396239c75cca4ad), [1b1f38c54](https://github.com/ymusic-io/YMusicV4/commit/1b1f38c54337a535c24486cc0a3cd80f9490b0f1), [6ab637c6f](https://github.com/ymusic-io/YMusicV4/commit/6ab637c6f428a13bf4cfd34bcdd93fe33bed59c3), [c46da11a5](https://github.com/ymusic-io/YMusicV4/commit/c46da11a5108c5b49dbd80502476cbb23352a170), [057bc5ef4](https://github.com/ymusic-io/YMusicV4/commit/057bc5ef46ad68780ae88594001160b04e5111ac))
+- The same song menu in every list: Go to artist, Go to album and Add to playlist in the Library, Library search and the queue; Library search also gets Show in folder and Remove from disk ([#45](https://github.com/ymusic-io/YMusicV4/issues/45), [#55](https://github.com/ymusic-io/YMusicV4/issues/55), [b4038e2d3](https://github.com/ymusic-io/YMusicV4/commit/b4038e2d3c741772790159139a74063137ba4c14))
+- Downloads: rename a finished download's file, add it to a playlist, share it, download it in another format, or remove it from disk ([#45](https://github.com/ymusic-io/YMusicV4/issues/45), [824d94527](https://github.com/ymusic-io/YMusicV4/commit/824d9452729f4d98e31bf85d383626a5a162e93e), [d79316ff8](https://github.com/ymusic-io/YMusicV4/commit/d79316ff84e0f2e6bd3b6df2e405bb4899a766bc), [9b94d61ff](https://github.com/ymusic-io/YMusicV4/commit/9b94d61ffb3406479a107efb971bcc5c972f50a5), [43d29aa03](https://github.com/ymusic-io/YMusicV4/commit/43d29aa0328da377310fcbd4b3dfcfe6c8632467))
+- Switch a YouTube video's audio track, e.g. take an auto-dubbed video back to its original language ([#36](https://github.com/ymusic-io/YMusicV4/issues/36), [8d5e10ae6](https://github.com/ymusic-io/YMusicV4/commit/8d5e10ae6128f98236840c2b05911e9c9b8b4a6c), [d04f2e1f7](https://github.com/ymusic-io/YMusicV4/commit/d04f2e1f775a37cf5933f3169fb286cbcfd525a7))
+- Android: Open with YMusic for audio and video files from file managers and chat apps ([67f0a273e](https://github.com/ymusic-io/YMusicV4/commit/67f0a273eaa343cb717c0e45c548ee7a0a848f05))
+- Now Playing: Search lyrics menu item ([35b76fa58](https://github.com/ymusic-io/YMusicV4/commit/35b76fa589992076af91d2dfa765b94b617f73c2))
+- Now Playing: the playing song is highlighted in the queue, and a button next to "Up next" scrolls back to it ([#40](https://github.com/ymusic-io/YMusicV4/issues/40), [3a3933bf4](https://github.com/ymusic-io/YMusicV4/commit/3a3933bf4198e97a3885332b9674b6b730fb9b74))
+- Library: sort songs by track number ([#46](https://github.com/ymusic-io/YMusicV4/issues/46), [fb519acc8](https://github.com/ymusic-io/YMusicV4/commit/fb519acc8feaaaa5bb033186f7aaa8e306ad561a))
+- Subscribe / Unsubscribe from a channel row's menu when signed in ([bb47fdbc3](https://github.com/ymusic-io/YMusicV4/commit/bb47fdbc3996ef21f7f632b34396239c75cca4ad))
+
+### FIXED
+- macOS 11: the app crashed at launch ([#54](https://github.com/ymusic-io/YMusicV4/issues/54), [8f5c41c32](https://github.com/ymusic-io/YMusicV4/commit/8f5c41c32ce1fdd195ae0d3b84a86d14e672d308))
+- iOS: YouTube sign-in never finished when the YouTube app was installed ([594e70005](https://github.com/ymusic-io/YMusicV4/commit/594e7000569ac4bcf4adfde93d5f6f1d016b882f))
+- Android: 1080p and higher videos dropped frames, froze while the audio played on, and heated up phones without a hardware AV1 decoder ([#52](https://github.com/ymusic-io/YMusicV4/issues/52), [e1a2ffdc1](https://github.com/ymusic-io/YMusicV4/commit/e1a2ffdc1964de2bfb803237f0262b04b74dbc12))
+- Opus and Ogg files (.opus, .ogg, .oga) couldn't be added to the Library ([#23](https://github.com/ymusic-io/YMusicV4/issues/23), [51ea29a82](https://github.com/ymusic-io/YMusicV4/commit/51ea29a82afb8617f1104cb9bda2729735b373bd))
+- Playlist download: the mini player covered the Download button ([#65](https://github.com/ymusic-io/YMusicV4/issues/65), [#68](https://github.com/ymusic-io/YMusicV4/issues/68), [#41](https://github.com/ymusic-io/YMusicV4/issues/41), [4c97b0745](https://github.com/ymusic-io/YMusicV4/commit/4c97b07458a560e23f0c0c413cb4e22067bf9fcd))
+- A download folder that already held music looked empty until a rescan ([965394ae3](https://github.com/ymusic-io/YMusicV4/commit/965394ae39a8e7818d52220d31699d61a0a18e20), [b88f99000](https://github.com/ymusic-io/YMusicV4/commit/b88f990002a17c80c3932467821c8dbc76284a24))
+- Some YouTube thumbnails and comment avatars didn't load ([338fbffa2](https://github.com/ymusic-io/YMusicV4/commit/338fbffa21bf60a212a0d01e7f1edbdd3b46a92e))
+- Desktop: clicking the app icon didn't bring back a window hidden to the tray ([0ef358ce4](https://github.com/ymusic-io/YMusicV4/commit/0ef358ce4762f6550157baa8f12a56be17b60792))
+
+### IMPROVED
+- Speed and pitch move in 0.01 steps, and holding −/+ keeps stepping ([#67](https://github.com/ymusic-io/YMusicV4/issues/67), [9b72f1e70](https://github.com/ymusic-io/YMusicV4/commit/9b72f1e70bb7cb058d2f997b2135215afe1a0257))
+- Ukrainian: strings that still showed in English are translated ([#56](https://github.com/ymusic-io/YMusicV4/issues/56), [ff2f101ef](https://github.com/ymusic-io/YMusicV4/commit/ff2f101ef92d57afadea381c19d8600efcbb06d4))
+
 ## 4.0.11
 
 ### NEW
