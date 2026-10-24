@@ -284,6 +284,7 @@
     <string name="play_all">Erreproduzitu guztiak</string>
     <string name="shuffle_all">Nahastu guztiak</string>
     <string name="cd_shuffle">Nahastu</string>
+    <string name="cd_scroll_to_now_playing">Joan erreproduzitzen ari den abestira</string>
     <string name="cd_sleep_timer">Lo egiteko tenporizadorea</string>
     <string name="cd_captions">Azpitituluak</string>
     <string name="cd_drag_to_reorder">Arrastatu ordena aldatzeko</string>

@@ -286,6 +286,7 @@
     <string name="play_all">Prehrať všetko</string>
     <string name="shuffle_all">Prehrať všetko náhodne</string>
     <string name="cd_shuffle">Náhodne</string>
+    <string name="cd_scroll_to_now_playing">Prejsť na prehrávanú skladbu</string>
     <string name="cd_sleep_timer">Časovač vypnutia</string>
     <string name="cd_captions">Titulky</string>
     <string name="cd_drag_to_reorder">Presunutím zmeníte poradie</string>

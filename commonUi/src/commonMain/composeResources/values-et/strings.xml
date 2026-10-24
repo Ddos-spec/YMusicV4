@@ -284,6 +284,7 @@
     <string name="play_all">Esita kõik</string>
     <string name="shuffle_all">Esita kõik juhuslikult</string>
     <string name="cd_shuffle">Juhuesitus</string>
+    <string name="cd_scroll_to_now_playing">Mine esitatava loo juurde</string>
     <string name="cd_sleep_timer">Unetaimer</string>
     <string name="cd_captions">Subtiitrid</string>
     <string name="cd_drag_to_reorder">Lohista järjestuse muutmiseks</string>

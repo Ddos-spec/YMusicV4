@@ -348,6 +348,7 @@
     <string name="play_all">Play all</string>
     <string name="shuffle_all">Shuffle all</string>
     <string name="cd_shuffle">Shuffle</string>
+    <string name="cd_scroll_to_now_playing">Scroll to the playing song</string>
     <string name="cd_sleep_timer">Sleep timer</string>
     <string name="cd_captions">Captions</string>
     <string name="cd_drag_to_reorder">Drag to reorder</string>

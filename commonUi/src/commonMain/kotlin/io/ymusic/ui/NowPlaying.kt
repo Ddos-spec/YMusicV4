@@ -49,6 +49,7 @@ import androidx.compose.material.icons.filled.FastRewind
 import androidx.compose.material.icons.filled.FitScreen
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
+import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Pause
@@ -171,6 +172,7 @@ import io.ymusic.ui.resources.cd_repeat_all
 import io.ymusic.ui.resources.cd_repeat_off
 import io.ymusic.ui.resources.cd_repeat_one
 import io.ymusic.ui.resources.cd_rewind10
+import io.ymusic.ui.resources.cd_scroll_to_now_playing
 import io.ymusic.ui.resources.cd_share
 import io.ymusic.ui.resources.cd_shuffle
 import io.ymusic.ui.resources.cd_unlock_rotation
@@ -526,6 +528,7 @@ private fun PortraitNowPlaying(
     }
     // Queue rows sit after the controls item and the sticky header in this list.
     val dragState = rememberReorderDragState(listState, indexOffset = 2) { from, to -> player.move(from, to) }
+    val locateCurrent = rememberLocateCurrent(listState, queue.currentIndex, indexOffset = 2)
 
     Column(
         Modifier.fillMaxSize()
@@ -620,7 +623,7 @@ private fun PortraitNowPlaying(
                         else Modifier,
                     ),
                 ) {
-                    QueueHeader(coordinator, queue.currentIndex, queue.displayTotal, queue.shuffle, queue.loopMode)
+                    QueueHeader(coordinator, queue.currentIndex, queue.displayTotal, queue.shuffle, queue.loopMode, locateCurrent)
                     HorizontalDivider(color = DesignColors.Divider)
                 }
             }
@@ -681,9 +684,10 @@ private fun LandscapeNowPlaying(
                     .background(DesignColors.Surface),
             ) {
                 PlayerTopBar(coordinator, sleepMs, onClose)
-                QueueHeader(coordinator, queue.currentIndex, queue.displayTotal, queue.shuffle, queue.loopMode)
-                HorizontalDivider(color = DesignColors.Divider)
                 val queueListState = rememberLazyListState()
+                val locateCurrent = rememberLocateCurrent(queueListState, queue.currentIndex, indexOffset = 0)
+                QueueHeader(coordinator, queue.currentIndex, queue.displayTotal, queue.shuffle, queue.loopMode, locateCurrent)
+                HorizontalDivider(color = DesignColors.Divider)
                 val dragState = rememberReorderDragState(queueListState, indexOffset = 0) { from, to -> player.move(from, to) }
                 FollowCurrentQueueItem(queueListState, queue.currentIndex)
                 LazyColumn(state = queueListState, modifier = Modifier.weight(1f)) {
@@ -728,6 +732,26 @@ private fun FollowCurrentQueueItem(listState: LazyListState, currentIndex: Int) 
             } finally {
                 following = false
             }
+        }
+    }
+}
+
+/**
+ * Scrolls the playing row (list index [indexOffset] + [currentIndex]) to the middle of [listState];
+ * null while any part of that row is on screen.
+ */
+@Composable
+private fun rememberLocateCurrent(listState: LazyListState, currentIndex: Int, indexOffset: Int): (() -> Unit)? {
+    val target = indexOffset + currentIndex
+    val onScreen by remember(listState, target) {
+        derivedStateOf { currentIndex < 0 || listState.layoutInfo.visibleItemsInfo.any { it.index == target } }
+    }
+    val scope = rememberCoroutineScope()
+    if (onScreen) return null
+    return {
+        scope.launch {
+            val rows = listState.layoutInfo.visibleItemsInfo.size
+            listState.animateScrollToItem(maxOf(target - rows / 2, 0))
         }
     }
 }
@@ -1697,7 +1721,14 @@ private fun QueueMoreRow(player: Player, more: QueueMore) {
 }
 
 @Composable
-private fun QueueHeader(coordinator: PlaybackCoordinator, currentIndex: Int, total: Int, shuffle: Boolean, loopMode: LoopMode) {
+private fun QueueHeader(
+    coordinator: PlaybackCoordinator,
+    currentIndex: Int,
+    total: Int,
+    shuffle: Boolean,
+    loopMode: LoopMode,
+    onLocateCurrent: (() -> Unit)?,
+) {
     val player = coordinator.player
     Row(
         Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 6.dp),
@@ -1712,6 +1743,14 @@ private fun QueueHeader(coordinator: PlaybackCoordinator, currentIndex: Int, tot
             "${currentIndex + 1} / $total",
             style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = DesignColors.InkFaint),
         )
+        if (onLocateCurrent != null) {
+            ActionIcon(
+                Icons.Default.GpsFixed,
+                stringResource(Res.string.cd_scroll_to_now_playing),
+                tint = DesignColors.InkSoft,
+                onClick = onLocateCurrent,
+            )
+        }
         Box(Modifier.weight(1f))
         ActionIcon(
             if (loopMode == LoopMode.One) Icons.Default.RepeatOne else Icons.Default.Repeat,
@@ -1820,6 +1859,7 @@ private fun QueueRowContent(
                     else -> Modifier
                 },
             )
+            .then(if (current) Modifier.background(DesignColors.Accent.copy(alpha = 0.1f)) else Modifier)
             .clickable { coordinator.player.playAt(index) }
             .padding(horizontal = 16.dp, vertical = if (large) 10.dp else 8.dp),
         horizontalArrangement = Arrangement.spacedBy(if (large) 12.dp else 8.dp),

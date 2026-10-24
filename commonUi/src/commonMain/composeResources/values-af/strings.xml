@@ -284,6 +284,7 @@
     <string name="play_all">Speel alles</string>
     <string name="shuffle_all">Skommel alles</string>
     <string name="cd_shuffle">Skommel</string>
+    <string name="cd_scroll_to_now_playing">Gaan na die liedjie wat speel</string>
     <string name="cd_sleep_timer">Slaaptydhouer</string>
     <string name="cd_captions">Onderskrifte</string>
     <string name="cd_drag_to_reorder">Sleep om te herrangskik</string>

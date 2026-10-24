@@ -284,6 +284,7 @@
     <string name="play_all">Αναπαραγωγή όλων</string>
     <string name="shuffle_all">Τυχαία αναπαραγωγή όλων</string>
     <string name="cd_shuffle">Τυχαία σειρά</string>
+    <string name="cd_scroll_to_now_playing">Μετάβαση στο τραγούδι που παίζει</string>
     <string name="cd_sleep_timer">Χρονοδιακόπτης</string>
     <string name="cd_captions">Υπότιτλοι</string>
     <string name="cd_drag_to_reorder">Σύρετε για αναδιάταξη</string>

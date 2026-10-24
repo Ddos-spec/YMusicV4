@@ -285,6 +285,7 @@
     <string name="play_all">Tocar tudo</string>
     <string name="shuffle_all">Tocar tudo no aleatório</string>
     <string name="cd_shuffle">Aleatório</string>
+    <string name="cd_scroll_to_now_playing">Ir para a música em reprodução</string>
     <string name="cd_sleep_timer">Timer para dormir</string>
     <string name="cd_captions">Legendas</string>
     <string name="cd_drag_to_reorder">Arraste para reordenar</string>

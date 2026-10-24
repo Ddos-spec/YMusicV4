@@ -283,6 +283,7 @@
     <string name="play_all">すべて再生</string>
     <string name="shuffle_all">すべてシャッフル</string>
     <string name="cd_shuffle">シャッフル</string>
+    <string name="cd_scroll_to_now_playing">再生中の曲へ移動</string>
     <string name="cd_sleep_timer">おやすみタイマー</string>
     <string name="cd_captions">字幕</string>
     <string name="cd_drag_to_reorder">ドラッグして並べ替え</string>

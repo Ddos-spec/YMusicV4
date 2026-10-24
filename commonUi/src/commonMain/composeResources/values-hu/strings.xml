@@ -284,6 +284,7 @@
     <string name="play_all">Összes lejátszása</string>
     <string name="shuffle_all">Összes keverése</string>
     <string name="cd_shuffle">Keverés</string>
+    <string name="cd_scroll_to_now_playing">Ugrás a lejátszott dalra</string>
     <string name="cd_sleep_timer">Elalvási időzítő</string>
     <string name="cd_captions">Feliratok</string>
     <string name="cd_drag_to_reorder">Húzd az átrendezéshez</string>

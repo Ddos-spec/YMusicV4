@@ -343,6 +343,7 @@
     <string name="play_all">Відтворити все</string>
     <string name="shuffle_all">Перемішати все</string>
     <string name="cd_shuffle">Перемішати</string>
+    <string name="cd_scroll_to_now_playing">До поточного треку</string>
     <string name="cd_sleep_timer">Таймер сну</string>
     <string name="cd_captions">Субтитри</string>
     <string name="cd_drag_to_reorder">Перетягніть, щоб змінити порядок</string>

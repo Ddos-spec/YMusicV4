@@ -283,6 +283,7 @@
     <string name="play_all">全部播放</string>
     <string name="shuffle_all">隨機播放全部</string>
     <string name="cd_shuffle">隨機播放</string>
+    <string name="cd_scroll_to_now_playing">跳到正在播放的歌曲</string>
     <string name="cd_sleep_timer">睡眠定時器</string>
     <string name="cd_captions">字幕</string>
     <string name="cd_drag_to_reorder">拖曳以重新排序</string>

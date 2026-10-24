@@ -285,6 +285,7 @@
     <string name="play_all">Tout lire</string>
     <string name="shuffle_all">Tout lire en aléatoire</string>
     <string name="cd_shuffle">Lecture aléatoire</string>
+    <string name="cd_scroll_to_now_playing">Aller au titre en cours</string>
     <string name="cd_sleep_timer">Minuteur de sommeil</string>
     <string name="cd_captions">Sous-titres</string>
     <string name="cd_drag_to_reorder">Faire glisser pour réorganiser</string>

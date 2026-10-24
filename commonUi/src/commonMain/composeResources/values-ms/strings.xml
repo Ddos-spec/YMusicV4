@@ -283,6 +283,7 @@
     <string name="play_all">Main semua</string>
     <string name="shuffle_all">Kocok semua</string>
     <string name="cd_shuffle">Kocok</string>
+    <string name="cd_scroll_to_now_playing">Pergi ke lagu yang sedang dimainkan</string>
     <string name="cd_sleep_timer">Pemasa tidur</string>
     <string name="cd_captions">Sari kata</string>
     <string name="cd_drag_to_reorder">Seret untuk menyusun semula</string>

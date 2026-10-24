@@ -284,6 +284,7 @@
     <string name="play_all">Cheza zote</string>
     <string name="shuffle_all">Changanya zote</string>
     <string name="cd_shuffle">Changanya</string>
+    <string name="cd_scroll_to_now_playing">Nenda kwenye wimbo unaocheza</string>
     <string name="cd_sleep_timer">Kipima muda cha kulala</string>
     <string name="cd_captions">Manukuu</string>
     <string name="cd_drag_to_reorder">Buruta ili kupanga upya</string>

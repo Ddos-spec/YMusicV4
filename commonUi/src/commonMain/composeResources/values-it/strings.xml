@@ -285,6 +285,7 @@
     <string name="play_all">Riproduci tutto</string>
     <string name="shuffle_all">Riproduci tutto in ordine casuale</string>
     <string name="cd_shuffle">Riproduzione casuale</string>
+    <string name="cd_scroll_to_now_playing">Vai al brano in riproduzione</string>
     <string name="cd_sleep_timer">Timer di spegnimento</string>
     <string name="cd_captions">Sottotitoli</string>
     <string name="cd_drag_to_reorder">Trascina per riordinare</string>

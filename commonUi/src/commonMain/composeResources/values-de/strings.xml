@@ -284,6 +284,7 @@
     <string name="play_all">Alle abspielen</string>
     <string name="shuffle_all">Alle zufällig</string>
     <string name="cd_shuffle">Zufallswiedergabe</string>
+    <string name="cd_scroll_to_now_playing">Zum laufenden Titel springen</string>
     <string name="cd_sleep_timer">Sleep-Timer</string>
     <string name="cd_captions">Untertitel</string>
     <string name="cd_drag_to_reorder">Zum Neuordnen ziehen</string>

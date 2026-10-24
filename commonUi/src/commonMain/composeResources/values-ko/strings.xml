@@ -283,6 +283,7 @@
     <string name="play_all">모두 재생</string>
     <string name="shuffle_all">모두 셔플</string>
     <string name="cd_shuffle">셔플</string>
+    <string name="cd_scroll_to_now_playing">재생 중인 곡으로 이동</string>
     <string name="cd_sleep_timer">자동 끄기 타이머</string>
     <string name="cd_captions">자막</string>
     <string name="cd_drag_to_reorder">드래그하여 순서 변경</string>
