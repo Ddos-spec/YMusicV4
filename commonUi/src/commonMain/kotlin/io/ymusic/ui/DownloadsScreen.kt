@@ -106,7 +106,10 @@ import io.ymusic.ui.resources.retry
 import kmpcommon.log.Logger
 import kmpcommon.uri.Uri
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -445,7 +448,19 @@ private fun RenameDownloadDialog(
     onDismiss: () -> Unit,
 ) {
     val uri = task.fileUri ?: return
-    val currentName by produceState<String?>(null, uri) { value = renamer.nameOf(uri) ?: "" }
+    val snackbar = LocalSnackbar.current
+    val currentName by produceState<String?>(null, uri) {
+        try {
+            value = withContext(Dispatchers.IO) { renamer.nameOf(uri) } ?: ""
+        } catch (cancel: CancellationException) {
+            throw cancel
+        } catch (failure: Throwable) {
+            graph.logger?.fork("download-rename", mapOf("taskId" to task.id))
+                ?.log(Logger.Level.WARN, "reading a downloaded file's name failed", failure)
+            snackbar(errorText(failure.errorCode() ?: "E70071").load())
+            onDismiss()
+        }
+    }
     val name = currentName ?: return
     val dot = name.lastIndexOf('.').takeIf { it > 0 } ?: name.length
     val extension = name.substring(dot)
@@ -460,7 +475,7 @@ private fun RenameDownloadDialog(
             try {
                 val store = graph.mediaStore
                 val libraryItem = store?.let { libraryItemOf(it, task) }
-                val newUri = renamer.rename(uri, stem + extension)
+                val newUri = withContext(Dispatchers.IO) { renamer.rename(uri, stem + extension) }
                 service.relocate(task.id, newUri)
                 if (store != null && libraryItem != null) store.relocateItem(libraryItem.id, Uri.parse(newUri))
                 onDismiss()

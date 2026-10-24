@@ -145,6 +145,7 @@ E70052 D googlevideo answered a SABR error part (UMP 44) to a download (download
 E70053 D a SABR download failed with an otherwise uncoded error (download YtStreamDownloader.sabrFailure)
 E70060 D could not create the download scratch directory, volume not full (download DefaultDownloadScratch)
 E70070 - renaming a completed download's file failed with an uncoded error (commonUi DownloadsScreen.kt RenameDownloadDialog)
+E70071 - reading a completed download's file name for Rename failed with an uncoded error (commonUi DownloadsScreen.kt RenameDownloadDialog)
 
 E80070 D MSE not available on this platform (mse apple)
 E80071 D MSE mime type not supported (mse)

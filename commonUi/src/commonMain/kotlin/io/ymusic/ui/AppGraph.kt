@@ -24,6 +24,7 @@ import io.ymusic.ui.sponsorblock.ServiceSponsorBlockApi
 import io.ymusic.ui.sponsorblock.SponsorBlockApi
 import io.ymusic.ui.sponsorblock.SponsorBlockService
 import io.ymusic.ui.sponsorblock.SponsorBlockStore
+import kmpcommon.WorkerThread
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -302,10 +303,11 @@ class AppGraph(
 }
 
 /** Renaming a media file in its own folder. */
+@WorkerThread
 interface FileRenaming {
     /** The file's current name, extension included; null when it is gone. */
-    suspend fun nameOf(uri: String): String?
+    fun nameOf(uri: String): String?
 
     /** Renames the file to [newName] (extension included) and returns its new uri. Throws on failure. */
-    suspend fun rename(uri: String, newName: String): String
+    fun rename(uri: String, newName: String): String
 }
