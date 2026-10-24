@@ -13,6 +13,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.LocalClipboard
+import io.ymusic.dynamicengine.yt.YtFeedItem
 import io.ymusic.mediastore.model.MediaStoreItem
 import io.ymusic.ui.resources.Res
 import io.ymusic.ui.resources.link_copied
@@ -32,20 +33,24 @@ internal val LocalLibraryGroupReveal = compositionLocalOf<MutableState<LibraryGr
 /** A local song's "Go to artist" / "Go to album"; null hides both. */
 internal val LocalGoToLibraryGroup = compositionLocalOf<((LibraryGroupKind, MediaStoreItem) -> Unit)?> { null }
 
-/** A local song's "Share" (the file itself); null (no shell share sheet) hides the item. */
-internal val LocalShareSong = compositionLocalOf<((MediaStoreItem) -> Unit)?> { null }
-
-/** A YouTube video's "Share" (its link); null hides the item. */
-internal val LocalShareVideo = compositionLocalOf<((videoId: String) -> Unit)?> { null }
+/** "Share" on a YouTube video / playlist / channel ([YtFeedItem.kind] + its id); null hides the item. */
+internal val LocalShareYoutube = compositionLocalOf<((kind: String, id: String) -> Unit)?> { null }
 
 /** The app-wide [SongActions], for screens that need more than a menu's request (e.g. a follow-up after a delete). */
 internal val LocalSongActions = compositionLocalOf<SongActions?> { null }
 
-internal fun youtubeShareLink(videoId: String) = "https://youtu.be/$videoId"
+/** The YouTube web link of a video / playlist / channel with youtube.com swapped for the app's own domain;
+ *  null when the id has no www.youtube.com page (a YouTube Music browse id such as an album's MPREb…). */
+internal fun youtubeShareLink(kind: String, id: String): String? = when (kind) {
+    YtFeedItem.KIND_VIDEO -> "watch?v=$id"
+    YtFeedItem.KIND_PLAYLIST -> id.removePrefix("VL").takeUnless { it.startsWith("MPRE") || it.startsWith("FE") }?.let { "playlist?list=$it" }
+    YtFeedItem.KIND_CHANNEL -> id.takeIf { it.startsWith("UC") }?.let { "channel/$it" }
+    else -> null
+}?.let { "https://www.ymusicapp.com/$it" }
 
 /**
  * The song-menu actions shared by every screen listing songs (Library, Library search, Downloads, the
- * queue): the add-to-playlist and remove-from-disk dialogs plus the share / go-to hooks. Provided
+ * queue): the add-to-playlist and remove-from-disk dialogs plus the go-to and link-share hooks. Provided
  * app-wide through [provided] and drawn once by [Dialogs], so a menu only ever REQUESTS an action.
  */
 @Stable
@@ -71,8 +76,8 @@ internal class SongActions(
         if (canDelete) confirmingDelete = song to afterDelete
     }
 
-    fun shareVideo(videoId: String) {
-        val link = youtubeShareLink(videoId)
+    fun shareYoutube(kind: String, id: String) {
+        val link = youtubeShareLink(kind, id) ?: return
         val share = graph.shareText
         if (share != null) {
             share(link)
@@ -84,9 +89,6 @@ internal class SongActions(
         }
     }
 
-    val shareSong: ((MediaStoreItem) -> Unit)? =
-        graph.shareFile?.let { share -> { song -> share(song.uri.toString(), song.mimeType) } }
-
     @Composable
     fun provided(): Array<ProvidedValue<*>> {
         val store = graph.mediaStore
@@ -96,8 +98,7 @@ internal class SongActions(
             LocalLibraryDelete provides if (canDelete) ({ song -> requestDelete(song) }) else null,
             LocalLibraryReveal provides if (store != null) reveal else null,
             LocalGoToLibraryGroup provides if (store != null) goToGroup else null,
-            LocalShareSong provides shareSong,
-            LocalShareVideo provides ::shareVideo,
+            LocalShareYoutube provides ::shareYoutube,
         )
     }
 

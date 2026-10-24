@@ -565,4 +565,6 @@
     <string name="menu_go_to_album">Gaan na album</string>
     <string name="link_copied">Skakel gekopieer</string>
     <string name="download_other_format">Laai in ’n ander formaat af</string>
+    <string name="unsubscribe">Kanselleer intekening</string>
+    <string name="unsubscribed">Intekening gekanselleer</string>
 </resources>

@@ -575,4 +575,6 @@
     <string name="menu_go_to_album">Перейти до альбому</string>
     <string name="link_copied">Посилання скопійовано</string>
     <string name="download_other_format">Завантажити в іншому форматі</string>
+    <string name="unsubscribe">Відписатися</string>
+    <string name="unsubscribed">Ви відписалися</string>
 </resources>

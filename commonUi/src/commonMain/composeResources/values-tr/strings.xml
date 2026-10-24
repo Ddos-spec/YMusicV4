@@ -565,4 +565,6 @@
     <string name="menu_go_to_album">Albüme git</string>
     <string name="link_copied">Bağlantı kopyalandı</string>
     <string name="download_other_format">Başka biçimde indir</string>
+    <string name="unsubscribe">Abonelikten çık</string>
+    <string name="unsubscribed">Abonelikten çıkıldı</string>
 </resources>

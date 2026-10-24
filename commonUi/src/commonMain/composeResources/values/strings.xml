@@ -733,4 +733,6 @@
     <string name="menu_go_to_album">Go to album</string>
     <string name="link_copied">Link copied</string>
     <string name="download_other_format">Download in another format</string>
+    <string name="unsubscribe">Unsubscribe</string>
+    <string name="unsubscribed">Unsubscribed</string>
 </resources>

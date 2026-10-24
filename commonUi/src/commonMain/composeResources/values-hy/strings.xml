@@ -565,4 +565,6 @@
     <string name="menu_go_to_album">Անցնել ալբոմին</string>
     <string name="link_copied">Հղումը պատճենվեց</string>
     <string name="download_other_format">Ներբեռնել այլ ձևաչափով</string>
+    <string name="unsubscribe">Չեղարկել բաժանորդագրությունը</string>
+    <string name="unsubscribed">Բաժանորդագրությունը չեղարկվեց</string>
 </resources>

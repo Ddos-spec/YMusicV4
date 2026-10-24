@@ -719,4 +719,6 @@
     <string name="menu_go_to_album">الذهاب إلى الألبوم</string>
     <string name="link_copied">تم نسخ الرابط</string>
     <string name="download_other_format">التنزيل بتنسيق آخر</string>
+    <string name="unsubscribe">إلغاء الاشتراك</string>
+    <string name="unsubscribed">تم إلغاء الاشتراك</string>
 </resources>

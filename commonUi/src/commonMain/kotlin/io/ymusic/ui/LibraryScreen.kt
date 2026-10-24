@@ -96,7 +96,6 @@ import io.ymusic.ui.resources.Res
 import io.ymusic.ui.resources.add_to_playlist_new
 import io.ymusic.ui.resources.cd_add_to_playlist
 import io.ymusic.ui.resources.cd_back
-import io.ymusic.ui.resources.cd_share
 import io.ymusic.ui.resources.delete_from_disk_confirm
 import io.ymusic.ui.resources.delete_from_disk_message
 import io.ymusic.ui.resources.delete_from_disk_title
@@ -1512,7 +1511,7 @@ internal fun SongRow(song: MediaStoreItem, coordinator: PlaybackCoordinator? = n
 }
 
 /** The local song overflow menu (the legacy app's song menu): play, queue, playlist, go to artist /
- *  album, reveal in its folder, share and remove from disk — each shown only where its host provides it. */
+ *  album, reveal in its folder and remove from disk — each shown only where its host provides it. */
 @Composable
 private fun songActions(song: MediaStoreItem, coordinator: PlaybackCoordinator): ItemActions {
     val play = stringResource(Res.string.menu_play)
@@ -1531,8 +1530,6 @@ private fun songActions(song: MediaStoreItem, coordinator: PlaybackCoordinator):
     val goToGroup = LocalGoToLibraryGroup.current
     val goToArtist = stringResource(Res.string.menu_go_to_artist)
     val goToAlbum = stringResource(Res.string.menu_go_to_album)
-    val share = LocalShareSong.current
-    val shareLabel = stringResource(Res.string.cd_share)
     return ItemActions(
         buildList {
             add(play to { coordinator.playLocalSingle(song) })
@@ -1546,7 +1543,6 @@ private fun songActions(song: MediaStoreItem, coordinator: PlaybackCoordinator):
                 add(goToAlbum to { goToGroup(LibraryGroupKind.Album, song) })
             }
             if (reveal != null && song.bucketId != null) add(showInFolder to { reveal(song) })
-            if (share != null) add(shareLabel to { share(song) })
             if (requestDelete != null) add(removeFromDisk to { requestDelete(song) })
         },
     )

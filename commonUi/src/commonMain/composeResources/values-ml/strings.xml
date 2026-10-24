@@ -565,4 +565,6 @@
     <string name="menu_go_to_album">ആൽബത്തിലേക്ക് പോകുക</string>
     <string name="link_copied">ലിങ്ക് പകർത്തി</string>
     <string name="download_other_format">മറ്റൊരു ഫോർമാറ്റിൽ ഡൗൺലോഡ് ചെയ്യുക</string>
+    <string name="unsubscribe">അൺസബ്‌സ്‌ക്രൈബ് ചെയ്യുക</string>
+    <string name="unsubscribed">അൺസബ്‌സ്‌ക്രൈബ് ചെയ്‌തു</string>
 </resources>

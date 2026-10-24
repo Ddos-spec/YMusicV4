@@ -565,4 +565,6 @@
     <string name="menu_go_to_album">Gehe zu Album</string>
     <string name="link_copied">Link kopiert</string>
     <string name="download_other_format">In anderem Format herunterladen</string>
+    <string name="unsubscribe">Deabonnieren</string>
+    <string name="unsubscribed">Deabonniert</string>
 </resources>

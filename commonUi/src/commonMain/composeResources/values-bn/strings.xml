@@ -565,4 +565,6 @@
     <string name="menu_go_to_album">অ্যালবামে যান</string>
     <string name="link_copied">লিঙ্ক কপি করা হয়েছে</string>
     <string name="download_other_format">অন্য ফরম্যাটে ডাউনলোড করুন</string>
+    <string name="unsubscribe">সদস্যতা ত্যাগ করুন</string>
+    <string name="unsubscribed">সদস্যতা ত্যাগ করা হয়েছে</string>
 </resources>

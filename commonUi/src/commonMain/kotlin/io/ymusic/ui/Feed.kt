@@ -47,6 +47,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,6 +62,7 @@ import io.ymusic.dynamicengine.yt.YtChip
 import io.ymusic.dynamicengine.yt.YtFeedItem
 import io.ymusic.dynamicengine.yt.YtSection
 import io.ymusic.dynamicengine.yt.YtSectionHeader
+import io.ymusic.dynamicengine.yt.subscribeChannel
 import io.ymusic.ui.resources.Res
 import io.ymusic.ui.resources.cd_download
 import io.ymusic.ui.resources.cd_share
@@ -87,6 +89,10 @@ import io.ymusic.ui.resources.retry
 import io.ymusic.ui.resources.show_less
 import io.ymusic.ui.resources.show_more
 import io.ymusic.ui.resources.show_more_n
+import io.ymusic.ui.resources.subscribe
+import io.ymusic.ui.resources.subscribed
+import io.ymusic.ui.resources.unsubscribe
+import io.ymusic.ui.resources.unsubscribed
 import kmpcommon.log.Logger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -99,6 +105,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import projectcommon.error.DISK_FULL_CODE
 import projectcommon.error.errorCode
@@ -783,7 +790,8 @@ private fun itemActions(item: YtFeedItem, coordinator: PlaybackCoordinator): Ite
     val removeFromTopTracks = LocalRemoveFromTopTracks.current
     val ytPlaylists = LocalYtPlaylistActions.current
     val removeFromYtPlaylist = LocalRemoveFromYtPlaylist.current
-    val share = LocalShareVideo.current
+    val share = LocalShareYoutube.current
+    val subscribe = if (item.kind == YtFeedItem.KIND_CHANNEL) rememberChannelSubscriber(coordinator) else null
     return ItemActions(
         if (item.kind == YtFeedItem.KIND_VIDEO) {
             buildList {
@@ -800,7 +808,7 @@ private fun itemActions(item: YtFeedItem, coordinator: PlaybackCoordinator): Ite
                         add(stringResource(Res.string.quick_download_menu, quickPreset.label()) to { downloadLauncher.quickLaunch(item) })
                     }
                 }
-                if (share != null) add(stringResource(Res.string.cd_share) to { share(item.id) })
+                if (share != null) add(stringResource(Res.string.cd_share) to { share(item.kind, item.id) })
                 if (removeFromYtPlaylist != null && item.removeToken != null) {
                     add(stringResource(Res.string.menu_remove_from_playlist) to { removeFromYtPlaylist(item) })
                 }
@@ -809,9 +817,43 @@ private fun itemActions(item: YtFeedItem, coordinator: PlaybackCoordinator): Ite
                 }
             }
         } else {
-            emptyList()
+            buildList {
+                val channelId = (item.channelId ?: item.id).takeIf { item.kind == YtFeedItem.KIND_CHANNEL }
+                if (channelId != null && subscribe != null) {
+                    add(stringResource(Res.string.subscribe) to { subscribe(channelId, true) })
+                    add(stringResource(Res.string.unsubscribe) to { subscribe(channelId, false) })
+                }
+                if (share != null && youtubeShareLink(item.kind, item.id) != null) {
+                    add(stringResource(Res.string.cd_share) to { share(item.kind, item.id) })
+                }
+            }
         },
     )
+}
+
+/** A channel row's Subscribe / Unsubscribe, reported by snackbar; null while signed out. */
+@Composable
+private fun rememberChannelSubscriber(coordinator: PlaybackCoordinator): ((channelId: String, subscribe: Boolean) -> Unit)? {
+    val signIn = LocalSignInResolver.current
+    if (signIn == null || !signIn.signedIn) return null
+    val graph = coordinator.graph
+    val scope = rememberCoroutineScope()
+    val snackbar = LocalSnackbar.current
+    return { channelId, subscribe ->
+        scope.launch {
+            val log = graph.logger?.fork("channel-subscribe", mapOf("channelId" to channelId))
+            val message = try {
+                graph.engines.subscribeChannel(channelId, subscribe, log)
+                getString(if (subscribe) Res.string.subscribed else Res.string.unsubscribed)
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Throwable) {
+                log?.log(Logger.Level.WARN, "subscribe from a channel row failed", error)
+                errorText(error.errorCode() ?: "E20161").load()
+            }
+            snackbar(message)
+        }
+    }
 }
 
 /** The feed filter chips ("All / Music / Gaming…"); tapping one reloads the feed through its token.

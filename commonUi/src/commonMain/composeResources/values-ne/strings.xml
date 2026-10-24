@@ -565,4 +565,6 @@
     <string name="menu_go_to_album">एल्बममा जानुहोस्</string>
     <string name="link_copied">लिङ्क प्रतिलिपि गरियो</string>
     <string name="download_other_format">अर्को ढाँचामा डाउनलोड गर्नुहोस्</string>
+    <string name="unsubscribe">सदस्यता रद्द गर्नुहोस्</string>
+    <string name="unsubscribed">सदस्यता रद्द गरियो</string>
 </resources>

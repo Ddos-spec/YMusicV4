@@ -565,4 +565,6 @@
     <string name="menu_go_to_album">Booqo albumka</string>
     <string name="link_copied">Linkiga waa la koobiyeeyay</string>
     <string name="download_other_format">Ku soo deji qaab kale</string>
+    <string name="unsubscribe">Ka bax rukummada</string>
+    <string name="unsubscribed">Waa laga baxay rukummada</string>
 </resources>

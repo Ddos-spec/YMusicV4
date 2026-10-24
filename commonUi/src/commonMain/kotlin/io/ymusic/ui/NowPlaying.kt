@@ -69,6 +69,7 @@ import androidx.compose.material.icons.outlined.GraphicEq
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -127,6 +128,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import io.ymusic.dynamicengine.yt.YtFeedItem
 import io.ymusic.mediastore.model.MediaStoreItem
 import io.ymusic.player.LoopMode
 import io.ymusic.player.PlayableItem
@@ -1348,6 +1350,7 @@ private fun PlayerMoreMenu(coordinator: PlaybackCoordinator) {
     var detailsOpen by remember { mutableStateOf(false) }
     val video = player.queue.collectAsState().value.currentItem as? PlayableItem.YtMedia
     val ytPlaylists = LocalYtPlaylistActions.current
+    val shareYoutube = LocalShareYoutube.current
     val snackbar = LocalSnackbar.current
     val noVideos = stringResource(Res.string.yt_playlist_queue_empty)
     val scope = rememberCoroutineScope()
@@ -1366,6 +1369,12 @@ private fun PlayerMoreMenu(coordinator: PlaybackCoordinator) {
                 if (ytPlaylists != null) {
                     MoreMenuItem(Icons.AutoMirrored.Outlined.PlaylistAdd, stringResource(Res.string.menu_add_to_playlist)) {
                         ytPlaylists.addToPlaylist(video.videoId)
+                        open = false
+                    }
+                }
+                if (shareYoutube != null) {
+                    MoreMenuItem(Icons.Outlined.Share, stringResource(Res.string.cd_share)) {
+                        shareYoutube(YtFeedItem.KIND_VIDEO, video.videoId)
                         open = false
                     }
                 }
@@ -1881,8 +1890,7 @@ private fun queueItemActions(coordinator: PlaybackCoordinator, index: Int, item:
     val goToGroup = LocalGoToLibraryGroup.current
     val goToArtist = stringResource(Res.string.menu_go_to_artist)
     val goToAlbum = stringResource(Res.string.menu_go_to_album)
-    val shareSong = LocalShareSong.current
-    val shareVideo = LocalShareVideo.current
+    val shareYoutube = LocalShareYoutube.current
     val ytPlaylists = LocalYtPlaylistActions.current
     val downloadLauncher = LocalDownloadLauncher.current
     val startRadio = stringResource(Res.string.menu_start_radio)
@@ -1906,12 +1914,11 @@ private fun queueItemActions(coordinator: PlaybackCoordinator, index: Int, item:
                         add(goToArtist to { goToGroup(LibraryGroupKind.Artist, local) })
                         add(goToAlbum to { goToGroup(LibraryGroupKind.Album, local) })
                     }
-                    if (shareSong != null) add(shareLabel to { shareSong(local) })
                 }
                 is PlayableItem.YtMedia -> {
                     if (ytPlaylists != null) add(addToPlaylistLabel to { ytPlaylists.addToPlaylist(item.videoId) })
                     if (video != null && downloadLauncher != null) add(download to { downloadLauncher.launch(video) })
-                    if (shareVideo != null) add(shareLabel to { shareVideo(item.videoId) })
+                    if (shareYoutube != null) add(shareLabel to { shareYoutube(YtFeedItem.KIND_VIDEO, item.videoId) })
                 }
             }
             add(removeFromQueue to { player.removeAt(index) })

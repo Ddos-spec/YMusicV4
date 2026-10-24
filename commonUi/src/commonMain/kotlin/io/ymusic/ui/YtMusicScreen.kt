@@ -265,6 +265,7 @@ fun MusicDetailScreen(
                     PlaylistHeader(
                         title = title,
                         meta = ready?.pageHeader?.subtitleLine1 ?: session.item.subtitleLine1,
+                        onShare = sharePlaylist(session.item, ready?.pageHeader),
                         onShuffle = if (videos.isEmpty()) {
                             null
                         } else {

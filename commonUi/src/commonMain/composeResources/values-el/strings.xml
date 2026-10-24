@@ -565,4 +565,6 @@
     <string name="menu_go_to_album">Πήγαινε στο άλμπουμ</string>
     <string name="link_copied">Ο σύνδεσμος αντιγράφηκε</string>
     <string name="download_other_format">Λήψη σε άλλη μορφή</string>
+    <string name="unsubscribe">Κατάργηση εγγραφής</string>
+    <string name="unsubscribed">Η εγγραφή καταργήθηκε</string>
 </resources>

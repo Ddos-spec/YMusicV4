@@ -565,4 +565,6 @@
     <string name="menu_go_to_album">Pumunta sa album</string>
     <string name="link_copied">Nakopya ang link</string>
     <string name="download_other_format">I-download sa ibang format</string>
+    <string name="unsubscribe">Mag-unsubscribe</string>
+    <string name="unsubscribed">Na-unsubscribe</string>
 </resources>

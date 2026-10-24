@@ -560,4 +560,6 @@
     <string name="menu_go_to_album">Pergi ke album</string>
     <string name="link_copied">Pautan disalin</string>
     <string name="download_other_format">Muat turun dalam format lain</string>
+    <string name="unsubscribe">Nyahlanggan</string>
+    <string name="unsubscribed">Dinyahlanggan</string>
 </resources>

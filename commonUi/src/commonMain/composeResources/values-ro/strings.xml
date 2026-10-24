@@ -570,4 +570,6 @@
     <string name="menu_go_to_album">Spre album</string>
     <string name="link_copied">Link copiat</string>
     <string name="download_other_format">Descarcă în alt format</string>
+    <string name="unsubscribe">Dezabonează-te</string>
+    <string name="unsubscribed">Dezabonat</string>
 </resources>

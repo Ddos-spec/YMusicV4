@@ -560,4 +560,6 @@
     <string name="menu_go_to_album">ไปที่อัลบั้ม</string>
     <string name="link_copied">คัดลอกลิงก์แล้ว</string>
     <string name="download_other_format">ดาวน์โหลดในรูปแบบอื่น</string>
+    <string name="unsubscribe">ยกเลิกการติดตาม</string>
+    <string name="unsubscribed">ยกเลิกการติดตามแล้ว</string>
 </resources>

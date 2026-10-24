@@ -565,4 +565,6 @@
     <string name="menu_go_to_album">Albuma keç</string>
     <string name="link_copied">Keçid kopyalandı</string>
     <string name="download_other_format">Başqa formatda endir</string>
+    <string name="unsubscribe">Abunəlikdən çıx</string>
+    <string name="unsubscribed">Abunəlik ləğv edildi</string>
 </resources>

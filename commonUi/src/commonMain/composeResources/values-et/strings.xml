@@ -565,4 +565,6 @@
     <string name="menu_go_to_album">Mine albumisse</string>
     <string name="link_copied">Link kopeeritud</string>
     <string name="download_other_format">Laadi alla teises vormingus</string>
+    <string name="unsubscribe">Loobu tellimusest</string>
+    <string name="unsubscribed">Tellimusest loobutud</string>
 </resources>

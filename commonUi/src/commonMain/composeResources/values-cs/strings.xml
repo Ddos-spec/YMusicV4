@@ -575,4 +575,6 @@
     <string name="menu_go_to_album">Zobrazit album</string>
     <string name="link_copied">Odkaz zkopírován</string>
     <string name="download_other_format">Stáhnout v jiném formátu</string>
+    <string name="unsubscribe">Zrušit odběr</string>
+    <string name="unsubscribed">Odběr zrušen</string>
 </resources>

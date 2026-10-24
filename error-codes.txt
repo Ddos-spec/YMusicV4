@@ -94,6 +94,7 @@ E20157 D player/init 20 s deadline hit with the base.js download the earliest st
 E20158 D player/init (or PO-token minter) 20 s deadline hit with the player storage hydrate the earliest step still running (engine-js logic/player/boot.ts)
 E20159 D player/init (or PO-token minter) 20 s deadline hit with no tracked step running (engine-js logic/player/boot.ts)
 E20160 D edit_playlist answered a non-success status when saving an owned playlist's sort order (engine-js logic/yt/playlistEdit.ts setPlaylistOrder)
+E20161 - subscribing/unsubscribing from a channel row menu failed with an uncoded error (commonUi Feed.kt rememberChannelSubscriber)
 E24242 - (example) dynamic-engine HostCommandTest fixture
 E29999 - (example) EngineErrorDecodeTest / HOST_PROTOCOLS.md fixture
 

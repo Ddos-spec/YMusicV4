@@ -565,4 +565,6 @@
     <string name="menu_go_to_album">Ga naar album</string>
     <string name="link_copied">Link gekopieerd</string>
     <string name="download_other_format">Downloaden in een ander formaat</string>
+    <string name="unsubscribe">Abonnement opzeggen</string>
+    <string name="unsubscribed">Abonnement opgezegd</string>
 </resources>

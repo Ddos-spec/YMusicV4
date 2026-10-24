@@ -570,4 +570,6 @@
     <string name="menu_go_to_album">Idi na album</string>
     <string name="link_copied">Poveznica kopirana</string>
     <string name="download_other_format">Preuzmi u drugom formatu</string>
+    <string name="unsubscribe">Otkaži pretplatu</string>
+    <string name="unsubscribed">Pretplata otkazana</string>
 </resources>

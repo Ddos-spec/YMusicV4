@@ -699,4 +699,6 @@
     <string name="menu_go_to_album">Đến album</string>
     <string name="link_copied">Đã sao chép liên kết</string>
     <string name="download_other_format">Tải xuống ở định dạng khác</string>
+    <string name="unsubscribe">Hủy đăng ký</string>
+    <string name="unsubscribed">Đã hủy đăng ký</string>
 </resources>

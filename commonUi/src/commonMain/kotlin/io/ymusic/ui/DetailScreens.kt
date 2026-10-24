@@ -240,6 +240,7 @@ fun PlaylistDetailScreen(
                         save = ready?.pageHeader?.savePlaylistId?.let { playlistId ->
                             { SavePlaylistToggle(s.saved, s.saving) { s.toggleSaved(playlistId) } }
                         },
+                        onShare = sharePlaylist(item, ready?.pageHeader),
                     )
                 },
                 listState = s.feed.listState,
@@ -248,7 +249,17 @@ fun PlaylistDetailScreen(
     }
 }
 
-/** Title + meta, the actions row (design chrome until playlists/share/downloads land) and the
+/** The playlist page's Share: its id from the page header, else from the row it was opened from (a
+ *  deeplink-seeded page carries the link, not an id, until the header answers). */
+@Composable
+internal fun sharePlaylist(item: YtFeedItem, header: YtPageHeader?): (() -> Unit)? {
+    val share = LocalShareYoutube.current ?: return null
+    val playlistId = header?.savePlaylistId ?: item.id.takeIf { item.kind == YtFeedItem.KIND_PLAYLIST && it != item.url } ?: return null
+    if (youtubeShareLink(YtFeedItem.KIND_PLAYLIST, playlistId) == null) return null
+    return { share(YtFeedItem.KIND_PLAYLIST, playlistId) }
+}
+
+/** Title + meta, the actions row and the
  *  shuffle FAB, closed by the 16dp-inset divider. Shared by the WEB playlist detail and the YT Music
  *  album/playlist detail so both read identically. [save] (the save-to-library toggle) leads the
  *  row only when the playlist can be saved. */
@@ -260,6 +271,7 @@ internal fun PlaylistHeader(
     onDownload: (() -> Unit)? = null,
     onCreateLocal: (() -> Unit)? = null,
     save: (@Composable () -> Unit)? = null,
+    onShare: (() -> Unit)? = null,
 ) {
     Column(Modifier.fillMaxWidth()) {
         Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 8.dp)) {
@@ -281,7 +293,7 @@ internal fun PlaylistHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             save?.invoke()
-            ActionIcon(Icons.Outlined.Share, stringResource(Res.string.cd_share), enabled = false, onClick = {})
+            ActionIcon(Icons.Outlined.Share, stringResource(Res.string.cd_share), enabled = onShare != null, onClick = { onShare?.invoke() })
             ActionIcon(Icons.Outlined.FileDownload, stringResource(Res.string.cd_download), enabled = onDownload != null, onClick = { onDownload?.invoke() })
             if (onCreateLocal != null) ActionIcon(Icons.Outlined.LibraryAdd, stringResource(Res.string.local_playlist_create), onClick = onCreateLocal)
             Box(Modifier.weight(1f))

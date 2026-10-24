@@ -570,4 +570,6 @@
     <string name="menu_go_to_album">עבור לאלבום</string>
     <string name="link_copied">הקישור הועתק</string>
     <string name="download_other_format">הורדה בפורמט אחר</string>
+    <string name="unsubscribe">ביטול הרשמה</string>
+    <string name="unsubscribed">ההרשמה בוטלה</string>
 </resources>
