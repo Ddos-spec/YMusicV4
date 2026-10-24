@@ -15,6 +15,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 /**
  * media3 [BitmapLoader] over the shared app [ImageLoader]: session + notification artwork resolves
@@ -32,14 +33,19 @@ class ImageLoaderBitmapLoader(
     private val imageLoader: ImageLoader,
     private val scope: CoroutineScope,
     private val ownAuthority: String,
+    /** The session's bitmap limit ([MediaSession.getBitmapDimensionLimit]). */
+    sessionBitmapLimit: Int,
 ) : BitmapLoader {
+    // Artwork over the session limit is rescaled by the platform on every metadata update
+    // (MediaMetadata.Builder.scaleBitmap), which crashes when that bitmap was recycled meanwhile.
+    private val maxPx = minOf(ARTWORK_MAX_PX, sessionBitmapLimit)
 
     override fun supportsMimeType(mimeType: String): Boolean = mimeType.startsWith("image/")
 
     override fun decodeBitmap(data: ByteArray): ListenableFuture<Bitmap> = future {
         // Bounded like every other artwork path: a controller can hand arbitrary artworkData, and
         // a full-size decode of it is an unowned allocation (decodeScaled subsamples during decode).
-        decodeScaled(data, IntSize(ARTWORK_MAX_PX, ARTWORK_MAX_PX)).bitmap.asAndroidBitmap()
+        decodeScaled(data, IntSize(maxPx, maxPx)).bitmap.asAndroidBitmap().fitWithin(maxPx)
     }
 
     override fun loadBitmap(uri: Uri): ListenableFuture<Bitmap> = future {
@@ -49,7 +55,14 @@ class ImageLoaderBitmapLoader(
         } else {
             uri.toString()
         }
-        imageLoader.load(artImageRequest(target, ARTWORK_MAX_PX, ARTWORK_MAX_PX), cacheInMemory = false).asAndroidBitmap()
+        imageLoader.load(artImageRequest(target, maxPx, maxPx), cacheInMemory = false).asAndroidBitmap().fitWithin(maxPx)
+    }
+
+    /** Subsampled decodes land up to 2x the request; finish the downscale exactly. */
+    private fun Bitmap.fitWithin(maxPx: Int): Bitmap {
+        if (width <= maxPx && height <= maxPx) return this
+        val ratio = maxPx.toFloat() / maxOf(width, height)
+        return Bitmap.createScaledBitmap(this, maxOf(1, (width * ratio).roundToInt()), maxOf(1, (height * ratio).roundToInt()), true)
     }
 
     private fun <T : Any> future(block: suspend () -> T): ListenableFuture<T> {
