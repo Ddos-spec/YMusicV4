@@ -136,6 +136,7 @@
     <string name="sort_last_added">Laaste bygevoeg</string>
     <string name="sort_date_created">Datum geskep</string>
     <string name="sort_type">Tipe</string>
+    <string name="sort_track_number">Snitnommer</string>
     <string name="sort_duration">Duur</string>
     <string name="sort_song_count">Aantal liedjies</string>
     <string name="cd_sort">Sorteer</string>

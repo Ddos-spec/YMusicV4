@@ -136,6 +136,7 @@
     <string name="sort_last_added">Последно добавени</string>
     <string name="sort_date_created">Дата на създаване</string>
     <string name="sort_type">Тип</string>
+    <string name="sort_track_number">Номер на песента</string>
     <string name="sort_duration">Продължителност</string>
     <string name="sort_song_count">Брой песни</string>
     <string name="cd_sort">Сортиране</string>

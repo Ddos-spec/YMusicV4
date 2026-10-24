@@ -136,6 +136,7 @@
     <string name="sort_last_added">Darrers afegits</string>
     <string name="sort_date_created">Data de creació</string>
     <string name="sort_type">Tipus</string>
+    <string name="sort_track_number">Número de pista</string>
     <string name="sort_duration">Durada</string>
     <string name="sort_song_count">Nombre de cançons</string>
     <string name="cd_sort">Ordena</string>

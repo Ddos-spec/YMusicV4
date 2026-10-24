@@ -175,6 +175,7 @@
     <string name="sort_last_added">Нещодавно додані</string>
     <string name="sort_date_created">Дата створення</string>
     <string name="sort_type">Тип</string>
+    <string name="sort_track_number">Номер треку</string>
     <string name="sort_duration">Тривалість</string>
     <string name="sort_song_count">Кількість пісень</string>
     <string name="cd_sort">Сортування</string>

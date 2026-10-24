@@ -136,6 +136,7 @@
     <string name="sort_last_added">අවසන් වරට එක් කළ</string>
     <string name="sort_date_created">සෑදූ දිනය</string>
     <string name="sort_type">වර්ගය</string>
+    <string name="sort_track_number">ගීත අංකය</string>
     <string name="sort_duration">කාලය</string>
     <string name="sort_song_count">ගීත ගණන</string>
     <string name="cd_sort">පිළිවෙළට සකසන්න</string>

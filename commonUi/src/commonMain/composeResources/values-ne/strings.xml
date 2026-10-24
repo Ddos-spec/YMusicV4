@@ -136,6 +136,7 @@
     <string name="sort_last_added">पछिल्लो थपिएको</string>
     <string name="sort_date_created">बनाइएको मिति</string>
     <string name="sort_type">प्रकार</string>
+    <string name="sort_track_number">ट्र्याक नम्बर</string>
     <string name="sort_duration">अवधि</string>
     <string name="sort_song_count">गीत सङ्ख्या</string>
     <string name="cd_sort">क्रमबद्ध गर्नुहोस्</string>

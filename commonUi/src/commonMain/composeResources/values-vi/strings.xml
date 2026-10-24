@@ -165,6 +165,7 @@
     <string name="sort_last_added">Thêm gần đây</string>
     <string name="sort_date_created">Ngày tạo</string>
     <string name="sort_type">Loại</string>
+    <string name="sort_track_number">Số thứ tự bài</string>
     <string name="sort_duration">Thời lượng</string>
     <string name="sort_song_count">Số bài hát</string>
     <string name="cd_sort">Sắp xếp</string>

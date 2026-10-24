@@ -136,6 +136,7 @@
     <string name="sort_last_added">Kuwii ugu dambeeyay</string>
     <string name="sort_date_created">Taariikhda la sameeyay</string>
     <string name="sort_type">Nooca</string>
+    <string name="sort_track_number">Lambarka heesta</string>
     <string name="sort_duration">Muddada</string>
     <string name="sort_song_count">Tirada heesaha</string>
     <string name="cd_sort">Kala horraysii</string>

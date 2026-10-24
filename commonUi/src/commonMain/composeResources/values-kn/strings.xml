@@ -136,6 +136,7 @@
     <string name="sort_last_added">ಕೊನೆಯಲ್ಲಿ ಸೇರಿಸಿದ್ದು</string>
     <string name="sort_date_created">ರಚಿಸಿದ ದಿನಾಂಕ</string>
     <string name="sort_type">ಪ್ರಕಾರ</string>
+    <string name="sort_track_number">ಟ್ರ್ಯಾಕ್ ಸಂಖ್ಯೆ</string>
     <string name="sort_duration">ಅವಧಿ</string>
     <string name="sort_song_count">ಹಾಡುಗಳ ಸಂಖ್ಯೆ</string>
     <string name="cd_sort">ವಿಂಗಡಿಸಿ</string>

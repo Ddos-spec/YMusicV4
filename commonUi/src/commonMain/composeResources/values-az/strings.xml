@@ -136,6 +136,7 @@
     <string name="sort_last_added">Son əlavə olunan</string>
     <string name="sort_date_created">Yaradılma tarixi</string>
     <string name="sort_type">Növ</string>
+    <string name="sort_track_number">Trek nömrəsi</string>
     <string name="sort_duration">Müddət</string>
     <string name="sort_song_count">Mahnı sayı</string>
     <string name="cd_sort">Sırala</string>

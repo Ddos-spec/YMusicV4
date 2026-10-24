@@ -136,6 +136,7 @@
     <string name="sort_last_added">છેલ્લે ઉમેરેલા</string>
     <string name="sort_date_created">બનાવ્યાની તારીખ</string>
     <string name="sort_type">પ્રકાર</string>
+    <string name="sort_track_number">ટ્રૅક નંબર</string>
     <string name="sort_duration">સમયગાળો</string>
     <string name="sort_song_count">ગીતોની સંખ્યા</string>
     <string name="cd_sort">સૉર્ટ કરો</string>

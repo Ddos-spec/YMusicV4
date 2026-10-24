@@ -136,6 +136,7 @@
     <string name="sort_last_added">അവസാനം ചേർത്തവ</string>
     <string name="sort_date_created">സൃഷ്ടിച്ച തീയതി</string>
     <string name="sort_type">തരം</string>
+    <string name="sort_track_number">ട്രാക്ക് നമ്പർ</string>
     <string name="sort_duration">ദൈർഘ്യം</string>
     <string name="sort_song_count">പാട്ടുകളുടെ എണ്ണം</string>
     <string name="cd_sort">അടുക്കുക</string>

@@ -155,6 +155,7 @@ import io.ymusic.ui.resources.sort_date_created
 import io.ymusic.ui.resources.sort_last_added
 import io.ymusic.ui.resources.sort_manual
 import io.ymusic.ui.resources.sort_name
+import io.ymusic.ui.resources.sort_track_number
 import io.ymusic.ui.resources.sort_type
 import io.ymusic.ui.resources.unknown_album
 import io.ymusic.ui.resources.unknown_artist
@@ -646,11 +647,12 @@ internal fun librarySongColumns(width: androidx.compose.ui.unit.Dp): Int {
 
 // ---- per-tab sort options (label order is shared where two lists sort together) ----
 
-/** Songs, and the songs shown in the Folders tab: name / date added / audio-before-video. */
+/** Songs, and the songs shown in the Folders tab: name / date added / audio-before-video / track number. */
 private val songSortOptions = listOf(
     SortOption<MediaStoreItem>(Res.string.sort_name, compareBy { it.title.lowercase() }),
     SortOption(Res.string.sort_date_added, compareBy { it.createdAt }),
     SortOption(Res.string.sort_type, compareBy({ if (it.videoCodec != null) 1 else 0 }, { it.title.lowercase() })),
+    SortOption(Res.string.sort_track_number, compareBy({ it.trackNumber == null }, { it.trackNumber }, { it.title.lowercase() })),
 )
 
 /** Folders in the Folders tab — Name / date added, sharing the tab's one sort control with the

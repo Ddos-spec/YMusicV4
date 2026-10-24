@@ -136,6 +136,7 @@
     <string name="sort_last_added">آخرین افزوده‌ها</string>
     <string name="sort_date_created">تاریخ ایجاد</string>
     <string name="sort_type">نوع</string>
+    <string name="sort_track_number">شماره آهنگ</string>
     <string name="sort_duration">مدت</string>
     <string name="sort_song_count">تعداد آهنگ</string>
     <string name="cd_sort">مرتب‌سازی</string>

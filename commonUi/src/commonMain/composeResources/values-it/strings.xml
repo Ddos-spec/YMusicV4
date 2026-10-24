@@ -136,6 +136,7 @@
     <string name="sort_last_added">Ultime aggiunte</string>
     <string name="sort_date_created">Data di creazione</string>
     <string name="sort_type">Tipo</string>
+    <string name="sort_track_number">Numero traccia</string>
     <string name="sort_duration">Durata</string>
     <string name="sort_song_count">Numero di brani</string>
     <string name="cd_sort">Ordina</string>

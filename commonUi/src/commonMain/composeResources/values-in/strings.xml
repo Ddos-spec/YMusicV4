@@ -136,6 +136,7 @@
     <string name="sort_last_added">Terakhir ditambahkan</string>
     <string name="sort_date_created">Tanggal dibuat</string>
     <string name="sort_type">Jenis</string>
+    <string name="sort_track_number">Nomor trek</string>
     <string name="sort_duration">Durasi</string>
     <string name="sort_song_count">Jumlah lagu</string>
     <string name="cd_sort">Urutkan</string>

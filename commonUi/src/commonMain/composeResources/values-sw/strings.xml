@@ -136,6 +136,7 @@
     <string name="sort_last_added">Zilizoongezwa mwisho</string>
     <string name="sort_date_created">Tarehe ya kuundwa</string>
     <string name="sort_type">Aina</string>
+    <string name="sort_track_number">Nambari ya wimbo</string>
     <string name="sort_duration">Muda</string>
     <string name="sort_song_count">Idadi ya nyimbo</string>
     <string name="cd_sort">Panga</string>

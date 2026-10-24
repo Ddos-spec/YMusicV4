@@ -136,6 +136,7 @@
     <string name="sort_last_added">เพิ่มล่าสุด</string>
     <string name="sort_date_created">วันที่สร้าง</string>
     <string name="sort_type">ประเภท</string>
+    <string name="sort_track_number">หมายเลขแทร็ก</string>
     <string name="sort_duration">ความยาว</string>
     <string name="sort_song_count">จำนวนเพลง</string>
     <string name="cd_sort">จัดเรียง</string>

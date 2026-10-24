@@ -136,6 +136,7 @@
     <string name="sort_last_added">Ultimele adăugate</string>
     <string name="sort_date_created">Data creării</string>
     <string name="sort_type">Tip</string>
+    <string name="sort_track_number">Număr piesă</string>
     <string name="sort_duration">Durată</string>
     <string name="sort_song_count">Număr de melodii</string>
     <string name="cd_sort">Sortează</string>

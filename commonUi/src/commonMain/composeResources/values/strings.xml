@@ -179,6 +179,7 @@
     <string name="sort_last_added">Last added</string>
     <string name="sort_date_created">Date created</string>
     <string name="sort_type">Type</string>
+    <string name="sort_track_number">Track number</string>
     <string name="sort_duration">Duration</string>
     <string name="sort_song_count">Song count</string>
     <string name="cd_sort">Sort</string>

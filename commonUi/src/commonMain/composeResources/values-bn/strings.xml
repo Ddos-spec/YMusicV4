@@ -136,6 +136,7 @@
     <string name="sort_last_added">সর্বশেষ যোগ করা</string>
     <string name="sort_date_created">তৈরির তারিখ</string>
     <string name="sort_type">ধরন</string>
+    <string name="sort_track_number">ট্র্যাক নম্বর</string>
     <string name="sort_duration">সময়কাল</string>
     <string name="sort_song_count">গানের সংখ্যা</string>
     <string name="cd_sort">সাজান</string>

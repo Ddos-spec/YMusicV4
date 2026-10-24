@@ -136,6 +136,7 @@
     <string name="sort_last_added">Վերջին ավելացվածը</string>
     <string name="sort_date_created">Ստեղծման ամսաթիվ</string>
     <string name="sort_type">Տեսակ</string>
+    <string name="sort_track_number">Թրեքի համարը</string>
     <string name="sort_duration">Տևողություն</string>
     <string name="sort_song_count">Երգերի քանակ</string>
     <string name="cd_sort">Դասավորել</string>

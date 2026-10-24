@@ -136,6 +136,7 @@
     <string name="sort_last_added">최근 추가</string>
     <string name="sort_date_created">만든 날짜</string>
     <string name="sort_type">유형</string>
+    <string name="sort_track_number">트랙 번호</string>
     <string name="sort_duration">재생 시간</string>
     <string name="sort_song_count">곡 수</string>
     <string name="cd_sort">정렬</string>
