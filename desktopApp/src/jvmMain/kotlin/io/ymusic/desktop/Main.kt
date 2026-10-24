@@ -197,6 +197,7 @@ import java.awt.Frame
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.RenderingHints
+import java.awt.desktop.AppReopenedListener
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.event.MouseAdapter
@@ -222,8 +223,8 @@ private val rootLogger: Logger =
     TeeLogger(FileLogger(logWorker), TeeLogger(SentryLogger(), StdoutLogger()))
         .also { it.bindMseNativeLogs() }
 
-/** Ticks when the OS hands over a link, so a window hidden to the tray comes back for it. */
-private val linkArrivals = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+/** Ticks when the OS hands over a link or the app icon is clicked, so a window hidden to the tray comes back. */
+private val showWindowRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
 fun main() {
     defaultLinuxSoftwareRendering()
@@ -233,8 +234,12 @@ fun main() {
     if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.APP_OPEN_URI)) {
         Desktop.getDesktop().setOpenURIHandler { event ->
             IncomingLinks.open(event.uri.toString())
-            linkArrivals.tryEmit(Unit)
+            showWindowRequests.tryEmit(Unit)
         }
+    }
+    // Dock / Finder / Launchpad click on the running instance (kAEReopenApplication).
+    if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.APP_EVENT_REOPENED)) {
+        Desktop.getDesktop().addAppEventListener(AppReopenedListener { showWindowRequests.tryEmit(Unit) })
     }
     // Opened before anything else: crash-reporting consent lives here.
     val appStore = AppStore.open(ymusicDataDir(), rootLogger.fork("app-store"))
@@ -322,7 +327,7 @@ fun main() {
                 }
         }
         LaunchedEffect(Unit) {
-            linkArrivals.collect {
+            showWindowRequests.collect {
                 windowVisible = true
                 windowState.isMinimized = false
             }
