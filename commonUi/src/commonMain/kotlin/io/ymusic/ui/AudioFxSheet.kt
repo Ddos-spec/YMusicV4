@@ -1,8 +1,11 @@
 package io.ymusic.ui
 
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -18,10 +21,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +44,7 @@ import io.ymusic.ui.resources.sound_playback
 import io.ymusic.ui.resources.sound_reset
 import io.ymusic.ui.resources.sound_speed
 import io.ymusic.ui.resources.sound_volume
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.abs
 import kotlin.math.round
@@ -104,7 +110,7 @@ private fun RateBlock(
     onChange: (Float) -> Unit,
 ) {
     var scrubbing by remember { mutableStateOf<Float?>(null) }
-    fun snapped(f: Float) = snap05(range.start + f * (range.endInclusive - range.start))
+    fun snapped(f: Float) = snapStep(range.start + f * (range.endInclusive - range.start))
     LabelValue("$title ×${trimFloat(scrubbing ?: value)}", "")
     FlowRow(
         DialogPad.fillMaxWidth().padding(top = 8.dp, bottom = 10.dp),
@@ -114,7 +120,7 @@ private fun RateBlock(
         RATE_CHIPS.forEach { s ->
             RateChip(
                 label = if (s == 1f) "1×" else "${trimFloat(s)}×",
-                selected = abs(value - s) < 0.02f,
+                selected = abs(value - s) < RATE_STEP / 2,
                 onClick = { onChange(s) },
             )
         }
@@ -123,14 +129,14 @@ private fun RateBlock(
         DialogPad.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Stepper("−") { onChange(snap05((value - 0.05f).coerceIn(range.start, range.endInclusive))) }
+        Stepper("−") { onChange(snapStep(value - RATE_STEP).coerceIn(range.start, range.endInclusive)) }
         FxBar(
             fraction = (value - range.start) / (range.endInclusive - range.start),
             onChange = { f -> onChange(snapped(f)) },
             onScrub = { f -> scrubbing = f?.let(::snapped) },
             modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
         )
-        Stepper("+") { onChange(snap05((value + 0.05f).coerceIn(range.start, range.endInclusive))) }
+        Stepper("+") { onChange(snapStep(value + RATE_STEP).coerceIn(range.start, range.endInclusive)) }
     }
 }
 
@@ -184,19 +190,44 @@ private fun RateChip(label: String, selected: Boolean, onClick: () -> Unit) {
     }
 }
 
+/** Tap steps once; holding repeats, and the release that ends a hold doesn't step again. */
 @Composable
 private fun Stepper(label: String, onClick: () -> Unit) {
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+    val step by rememberUpdatedState(onClick)
+    var repeated by remember { mutableStateOf(false) }
+    LaunchedEffect(pressed) {
+        // Runs after the release's click, which a hold must swallow; a later quick tap must not be.
+        if (!pressed) {
+            repeated = false
+            return@LaunchedEffect
+        }
+        delay(STEPPER_HOLD_DELAY_MS)
+        repeated = true
+        while (true) {
+            step()
+            delay(STEPPER_REPEAT_MS)
+        }
+    }
     Text(
         label,
         style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = DesignColors.Accent),
         modifier = Modifier
             .clip(RoundedCornerShape(999.dp))
-            .clickable(onClick = onClick)
+            .clickable(interactionSource = interaction, indication = LocalIndication.current) {
+                if (!repeated) step()
+            }
             .padding(horizontal = 10.dp, vertical = 4.dp),
     )
 }
 
-private fun snap05(v: Float): Float = round(v * 20f) / 20f
+private const val RATE_STEPS_PER_UNIT = 100f
+private const val RATE_STEP = 1f / RATE_STEPS_PER_UNIT
+private const val STEPPER_HOLD_DELAY_MS = 400L
+private const val STEPPER_REPEAT_MS = 60L
+
+private fun snapStep(v: Float): Float = round(v * RATE_STEPS_PER_UNIT) / RATE_STEPS_PER_UNIT
 
 internal fun trimFloat(v: Float): String {
     val x = round(v * 100f) / 100f
