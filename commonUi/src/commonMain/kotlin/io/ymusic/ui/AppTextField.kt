@@ -40,6 +40,7 @@ fun AppTextField(
     autoFocus: Boolean = false,
     isError: Boolean = false,
     supportingText: String? = null,
+    suffix: String? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -85,6 +86,7 @@ fun AppTextField(
                 isError = isError,
                 label = { Text(label) },
                 supportingText = supportingText?.let { { Text(it) } },
+                suffix = suffix?.let { { Text(it, color = DesignColors.InkFaint) } },
                 colors = colors,
                 // Flush to the edges: no inner horizontal padding, just vertical breathing room.
                 contentPadding = PaddingValues(vertical = 8.dp),

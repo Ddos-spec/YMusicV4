@@ -18,6 +18,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -30,7 +32,6 @@ import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.RecordVoiceOver
 import androidx.compose.material.icons.outlined.Subtitles
 import androidx.compose.material.icons.outlined.Videocam
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -42,7 +43,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
@@ -64,6 +64,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
@@ -578,46 +579,60 @@ private fun DownloadButton(state: DownloadOptionsState, onDownload: () -> Unit) 
 /** The file-name editor: a dialog of its own so the long name gets the full width to edit in. */
 @Composable
 internal fun RenameDialog(state: DownloadOptionsState, onDone: () -> Unit) {
-    var draft by remember { mutableStateOf(state.fileName) }
+    FileNameDialog(state.fileName, state.extension, onDismiss = onDone) { stem ->
+        state.fileName = stem
+        onDone()
+    }
+}
+
+/** Edits a file's stem ([extension] is shown, not editable) under the download file-name policy; [onSave]
+ *  gets the finalized stem. [error] shows under the field; [busy] locks the dialog while a save runs. */
+@Composable
+internal fun FileNameDialog(
+    initial: String,
+    extension: String,
+    error: String? = null,
+    busy: Boolean = false,
+    onDismiss: () -> Unit,
+    onSave: (String) -> Unit,
+) {
+    var draft by remember { mutableStateOf(initial) }
     var stripped by remember { mutableStateOf(false) }
     val blank = DownloadFileNames.finalize(draft).isEmpty()
-    AlertDialog(
-        onDismissRequest = onDone,
-        containerColor = DesignColors.Surface,
-        title = { Text(stringResource(Res.string.download_rename), color = DesignColors.Ink) },
-        text = {
-            OutlinedTextField(
-                value = draft,
-                onValueChange = { raw ->
-                    val clean = DownloadFileNames.stripForbidden(raw)
-                    stripped = clean != raw
-                    draft = clean
-                },
-                label = { Text(stringResource(Res.string.download_file_name)) },
-                suffix = { Text(state.extension, color = DesignColors.InkFaint) },
-                isError = blank || stripped,
-                supportingText = {
-                    Text(
-                        if (blank) {
-                            stringResource(Res.string.download_name_empty)
-                        } else {
-                            stringResource(Res.string.download_forbidden_hint, DownloadFileNames.FORBIDDEN_DISPLAY)
-                        },
-                    )
-                },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-            )
+    val canSave = !blank && !busy
+    val dismiss = { if (!busy) onDismiss() }
+    val save = { if (canSave) onSave(DownloadFileNames.finalize(draft)) }
+    ElevatedBarDialog(
+        title = stringResource(Res.string.download_rename),
+        onDismiss = dismiss,
+        canScrollBackward = false,
+        canScrollForward = false,
+        buttons = {
+            DialogSecondaryButton(stringResource(Res.string.dialog_cancel), enabled = !busy, onClick = dismiss)
+            TextButton(enabled = canSave, onClick = save) {
+                Text(stringResource(Res.string.download_save), color = if (canSave) DesignColors.Accent else DesignColors.InkFaint)
+            }
         },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    state.fileName = DownloadFileNames.finalize(draft)
-                    onDone()
-                },
-                enabled = !blank,
-            ) { Text(stringResource(Res.string.download_save), color = if (blank) DesignColors.InkFaint else DesignColors.Accent) }
-        },
-        dismissButton = { TextButton(onClick = onDone) { Text(stringResource(Res.string.dialog_cancel), color = DesignColors.InkSoft) } },
-    )
+    ) {
+        AppTextField(
+            value = draft,
+            onValueChange = { raw ->
+                val clean = DownloadFileNames.stripForbidden(raw)
+                stripped = clean != raw
+                draft = clean
+            },
+            label = stringResource(Res.string.download_file_name),
+            autoFocus = true,
+            isError = blank || stripped || error != null,
+            supportingText = when {
+                error != null -> error
+                blank -> stringResource(Res.string.download_name_empty)
+                else -> stringResource(Res.string.download_forbidden_hint, DownloadFileNames.FORBIDDEN_DISPLAY)
+            },
+            suffix = extension,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { save() }),
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+        )
+    }
 }

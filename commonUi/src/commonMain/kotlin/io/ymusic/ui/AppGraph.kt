@@ -132,6 +132,8 @@ class AppGraph(
     val shareText: ((text: String) -> Unit)? = null,
     /** Opens the system share sheet with a media file by its uri; null hides "Share" on local files. */
     val shareFile: ((uri: String, mimeType: String) -> Unit)? = null,
+    /** Renames downloaded files in place (Downloads' "Rename"); null hides the action. */
+    val fileRenaming: FileRenaming? = null,
     /** Display version for the drawer header (e.g. "4.0.1 · arm64"); null hides the line. */
     val appVersion: String? = null,
     /** Settings › Versions: the build's versionName and versionCode; null hides the app line. */
@@ -299,4 +301,13 @@ class AppGraph(
     fun requestRefresh() {
         refreshRequests.tryEmit(Unit)
     }
+}
+
+/** Renaming a media file in its own folder. */
+interface FileRenaming {
+    /** The file's current name, extension included; null when it is gone. */
+    suspend fun nameOf(uri: String): String?
+
+    /** Renames the file to [newName] (extension included) and returns its new uri. Throws on failure. */
+    suspend fun rename(uri: String, newName: String): String
 }
