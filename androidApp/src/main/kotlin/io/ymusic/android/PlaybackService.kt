@@ -172,7 +172,12 @@ class PlaybackService : MediaLibraryService() {
             extraInvalidations = errorTextChanged,
         )
         bitmapLoader.delegate = graph.imageLoader?.let {
-            ImageLoaderBitmapLoader(it, serviceScope, artworkAuthority(this@PlaybackService))
+            ImageLoaderBitmapLoader(
+                it,
+                serviceScope,
+                artworkAuthority(this@PlaybackService),
+                MediaSession.getBitmapDimensionLimit(this@PlaybackService),
+            )
         }
         session?.player = adapter
         pendingPlayer?.release()
