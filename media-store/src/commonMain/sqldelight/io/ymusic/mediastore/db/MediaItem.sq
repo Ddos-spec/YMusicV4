@@ -62,6 +62,10 @@ UPDATE mediaItem SET
     fileSize = ?, lastModified = ?, deleted = 0, updatedAt = ?
 WHERE id = ?;
 
+-- The file was renamed/moved by the app: same row (playlist links, metadata), new location.
+updateItemUri:
+UPDATE mediaItem SET uri = ?, updatedAt = ? WHERE id = ?;
+
 setItemDeleted:
 UPDATE mediaItem SET deleted = 1, updatedAt = ? WHERE id = ?;
 

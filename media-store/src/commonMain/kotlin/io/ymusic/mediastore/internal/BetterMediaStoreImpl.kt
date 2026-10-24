@@ -243,6 +243,19 @@ internal class BetterMediaStoreImpl(
         if (hard) itemQ.hardDeleteItem(itemId) else itemQ.setItemDeleted(now(), itemId)
     }
 
+    override suspend fun relocateItem(itemId: Long, uri: Uri): Unit = withContext(io) {
+        val target = uri.canonicalString()
+        db.transaction {
+            itemQ.findItemByUriIncludingDeleted(target).executeAsOneOrNull()
+                ?.takeIf { it.id != itemId }
+                ?.let { other ->
+                    check(other.deleted != 0L) { "another live item already has $target" }
+                    itemQ.hardDeleteItem(other.id)
+                }
+            itemQ.updateItemUri(target, now(), itemId)
+        }
+    }
+
     override suspend fun purgeDeletedItems(olderThan: Long): Int = withContext(io) {
         // The generated DELETE returns the number of affected rows.
         itemQ.purgeDeleted(olderThan).value.toInt()
