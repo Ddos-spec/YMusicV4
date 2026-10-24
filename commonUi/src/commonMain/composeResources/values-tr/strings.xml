@@ -136,6 +136,7 @@
     <string name="sort_last_added">Son eklenen</string>
     <string name="sort_date_created">Oluşturulma tarihi</string>
     <string name="sort_type">Tür</string>
+    <string name="sort_track_number">Parça numarası</string>
     <string name="sort_duration">Süre</string>
     <string name="sort_song_count">Şarkı sayısı</string>
     <string name="cd_sort">Sırala</string>

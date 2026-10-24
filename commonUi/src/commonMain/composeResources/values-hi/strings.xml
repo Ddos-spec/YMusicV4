@@ -136,6 +136,7 @@
     <string name="sort_last_added">हाल में जोड़े गए</string>
     <string name="sort_date_created">बनाने की तारीख</string>
     <string name="sort_type">प्रकार</string>
+    <string name="sort_track_number">ट्रैक नंबर</string>
     <string name="sort_duration">अवधि</string>
     <string name="sort_song_count">गानों की संख्या</string>
     <string name="cd_sort">क्रमबद्ध करें</string>

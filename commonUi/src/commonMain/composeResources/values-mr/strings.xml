@@ -136,6 +136,7 @@
     <string name="sort_last_added">अलीकडे जोडलेले</string>
     <string name="sort_date_created">तयार केल्याची तारीख</string>
     <string name="sort_type">प्रकार</string>
+    <string name="sort_track_number">ट्रॅक क्रमांक</string>
     <string name="sort_duration">कालावधी</string>
     <string name="sort_song_count">गाण्यांची संख्या</string>
     <string name="cd_sort">क्रमवारी लावा</string>

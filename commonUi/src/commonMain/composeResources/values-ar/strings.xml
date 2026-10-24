@@ -165,6 +165,7 @@
     <string name="sort_last_added">آخر ما أُضيف</string>
     <string name="sort_date_created">تاريخ الإنشاء</string>
     <string name="sort_type">النوع</string>
+    <string name="sort_track_number">رقم المقطع</string>
     <string name="sort_duration">المدة</string>
     <string name="sort_song_count">عدد الأغاني</string>
     <string name="cd_sort">فرز</string>

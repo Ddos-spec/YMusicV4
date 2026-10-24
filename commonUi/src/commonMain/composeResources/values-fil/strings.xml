@@ -136,6 +136,7 @@
     <string name="sort_last_added">Huling idinagdag</string>
     <string name="sort_date_created">Petsa ng paggawa</string>
     <string name="sort_type">Uri</string>
+    <string name="sort_track_number">Numero ng track</string>
     <string name="sort_duration">Tagal</string>
     <string name="sort_song_count">Bilang ng kanta</string>
     <string name="cd_sort">Ayusin</string>

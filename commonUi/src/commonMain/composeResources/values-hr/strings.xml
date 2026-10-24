@@ -136,6 +136,7 @@
     <string name="sort_last_added">Zadnje dodano</string>
     <string name="sort_date_created">Datum izrade</string>
     <string name="sort_type">Vrsta</string>
+    <string name="sort_track_number">Broj pjesme</string>
     <string name="sort_duration">Trajanje</string>
     <string name="sort_song_count">Broj pjesama</string>
     <string name="cd_sort">Razvrstaj</string>

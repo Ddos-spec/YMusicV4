@@ -136,6 +136,7 @@
     <string name="sort_last_added">கடைசியாகச் சேர்த்தவை</string>
     <string name="sort_date_created">உருவாக்கிய தேதி</string>
     <string name="sort_type">வகை</string>
+    <string name="sort_track_number">டிராக் எண்</string>
     <string name="sort_duration">கால அளவு</string>
     <string name="sort_song_count">பாடல் எண்ணிக்கை</string>
     <string name="cd_sort">வரிசைப்படுத்து</string>

@@ -136,6 +136,7 @@
     <string name="sort_last_added">Naposledy přidané</string>
     <string name="sort_date_created">Datum vytvoření</string>
     <string name="sort_type">Typ</string>
+    <string name="sort_track_number">Číslo skladby</string>
     <string name="sort_duration">Délka</string>
     <string name="sort_song_count">Počet skladeb</string>
     <string name="cd_sort">Seřadit</string>

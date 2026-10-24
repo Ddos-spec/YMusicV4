@@ -136,6 +136,7 @@
     <string name="sort_last_added">最近追加</string>
     <string name="sort_date_created">作成日</string>
     <string name="sort_type">種類</string>
+    <string name="sort_track_number">トラック番号</string>
     <string name="sort_duration">長さ</string>
     <string name="sort_song_count">曲数</string>
     <string name="cd_sort">並べ替え</string>

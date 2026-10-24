@@ -136,6 +136,7 @@
     <string name="sort_last_added">Τελευταία προσθήκη</string>
     <string name="sort_date_created">Ημερομηνία δημιουργίας</string>
     <string name="sort_type">Τύπος</string>
+    <string name="sort_track_number">Αριθμός κομματιού</string>
     <string name="sort_duration">Διάρκεια</string>
     <string name="sort_song_count">Αριθμός τραγουδιών</string>
     <string name="cd_sort">Ταξινόμηση</string>

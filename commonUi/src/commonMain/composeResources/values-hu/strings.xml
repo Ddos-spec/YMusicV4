@@ -136,6 +136,7 @@
     <string name="sort_last_added">Legutóbb hozzáadott</string>
     <string name="sort_date_created">Létrehozás dátuma</string>
     <string name="sort_type">Típus</string>
+    <string name="sort_track_number">Számsorszám</string>
     <string name="sort_duration">Időtartam</string>
     <string name="sort_song_count">Dalok száma</string>
     <string name="cd_sort">Rendezés</string>

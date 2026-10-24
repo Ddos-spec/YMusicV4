@@ -136,6 +136,7 @@
     <string name="sort_last_added">Последње додато</string>
     <string name="sort_date_created">Датум прављења</string>
     <string name="sort_type">Тип</string>
+    <string name="sort_track_number">Број нумере</string>
     <string name="sort_duration">Трајање</string>
     <string name="sort_song_count">Број песама</string>
     <string name="cd_sort">Сортирај</string>

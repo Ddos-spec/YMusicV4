@@ -136,6 +136,7 @@
     <string name="sort_last_added">Viimati lisatud</string>
     <string name="sort_date_created">Loomise kuupäev</string>
     <string name="sort_type">Tüüp</string>
+    <string name="sort_track_number">Loo number</string>
     <string name="sort_duration">Kestus</string>
     <string name="sort_song_count">Lugude arv</string>
     <string name="cd_sort">Sordi</string>

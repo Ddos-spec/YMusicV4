@@ -136,6 +136,7 @@
     <string name="sort_last_added">Azken gehituak</string>
     <string name="sort_date_created">Sortze-data</string>
     <string name="sort_type">Mota</string>
+    <string name="sort_track_number">Pista-zenbakia</string>
     <string name="sort_duration">Iraupena</string>
     <string name="sort_song_count">Abesti kopurua</string>
     <string name="cd_sort">Ordenatu</string>

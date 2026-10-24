@@ -136,6 +136,7 @@
     <string name="sort_last_added">נוספו לאחרונה</string>
     <string name="sort_date_created">תאריך יצירה</string>
     <string name="sort_type">סוג</string>
+    <string name="sort_track_number">מספר רצועה</string>
     <string name="sort_duration">משך</string>
     <string name="sort_song_count">מספר שירים</string>
     <string name="cd_sort">מיון</string>
