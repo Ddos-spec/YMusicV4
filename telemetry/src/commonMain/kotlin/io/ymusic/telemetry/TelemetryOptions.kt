@@ -35,14 +35,12 @@ fun SentryOptions.applyYMusicTelemetry() {
  * meaningless here): a site code (`E#####`) groups alone — one code, one throw site, one issue;
  * a category code ("parse", "oom"; "network" and cancellations are never captured) and a non-coded exception
  * group per trail, so the same failure shape in two subsystems stays two issues. Events with no
- * trail tag (uncaught crashes the SDK captured itself) keep Sentry's default grouping. Feedback
- * groups per subject; everything else is tagged [REPORT_TYPE_ERROR] so the two filter apart.
+ * trail tag (uncaught crashes the SDK captured itself) keep Sentry's default grouping. Each feedback
+ * report is its own issue; everything else is tagged [REPORT_TYPE_ERROR] so the two filter apart.
  */
 internal fun fingerprintPolicy(event: SentryEvent): SentryEvent {
     if (event.getTag(REPORT_TYPE_TAG) == REPORT_TYPE_FEEDBACK) {
-        // sentry-java's captureMessage fills Message.formatted only; .message stays null.
-        val subject = event.message?.let { it.formatted ?: it.message }.orEmpty()
-        event.fingerprint = mutableListOf(REPORT_TYPE_FEEDBACK, subject)
+        event.fingerprint = mutableListOf(REPORT_TYPE_FEEDBACK, event.eventId.toString())
         return event
     }
     event.setTag(REPORT_TYPE_TAG, REPORT_TYPE_ERROR)

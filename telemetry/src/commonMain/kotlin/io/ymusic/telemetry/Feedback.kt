@@ -8,8 +8,8 @@ import io.sentry.kotlin.multiplatform.protocol.UserFeedback
 /**
  * Sends the app logs as one anonymous feedback event and returns its event id, which
  * [sendFeedbackMessage] links to; a user quoting their Device ID finds it by the device_id tag. No
- * user feedback item rides it, so it stays out of the feedback inbox; every report groups under one
- * issue. Null until Sentry.init ran (the SDK hands back the empty id).
+ * user feedback item rides it, so it stays out of the feedback inbox; every report is its own issue.
+ * Null until Sentry.init ran (the SDK hands back the empty id).
  */
 fun captureFeedbackReport(attachments: List<Attachment>): String? {
     val eventId = Sentry.captureMessage(FEEDBACK_REPORT_MESSAGE) { scope ->
