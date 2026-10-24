@@ -328,6 +328,7 @@
     <string name="play_all">Phát tất cả</string>
     <string name="shuffle_all">Phát ngẫu nhiên tất cả</string>
     <string name="cd_shuffle">Phát ngẫu nhiên</string>
+    <string name="cd_scroll_to_now_playing">Đến bài đang phát</string>
     <string name="cd_sleep_timer">Hẹn giờ ngủ</string>
     <string name="cd_captions">Phụ đề</string>
     <string name="cd_drag_to_reorder">Kéo để sắp xếp lại</string>

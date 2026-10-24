@@ -283,6 +283,7 @@
     <string name="play_all">Putar semua</string>
     <string name="shuffle_all">Acak semua</string>
     <string name="cd_shuffle">Acak</string>
+    <string name="cd_scroll_to_now_playing">Gulir ke lagu yang diputar</string>
     <string name="cd_sleep_timer">Timer tidur</string>
     <string name="cd_captions">Teks</string>
     <string name="cd_drag_to_reorder">Seret untuk mengubah urutan</string>

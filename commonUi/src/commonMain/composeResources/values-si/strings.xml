@@ -284,6 +284,7 @@
     <string name="play_all">සියල්ල වාදනය කරන්න</string>
     <string name="shuffle_all">සියල්ල කලවම් කරන්න</string>
     <string name="cd_shuffle">කලවම් කරන්න</string>
+    <string name="cd_scroll_to_now_playing">වාදනය වන ගීතයට යන්න</string>
     <string name="cd_sleep_timer">නින්ද කාල ගණකය</string>
     <string name="cd_captions">උපසිරැසි</string>
     <string name="cd_drag_to_reorder">නැවත පිළිවෙළ කිරීමට අදින්න</string>

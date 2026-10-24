@@ -284,6 +284,7 @@
     <string name="play_all">সব চালান</string>
     <string name="shuffle_all">সব শাফল করুন</string>
     <string name="cd_shuffle">শাফল</string>
+    <string name="cd_scroll_to_now_playing">চলমান গানে যান</string>
     <string name="cd_sleep_timer">স্লিপ টাইমার</string>
     <string name="cd_captions">ক্যাপশন</string>
     <string name="cd_drag_to_reorder">ক্রম বদলাতে টেনে আনুন</string>

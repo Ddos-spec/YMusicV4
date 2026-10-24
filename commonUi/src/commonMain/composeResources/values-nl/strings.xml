@@ -284,6 +284,7 @@
     <string name="play_all">Alles afspelen</string>
     <string name="shuffle_all">Alles shufflen</string>
     <string name="cd_shuffle">Shuffle</string>
+    <string name="cd_scroll_to_now_playing">Naar het spelende nummer</string>
     <string name="cd_sleep_timer">Slaaptimer</string>
     <string name="cd_captions">Ondertiteling</string>
     <string name="cd_drag_to_reorder">Sleep om te herschikken</string>

@@ -284,6 +284,7 @@
     <string name="play_all">Hamısını oxut</string>
     <string name="shuffle_all">Hamısını qarışıq oxut</string>
     <string name="cd_shuffle">Qarışdır</string>
+    <string name="cd_scroll_to_now_playing">Oxunan mahnıya keç</string>
     <string name="cd_sleep_timer">Yuxu taymeri</string>
     <string name="cd_captions">Subtitrlər</string>
     <string name="cd_drag_to_reorder">Sıranı dəyişmək üçün sürüşdürün</string>

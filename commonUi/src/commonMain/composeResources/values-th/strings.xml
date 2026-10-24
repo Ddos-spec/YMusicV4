@@ -283,6 +283,7 @@
     <string name="play_all">เล่นทั้งหมด</string>
     <string name="shuffle_all">สุ่มเล่นทั้งหมด</string>
     <string name="cd_shuffle">สุ่มเล่น</string>
+    <string name="cd_scroll_to_now_playing">ไปที่เพลงที่กำลังเล่น</string>
     <string name="cd_sleep_timer">ตั้งเวลาปิด</string>
     <string name="cd_captions">คำบรรยาย</string>
     <string name="cd_drag_to_reorder">ลากเพื่อจัดลำดับใหม่</string>

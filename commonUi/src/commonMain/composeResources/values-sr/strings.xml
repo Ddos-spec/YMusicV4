@@ -285,6 +285,7 @@
     <string name="play_all">Пусти све</string>
     <string name="shuffle_all">Насумично пусти све</string>
     <string name="cd_shuffle">Насумично</string>
+    <string name="cd_scroll_to_now_playing">Иди на песму која свира</string>
     <string name="cd_sleep_timer">Тајмер за спавање</string>
     <string name="cd_captions">Титлови</string>
     <string name="cd_drag_to_reorder">Превуците да бисте променили редослед</string>

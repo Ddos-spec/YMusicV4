@@ -284,6 +284,7 @@
     <string name="play_all">அனைத்தையும் இயக்கு</string>
     <string name="shuffle_all">அனைத்தையும் கலக்கு</string>
     <string name="cd_shuffle">கலக்கு</string>
+    <string name="cd_scroll_to_now_playing">இயங்கும் பாடலுக்குச் செல்</string>
     <string name="cd_sleep_timer">உறக்க டைமர்</string>
     <string name="cd_captions">வசனங்கள்</string>
     <string name="cd_drag_to_reorder">வரிசையை மாற்ற இழுக்கவும்</string>

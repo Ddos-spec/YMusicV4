@@ -284,6 +284,7 @@
     <string name="play_all">پخش همه</string>
     <string name="shuffle_all">پخش تصادفی همه</string>
     <string name="cd_shuffle">پخش تصادفی</string>
+    <string name="cd_scroll_to_now_playing">رفتن به آهنگ در حال پخش</string>
     <string name="cd_sleep_timer">تایمر خواب</string>
     <string name="cd_captions">زیرنویس</string>
     <string name="cd_drag_to_reorder">برای تغییر ترتیب بکشید</string>

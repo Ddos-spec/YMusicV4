@@ -284,6 +284,7 @@
     <string name="play_all">सर्व प्ले करा</string>
     <string name="shuffle_all">सर्व शफल करा</string>
     <string name="cd_shuffle">शफल</string>
+    <string name="cd_scroll_to_now_playing">वाजत असलेल्या गाण्यावर जा</string>
     <string name="cd_sleep_timer">स्लीप टायमर</string>
     <string name="cd_captions">कॅप्शन</string>
     <string name="cd_drag_to_reorder">क्रम बदलण्यासाठी ओढा</string>

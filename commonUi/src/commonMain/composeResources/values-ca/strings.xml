@@ -285,6 +285,7 @@
     <string name="play_all">Reprodueix-ho tot</string>
     <string name="shuffle_all">Reprodueix-ho tot aleatòriament</string>
     <string name="cd_shuffle">Aleatori</string>
+    <string name="cd_scroll_to_now_playing">Ves a la cançó que sona</string>
     <string name="cd_sleep_timer">Temporitzador per dormir</string>
     <string name="cd_captions">Subtítols</string>
     <string name="cd_drag_to_reorder">Arrossega per reordenar</string>

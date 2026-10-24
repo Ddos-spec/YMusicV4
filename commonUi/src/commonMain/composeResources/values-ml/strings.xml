@@ -284,6 +284,7 @@
     <string name="play_all">എല്ലാം പ്ലേ ചെയ്യുക</string>
     <string name="shuffle_all">എല്ലാം ഷഫിൾ ചെയ്യുക</string>
     <string name="cd_shuffle">ഷഫിൾ</string>
+    <string name="cd_scroll_to_now_playing">പ്ലേ ചെയ്യുന്ന പാട്ടിലേക്ക് പോകുക</string>
     <string name="cd_sleep_timer">സ്ലീപ്പ് ടൈമർ</string>
     <string name="cd_captions">അടിക്കുറിപ്പുകൾ</string>
     <string name="cd_drag_to_reorder">ക്രമം മാറ്റാൻ വലിച്ചിടുക</string>

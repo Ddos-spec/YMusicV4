@@ -284,6 +284,7 @@
     <string name="play_all">Tümünü oynat</string>
     <string name="shuffle_all">Tümünü karıştır</string>
     <string name="cd_shuffle">Karıştır</string>
+    <string name="cd_scroll_to_now_playing">Çalan şarkıya git</string>
     <string name="cd_sleep_timer">Uyku zamanlayıcısı</string>
     <string name="cd_captions">Altyazılar</string>
     <string name="cd_drag_to_reorder">Yeniden sıralamak için sürükleyin</string>

@@ -284,6 +284,7 @@
     <string name="play_all">Նվագարկել բոլորը</string>
     <string name="shuffle_all">Խառնել բոլորը</string>
     <string name="cd_shuffle">Խառնել</string>
+    <string name="cd_scroll_to_now_playing">Անցնել նվագվող երգին</string>
     <string name="cd_sleep_timer">Քնի ժամաչափ</string>
     <string name="cd_captions">Ենթագրեր</string>
     <string name="cd_drag_to_reorder">Քաշեք՝ հերթականությունը փոխելու համար</string>

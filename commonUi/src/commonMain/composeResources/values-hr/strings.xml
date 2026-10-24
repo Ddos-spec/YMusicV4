@@ -285,6 +285,7 @@
     <string name="play_all">Reproduciraj sve</string>
     <string name="shuffle_all">Nasumično sve</string>
     <string name="cd_shuffle">Nasumično</string>
+    <string name="cd_scroll_to_now_playing">Idi na pjesmu koja svira</string>
     <string name="cd_sleep_timer">Mjerač vremena za spavanje</string>
     <string name="cd_captions">Titlovi</string>
     <string name="cd_drag_to_reorder">Povucite za promjenu redoslijeda</string>

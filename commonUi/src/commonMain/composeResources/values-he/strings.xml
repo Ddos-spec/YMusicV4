@@ -285,6 +285,7 @@
     <string name="play_all">השמע הכול</string>
     <string name="shuffle_all">ערבב הכול</string>
     <string name="cd_shuffle">ערבוב</string>
+    <string name="cd_scroll_to_now_playing">מעבר לשיר המתנגן</string>
     <string name="cd_sleep_timer">טיימר שינה</string>
     <string name="cd_captions">כתוביות</string>
     <string name="cd_drag_to_reorder">גרור כדי לשנות סדר</string>

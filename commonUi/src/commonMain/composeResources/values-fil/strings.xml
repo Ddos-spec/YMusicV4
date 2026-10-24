@@ -284,6 +284,7 @@
     <string name="play_all">I-play lahat</string>
     <string name="shuffle_all">I-shuffle lahat</string>
     <string name="cd_shuffle">I-shuffle</string>
+    <string name="cd_scroll_to_now_playing">Pumunta sa kantang tumutugtog</string>
     <string name="cd_sleep_timer">Sleep timer</string>
     <string name="cd_captions">Mga caption</string>
     <string name="cd_drag_to_reorder">I-drag para ayusin ang pagkakasunod-sunod</string>

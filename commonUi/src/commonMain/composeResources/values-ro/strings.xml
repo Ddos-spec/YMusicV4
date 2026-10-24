@@ -285,6 +285,7 @@
     <string name="play_all">Redă tot</string>
     <string name="shuffle_all">Amestecă tot</string>
     <string name="cd_shuffle">Amestecă</string>
+    <string name="cd_scroll_to_now_playing">Mergi la melodia redată</string>
     <string name="cd_sleep_timer">Temporizator</string>
     <string name="cd_captions">Subtitrări</string>
     <string name="cd_drag_to_reorder">Trage pentru a reordona</string>

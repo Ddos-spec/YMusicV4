@@ -284,6 +284,7 @@
     <string name="play_all">Wada daar</string>
     <string name="shuffle_all">Isku dhexqas dhammaan</string>
     <string name="cd_shuffle">Isku dhexqas</string>
+    <string name="cd_scroll_to_now_playing">U gudub heesta socota</string>
     <string name="cd_sleep_timer">Gooraynta jiifka</string>
     <string name="cd_captions">Qoraal-hooseed</string>
     <string name="cd_drag_to_reorder">Jiid si aad u kala habayso</string>
