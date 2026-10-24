@@ -90,6 +90,10 @@ interface BetterMediaStore {
     /** Remove an item: soft-delete (tombstone) by default, or [hard] to purge it and its links now. */
     suspend fun deleteItem(itemId: Long, hard: Boolean = false)
 
+    /** Re-point an item at its file's new [uri] after the app renamed or moved it; a tombstone already at
+     *  [uri] is dropped. */
+    suspend fun relocateItem(itemId: Long, uri: Uri)
+
     /** Hard-delete item tombstones whose deletion is older than [olderThan] (epoch millis). Returns the count removed. */
     suspend fun purgeDeletedItems(olderThan: Long): Int
 

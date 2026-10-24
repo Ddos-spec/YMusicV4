@@ -128,6 +128,10 @@ class AppGraph(
     /** Reveal a file (by its uri) in the OS file manager — desktop only (mac Finder / file explorer);
      *  null on mobile, which hides the "Reveal in Finder" download action. */
     val revealInFolder: (suspend (uri: String) -> Unit)? = null,
+    /** Opens the system share sheet with a text (a link). Null = the UI copies it to the clipboard instead. */
+    val shareText: ((text: String) -> Unit)? = null,
+    /** Renames downloaded files in place (Downloads' "Rename"); null hides the action. */
+    val fileRenaming: FileRenaming? = null,
     /** Display version for the drawer header (e.g. "4.0.1 · arm64"); null hides the line. */
     val appVersion: String? = null,
     /** Settings › Versions: the build's versionName and versionCode; null hides the app line. */
@@ -295,4 +299,13 @@ class AppGraph(
     fun requestRefresh() {
         refreshRequests.tryEmit(Unit)
     }
+}
+
+/** Renaming a media file in its own folder. */
+interface FileRenaming {
+    /** The file's current name, extension included; null when it is gone. */
+    suspend fun nameOf(uri: String): String?
+
+    /** Renames the file to [newName] (extension included) and returns its new uri. Throws on failure. */
+    suspend fun rename(uri: String, newName: String): String
 }

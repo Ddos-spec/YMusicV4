@@ -398,6 +398,7 @@ private fun AppRoot(
         // A folder-reveal target (bucket id) set by Downloads' "Reveal in Library" and consumed by the
         // Library once it composes. Lives here so it survives the section switch.
         val libraryReveal = remember { androidx.compose.runtime.mutableStateOf<Long?>(null) }
+        val libraryGroupReveal = remember { androidx.compose.runtime.mutableStateOf<LibraryGroupReveal?>(null) }
         // Signed-in state, derived from the engine's cookie gate. Bumps loginEpoch on sign-in/out.
         val accountController = remember { AccountController(graph, scope) }
         val signedIn by accountController.signedIn.collectAsState()
@@ -826,6 +827,29 @@ private fun AppRoot(
                 onCancel = { askFeedbackConsent = false },
             )
         }
+        // The song menus' cross-screen jumps land on the Library's root, over Now Playing and any search layer.
+        fun openLibraryRoot() {
+            graph.pip.nowPlayingOpen.value = false
+            nowPlayingPeeking = false
+            sectionLayers[AppSection.Library]?.clear()
+            openSection(AppSection.Library)
+        }
+        val songActions = rememberSongActions(
+            graph,
+            showSnackbar,
+            reveal = { song ->
+                libraryReveal.value = song.bucketId
+                openLibraryRoot()
+            },
+            goToGroup = { kind, song ->
+                val name = when (kind) {
+                    LibraryGroupKind.Artist -> song.artist
+                    LibraryGroupKind.Album -> song.album
+                }
+                libraryGroupReveal.value = LibraryGroupReveal(kind, name.orEmpty())
+                openLibraryRoot()
+            },
+        )
         val premium by graph.premium.collectAsState()
         var updateRecheck by remember { mutableStateOf(0) }
         // The system back gesture/button walks the same path as the in-app back arrows: overlays
@@ -949,6 +973,8 @@ private fun AppRoot(
                             LocalAvailableOffline provides availableOffline,
                             LocalNavigateToSection provides { openSection(it) },
                             LocalLibraryFolderReveal provides libraryReveal,
+                            LocalLibraryGroupReveal provides libraryGroupReveal,
+                            *songActions.provided(),
                             LocalCaptchaResolver provides captchaResolver,
                             LocalSignInResolver provides signInResolver,
                         ) {
@@ -1204,6 +1230,7 @@ private fun AppRoot(
                 LocalYtPlaylistActions provides ytPlaylistActions,
                 LocalCaptchaResolver provides captchaResolver,
                 LocalSignInResolver provides signInResolver,
+                *songActions.provided(),
             ) {
                 if (nowPlayingOpen) {
                     NowPlayingScreen(
@@ -1234,6 +1261,7 @@ private fun AppRoot(
                         },
                     )
                 }
+                songActions.Dialogs()
                 DownloadDialogHost(graph, pendingDownload) { pendingDownload = null }
                 QuickDownloadHost(graph, pendingQuickDownload) { pendingQuickDownload = null }
                 QuickDownloadHost(graph, pendingFormatDownload?.first, pendingFormatDownload?.second) { pendingFormatDownload = null }

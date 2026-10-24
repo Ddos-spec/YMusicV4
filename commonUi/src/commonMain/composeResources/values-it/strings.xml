@@ -566,4 +566,10 @@
     <string name="dialog_save">Salva</string>
     <string name="upgraded_message">YMusic aggiornato alla %1$s</string>
     <string name="upgraded_view_changelog">Vedi le novità</string>
+    <string name="menu_go_to_artist">Vai all'artista</string>
+    <string name="menu_go_to_album">Vai all'album</string>
+    <string name="link_copied">Link copiato</string>
+    <string name="download_other_format">Scarica in un altro formato</string>
+    <string name="unsubscribe">Annulla iscrizione</string>
+    <string name="unsubscribed">Iscrizione annullata</string>
 </resources>

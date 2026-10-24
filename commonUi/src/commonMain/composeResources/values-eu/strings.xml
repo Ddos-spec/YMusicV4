@@ -561,4 +561,10 @@
     <string name="dialog_save">Gorde</string>
     <string name="upgraded_message">YMusic %1$s bertsiora eguneratu da</string>
     <string name="upgraded_view_changelog">Ikusi aldaketak</string>
+    <string name="menu_go_to_artist">Joan artistara</string>
+    <string name="menu_go_to_album">Joan albumera</string>
+    <string name="link_copied">Esteka kopiatu da</string>
+    <string name="download_other_format">Deskargatu beste formatu batean</string>
+    <string name="unsubscribe">Kendu harpidetza</string>
+    <string name="unsubscribed">Harpidetza kendu da</string>
 </resources>

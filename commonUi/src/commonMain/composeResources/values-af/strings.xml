@@ -561,4 +561,10 @@
     <string name="dialog_save">Stoor</string>
     <string name="upgraded_message">YMusic is opgedateer na %1$s</string>
     <string name="upgraded_view_changelog">Bekyk veranderinglys</string>
+    <string name="menu_go_to_artist">Gaan na kunstenaar</string>
+    <string name="menu_go_to_album">Gaan na album</string>
+    <string name="link_copied">Skakel gekopieer</string>
+    <string name="download_other_format">Laai in ’n ander formaat af</string>
+    <string name="unsubscribe">Kanselleer intekening</string>
+    <string name="unsubscribed">Intekening gekanselleer</string>
 </resources>

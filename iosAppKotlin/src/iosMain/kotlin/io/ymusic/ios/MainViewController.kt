@@ -310,6 +310,7 @@ private suspend fun buildIosGraph(container: UIView): AppGraph {
         exportSessionCookies = { cookies.exportSessionCookies() },
         scanQrCode = { iosScanQrCode() },
         confirmDeviceOwner = { title, subtitle -> iosConfirmDeviceOwner(title, subtitle) },
+        shareText = ::iosShareText,
     ) { modifier -> IosMseVideo(mseHole, msePlayer, modifier) }
     IosPipHost.hole = mseHole
     IosPipHost.pip = graph.pip

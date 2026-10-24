@@ -561,4 +561,10 @@
     <string name="dialog_save">Зачувај</string>
     <string name="upgraded_message">YMusic е ажуриран на %1$s</string>
     <string name="upgraded_view_changelog">Види ги промените</string>
+    <string name="menu_go_to_artist">Оди до изведувачот</string>
+    <string name="menu_go_to_album">Оди до албумот</string>
+    <string name="link_copied">Врската е копирана</string>
+    <string name="download_other_format">Преземи во друг формат</string>
+    <string name="unsubscribe">Откажи претплата</string>
+    <string name="unsubscribed">Претплатата е откажана</string>
 </resources>

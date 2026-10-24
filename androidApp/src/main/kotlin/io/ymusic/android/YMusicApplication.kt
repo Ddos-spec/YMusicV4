@@ -170,6 +170,13 @@ class YMusicApplication : Application() {
     /** The resumed MainActivity, for launches that must stay in YMusic's task (Donate). */
     var resumedActivity: WeakReference<Activity>? = null
 
+    /** The system share sheet, over the visible activity when there is one. */
+    private fun startShare(intent: Intent) {
+        val chooser = Intent.createChooser(intent, null)
+        val activity = resumedActivity?.get()
+        if (activity != null) activity.startActivity(chooser) else startActivity(chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+
     /** Rotating file sink (`filesDir/logs/ymusic.log`, 5 MiB × 3). Lazy: needs [filesDir]. */
     val logWorker: LoggingWorker by lazy { LoggingWorker(File(filesDir, "logs").toOkioPath()) }
 
@@ -630,6 +637,10 @@ class YMusicApplication : Application() {
                     SupportApp.openDonation(activity, shared.remoteConfig.config.value.donationUrl, rootLogger)
                 }
             },
+            shareText = { text ->
+                startShare(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text))
+            },
+            fileRenaming = AndroidFileRenaming(contentResolver),
             api = shared.api,
             remoteConfig = shared.remoteConfig.config,
             mediaStore = shared.mediaStore,

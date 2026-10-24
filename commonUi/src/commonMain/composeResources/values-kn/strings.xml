@@ -561,4 +561,10 @@
     <string name="dialog_save">ಉಳಿಸಿ</string>
     <string name="upgraded_message">YMusic ಅನ್ನು %1$s ಗೆ ನವೀಕರಿಸಲಾಗಿದೆ</string>
     <string name="upgraded_view_changelog">ಬದಲಾವಣೆಗಳನ್ನು ವೀಕ್ಷಿಸಿ</string>
+    <string name="menu_go_to_artist">ಕಲಾವಿದರ ಬಳಿ ಹೋಗಿ</string>
+    <string name="menu_go_to_album">ಆಲ್ಬಮ್ ಬಳಿ ಹೋಗಿ</string>
+    <string name="link_copied">ಲಿಂಕ್ ನಕಲಿಸಲಾಗಿದೆ</string>
+    <string name="download_other_format">ಬೇರೆ ಫಾರ್ಮ್ಯಾಟ್‌ನಲ್ಲಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ</string>
+    <string name="unsubscribe">ಚಂದಾದಾರಿಕೆ ರದ್ದುಮಾಡಿ</string>
+    <string name="unsubscribed">ಚಂದಾದಾರಿಕೆ ರದ್ದಾಗಿದೆ</string>
 </resources>

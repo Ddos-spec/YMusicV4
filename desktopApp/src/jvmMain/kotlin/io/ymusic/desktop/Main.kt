@@ -869,6 +869,7 @@ private suspend fun buildGraph(settings: AppStoreSettings, session: CookieSessio
                 FileSystem.SYSTEM.delete(item.uri.path.toString().toPath(), mustExist = false)
             }
         },
+        fileRenaming = DesktopFileRenaming,
         revealInFolder = { uri ->
             withContext(Dispatchers.IO) {
                 val path = Uri.parse(uri).filePath()

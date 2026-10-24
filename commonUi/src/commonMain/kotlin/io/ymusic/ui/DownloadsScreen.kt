@@ -35,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -51,8 +52,14 @@ import io.ymusic.download.DownloadService
 import io.ymusic.download.DownloadState
 import io.ymusic.download.DownloadTask
 import io.ymusic.download.DownloadTasksAggregator
+import io.ymusic.dynamicengine.yt.YtFeedItem
+import io.ymusic.dynamicengine.yt.YtThumb
+import io.ymusic.mediastore.BetterMediaStore
+import io.ymusic.mediastore.model.MediaStoreItem
 import io.ymusic.ui.resources.Res
+import io.ymusic.ui.resources.cd_share
 import io.ymusic.ui.resources.dialog_cancel
+import io.ymusic.ui.resources.download_other_format
 import io.ymusic.ui.resources.download_size_kb
 import io.ymusic.ui.resources.download_size_mb
 import io.ymusic.ui.resources.downloads_action_pause
@@ -86,14 +93,19 @@ import io.ymusic.ui.resources.downloads_state_preparing
 import io.ymusic.ui.resources.downloads_state_processing
 import io.ymusic.ui.resources.downloads_state_queued
 import io.ymusic.ui.resources.downloads_unavailable
+import io.ymusic.ui.resources.menu_add_to_playlist
 import io.ymusic.ui.resources.menu_play
 import io.ymusic.ui.resources.menu_remove
+import io.ymusic.ui.resources.menu_remove_from_disk
+import io.ymusic.ui.resources.menu_rename
 import io.ymusic.ui.resources.month_abbr
 import io.ymusic.ui.resources.playback_retry_later
 import io.ymusic.ui.resources.playback_sign_in_required
 import io.ymusic.ui.resources.playback_unavailable
 import io.ymusic.ui.resources.retry
+import kmpcommon.log.Logger
 import kmpcommon.uri.Uri
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -102,6 +114,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringArrayResource
 import org.jetbrains.compose.resources.stringResource
 import projectcommon.error.Playability
+import projectcommon.error.errorCode
 import projectcommon.error.playabilityOf
 
 /**
@@ -150,11 +163,16 @@ fun DownloadsScreen(graph: AppGraph, coordinator: PlaybackCoordinator) {
 
     val navigate = LocalNavigateToSection.current
     val folderReveal = LocalLibraryFolderReveal.current
+    val downloadLauncher = LocalDownloadLauncher.current
     val store = graph.mediaStore
     val scope = rememberCoroutineScope()
     val signIn = LocalSignInResolver.current
     val snackbar = LocalSnackbar.current
     var retryBlock by remember { mutableStateOf<RetryBlock?>(null) }
+    var renaming by remember { mutableStateOf<DownloadTask?>(null) }
+    renaming?.let { task ->
+        graph.fileRenaming?.let { renamer -> RenameDownloadDialog(graph, renamer, service, task, onDismiss = { renaming = null }) }
+    }
     retryBlock?.let { block ->
         val dismiss = { retryBlock = null }
         when (block.verdict) {
@@ -219,18 +237,20 @@ fun DownloadsScreen(graph: AppGraph, coordinator: PlaybackCoordinator) {
                     },
                     onRevealLibrary = if (store != null) ({
                         scope.launch {
-                            // Resolve the folder from the file's own persisted uri, not the current
-                            // download-location setting (which may have changed since): the item's
-                            // registered bucket, else the file's parent folder as a Library bucket.
-                            // Null falls back to just opening the Library.
+                            // Resolve the folder from the file itself, not the current download-location
+                            // setting (which may have changed since): the item's registered bucket, else
+                            // the file's parent folder as a Library bucket, else the download location.
                             val uri = task.fileUri
-                            folderReveal?.value = uri?.let { store.findItemByUri(Uri.parse(it)) }?.bucketId
+                            folderReveal?.value = libraryItemOf(store, task)?.bucketId
                                 ?: uri?.parentFolderUri()?.let { store.findBucketByUri(Uri.parse(it)) }?.id
+                                ?: graph.settings.downloadLocationFolder()?.let { store.findBucketByUri(Uri.parse(it)) }?.id
                             navigate(AppSection.Library)
                         }
                         Unit
                     }) else null,
                     onRevealFolder = graph.revealInFolder?.let { hook -> { task.fileUri?.let { uri -> scope.launch { hook(uri) } }; Unit } },
+                    fileActions = completedFileActions(graph, task, service, onRename = { renaming = task }),
+                    onOtherFormat = downloadLauncher?.let { launcher -> { launcher.launch(task.toFeedItem()) } },
                 )
             }
         }
@@ -291,6 +311,8 @@ private fun DownloadCard(
     onPlay: () -> Unit,
     onRevealLibrary: (() -> Unit)?,
     onRevealFolder: (() -> Unit)?,
+    fileActions: CompletedFileActions,
+    onOtherFormat: (() -> Unit)?,
 ) {
     val c = downloadColors()
     val failed = task.state == DownloadState.FAILED
@@ -318,7 +340,7 @@ private fun DownloadCard(
                         }
                     }
                 }
-                MoreMenu(actionsFor(task, service, onRetry, onPlay, onRevealLibrary, onRevealFolder))
+                MoreMenu(actionsFor(task, service, onRetry, onPlay, onRevealLibrary, onRevealFolder, fileActions, onOtherFormat))
             }
             if (task.showsBar()) {
                 Box(Modifier.fillMaxWidth().padding(start = ContentIndent)) { DownloadBar(task, c) }
@@ -383,6 +405,92 @@ private fun downloadErrorUiText(task: DownloadTask): UiText {
 private fun DownloadTask.showsBar(): Boolean = state == DownloadState.PREPARING ||
     ((state == DownloadState.DOWNLOADING || state == DownloadState.PROCESSING || state == DownloadState.PAUSED) && progress != null)
 
+/** A download's file and link actions, each null when it doesn't apply (no Library row, no rename hook…). */
+private class CompletedFileActions(
+    val addToPlaylist: (() -> Unit)?,
+    val share: (() -> Unit)?,
+    val rename: (() -> Unit)?,
+    val deleteFile: (() -> Unit)?,
+)
+
+@Composable
+private fun completedFileActions(graph: AppGraph, task: DownloadTask, service: DownloadService, onRename: () -> Unit): CompletedFileActions {
+    val store = graph.mediaStore
+    val songActions = LocalSongActions.current
+    val libraryItem by produceState<MediaStoreItem?>(null, store, task.state, task.fileUri) {
+        value = if (store != null && task.state == DownloadState.COMPLETED) libraryItemOf(store, task) else null
+    }
+    val item = libraryItem
+    val fileUri = task.fileUri
+    return CompletedFileActions(
+        addToPlaylist = if (item != null && songActions != null) ({ songActions.addToPlaylist(item) }) else null,
+        share = LocalShareYoutube.current?.let { share -> { share(YtFeedItem.KIND_VIDEO, task.videoId) } },
+        rename = if (graph.fileRenaming != null && fileUri != null && task.state == DownloadState.COMPLETED) onRename else null,
+        deleteFile = if (item != null && songActions?.canDelete == true) {
+            { songActions.requestDelete(item) { service.remove(task.id) } }
+        } else {
+            null
+        },
+    )
+}
+
+/** Renames a completed download's file in place, then re-points its task and its Library row at the new uri. */
+@Composable
+private fun RenameDownloadDialog(
+    graph: AppGraph,
+    renamer: FileRenaming,
+    service: DownloadService,
+    task: DownloadTask,
+    onDismiss: () -> Unit,
+) {
+    val uri = task.fileUri ?: return
+    val currentName by produceState<String?>(null, uri) { value = renamer.nameOf(uri) ?: "" }
+    val name = currentName ?: return
+    val dot = name.lastIndexOf('.').takeIf { it > 0 } ?: name.length
+    val extension = name.substring(dot)
+    val scope = rememberCoroutineScope()
+    var busy by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+    FileNameDialog(name.substring(0, dot), extension, error = error, busy = busy, onDismiss = onDismiss) { stem ->
+        busy = true
+        error = null
+        scope.launch {
+            val log = graph.logger?.fork("download-rename", mapOf("taskId" to task.id))
+            try {
+                val store = graph.mediaStore
+                val libraryItem = store?.let { libraryItemOf(it, task) }
+                val newUri = renamer.rename(uri, stem + extension)
+                service.relocate(task.id, newUri)
+                if (store != null && libraryItem != null) store.relocateItem(libraryItem.id, Uri.parse(newUri))
+                onDismiss()
+            } catch (cancel: CancellationException) {
+                throw cancel
+            } catch (failure: Throwable) {
+                log?.log(Logger.Level.WARN, "renaming a downloaded file failed", failure)
+                error = errorText(failure.errorCode() ?: "E70070").load()
+            } finally {
+                busy = false
+            }
+        }
+    }
+}
+
+/** The Library row of a completed download: by its file uri, else by its video id and format. */
+private suspend fun libraryItemOf(store: BetterMediaStore, task: DownloadTask): MediaStoreItem? {
+    task.fileUri?.let { uri -> store.findItemByUri(Uri.parse(uri))?.let { return it } }
+    val sameVideo = store.findItemsByVideoId(task.videoId)
+    return sameVideo.firstOrNull { it.mimeType == task.format.mimeType() } ?: sameVideo.singleOrNull()
+}
+
+private fun DownloadTask.toFeedItem() = YtFeedItem(
+    kind = YtFeedItem.KIND_VIDEO,
+    id = videoId,
+    title = title,
+    subtitleLine1 = artist,
+    channelTitle = artist,
+    thumbs = thumbnailUrl?.let { listOf(YtThumb(it)) } ?: emptyList(),
+)
+
 /** The containing folder of a `file://` uri, as a bucket uri; null for opaque uris (Android SAF
  *  `content://` documents, whose parent isn't derivable by string ops — those resolve via findItemByUri). */
 private fun String.parentFolderUri(): String? =
@@ -441,7 +549,10 @@ private fun actionsFor(
     onPlay: () -> Unit,
     onRevealLibrary: (() -> Unit)?,
     onRevealFolder: (() -> Unit)?,
+    fileActions: CompletedFileActions,
+    onOtherFormat: (() -> Unit)?,
 ): ItemActions {
+    val otherFormat = stringResource(Res.string.download_other_format)
     val entries = buildList<Pair<String, () -> Unit>> {
         when (task.state) {
             DownloadState.QUEUED, DownloadState.PREPARING, DownloadState.DOWNLOADING, DownloadState.PROCESSING -> {
@@ -454,15 +565,24 @@ private fun actionsFor(
             }
             DownloadState.FAILED -> {
                 add(stringResource(Res.string.retry) to onRetry)
+                onOtherFormat?.let { add(otherFormat to it) }
+                fileActions.share?.let { add(stringResource(Res.string.cd_share) to it) }
                 add(stringResource(Res.string.menu_remove) to { service.remove(task.id) })
             }
             DownloadState.COMPLETED -> {
                 add(stringResource(Res.string.menu_play) to onPlay)
+                fileActions.addToPlaylist?.let { add(stringResource(Res.string.menu_add_to_playlist) to it) }
+                onOtherFormat?.let { add(otherFormat to it) }
                 onRevealLibrary?.let { add(stringResource(Res.string.downloads_action_reveal_library) to it) }
                 onRevealFolder?.let { add(stringResource(Res.string.downloads_action_reveal_finder) to it) }
+                fileActions.rename?.let { add(stringResource(Res.string.menu_rename) to it) }
+                fileActions.share?.let { add(stringResource(Res.string.cd_share) to it) }
                 add(stringResource(Res.string.menu_remove) to { service.remove(task.id) })
+                fileActions.deleteFile?.let { add(stringResource(Res.string.menu_remove_from_disk) to it) }
             }
             DownloadState.CANCELED -> {
+                onOtherFormat?.let { add(otherFormat to it) }
+                fileActions.share?.let { add(stringResource(Res.string.cd_share) to it) }
                 add(stringResource(Res.string.menu_remove) to { service.remove(task.id) })
             }
         }

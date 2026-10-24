@@ -566,4 +566,10 @@
     <string name="dialog_save">Desa</string>
     <string name="upgraded_message">YMusic s'ha actualitzat a la %1$s</string>
     <string name="upgraded_view_changelog">Mostra els canvis</string>
+    <string name="menu_go_to_artist">Ves a l'artista</string>
+    <string name="menu_go_to_album">Ves a l'àlbum</string>
+    <string name="link_copied">S'ha copiat l'enllaç</string>
+    <string name="download_other_format">Baixa en un altre format</string>
+    <string name="unsubscribe">Cancel·la la subscripció</string>
+    <string name="unsubscribed">S'ha cancel·lat la subscripció</string>
 </resources>

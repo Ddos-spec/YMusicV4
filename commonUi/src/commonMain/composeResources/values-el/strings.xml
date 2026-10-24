@@ -561,4 +561,10 @@
     <string name="dialog_save">Αποθήκευση</string>
     <string name="upgraded_message">Το YMusic ενημερώθηκε στην έκδοση %1$s</string>
     <string name="upgraded_view_changelog">Προβολή αλλαγών</string>
+    <string name="menu_go_to_artist">Πήγαινε στον καλλιτέχνη</string>
+    <string name="menu_go_to_album">Πήγαινε στο άλμπουμ</string>
+    <string name="link_copied">Ο σύνδεσμος αντιγράφηκε</string>
+    <string name="download_other_format">Λήψη σε άλλη μορφή</string>
+    <string name="unsubscribe">Κατάργηση εγγραφής</string>
+    <string name="unsubscribed">Η εγγραφή καταργήθηκε</string>
 </resources>

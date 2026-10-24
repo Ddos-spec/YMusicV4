@@ -571,4 +571,10 @@
     <string name="dialog_save">Uložiť</string>
     <string name="upgraded_message">YMusic bol aktualizovaný na %1$s</string>
     <string name="upgraded_view_changelog">Zobraziť zoznam zmien</string>
+    <string name="menu_go_to_artist">Prejsť na interpreta</string>
+    <string name="menu_go_to_album">Prejsť na album</string>
+    <string name="link_copied">Odkaz bol skopírovaný</string>
+    <string name="download_other_format">Stiahnuť v inom formáte</string>
+    <string name="unsubscribe">Zrušiť odber</string>
+    <string name="unsubscribed">Odber zrušený</string>
 </resources>

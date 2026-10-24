@@ -561,4 +561,10 @@
     <string name="dialog_save">சேமி</string>
     <string name="upgraded_message">YMusic %1$s-க்குப் புதுப்பிக்கப்பட்டது</string>
     <string name="upgraded_view_changelog">மாற்றங்களைக் காண்க</string>
+    <string name="menu_go_to_artist">கலைஞருக்குச் செல்</string>
+    <string name="menu_go_to_album">ஆல்பத்துக்குச் செல்</string>
+    <string name="link_copied">இணைப்பு நகலெடுக்கப்பட்டது</string>
+    <string name="download_other_format">வேறு வடிவத்தில் பதிவிறக்கு</string>
+    <string name="unsubscribe">குழுவிலகு</string>
+    <string name="unsubscribed">குழுவிலகப்பட்டது</string>
 </resources>

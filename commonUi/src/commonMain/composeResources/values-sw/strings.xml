@@ -561,4 +561,10 @@
     <string name="dialog_save">Hifadhi</string>
     <string name="upgraded_message">YMusic imesasishwa hadi %1$s</string>
     <string name="upgraded_view_changelog">Angalia mabadiliko</string>
+    <string name="menu_go_to_artist">Nenda kwa msanii</string>
+    <string name="menu_go_to_album">Nenda kwa albamu</string>
+    <string name="link_copied">Kiungo kimenakiliwa</string>
+    <string name="download_other_format">Pakua kwa umbizo jingine</string>
+    <string name="unsubscribe">Jiondoe</string>
+    <string name="unsubscribed">Umejiondoa</string>
 </resources>
