@@ -491,12 +491,9 @@ private fun RenameDownloadDialog(
     }
 }
 
-/** The Library row of a completed download: by its file uri, else by its video id and format. */
-private suspend fun libraryItemOf(store: BetterMediaStore, task: DownloadTask): MediaStoreItem? {
-    task.fileUri?.let { uri -> store.findItemByUri(Uri.parse(uri))?.let { return it } }
-    val sameVideo = store.findItemsByVideoId(task.videoId)
-    return sameVideo.firstOrNull { it.mimeType == task.format.mimeType() } ?: sameVideo.singleOrNull()
-}
+/** The Library row of a completed download, by its exact file uri. */
+private suspend fun libraryItemOf(store: BetterMediaStore, task: DownloadTask): MediaStoreItem? =
+    task.fileUri?.let { uri -> store.findItemByUri(Uri.parse(uri)) }
 
 private fun DownloadTask.toFeedItem() = YtFeedItem(
     kind = YtFeedItem.KIND_VIDEO,
