@@ -33,6 +33,7 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PushPin
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.ThumbDown
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.AlertDialog
@@ -65,6 +66,7 @@ import androidx.compose.ui.unit.sp
 import io.ymusic.dynamicengine.yt.YtChip
 import io.ymusic.dynamicengine.yt.YtComment
 import io.ymusic.dynamicengine.yt.YtCommentPage
+import io.ymusic.dynamicengine.yt.YtFeedItem
 import io.ymusic.dynamicengine.yt.YtVideoDetails
 import io.ymusic.dynamicengine.yt.commentAction
 import io.ymusic.dynamicengine.yt.createComment
@@ -76,6 +78,7 @@ import io.ymusic.dynamicengine.yt.replyToComment
 import io.ymusic.ui.resources.Res
 import io.ymusic.ui.resources.cd_close
 import io.ymusic.ui.resources.cd_more
+import io.ymusic.ui.resources.cd_share
 import io.ymusic.ui.resources.dialog_cancel
 import io.ymusic.ui.resources.retry
 import io.ymusic.ui.resources.show_less
@@ -472,7 +475,10 @@ private fun DetailsHeader(state: VideoDetailsState, details: YtVideoDetails, onO
                     }
                 }
             }
-            RatingPill(state, details)
+            Row(horizontalArrangement = Arrangement.spacedBy(DesignSpacing.Space8)) {
+                RatingPill(state, details)
+                LocalShareYoutube.current?.let { share -> SharePill { share(YtFeedItem.KIND_VIDEO, state.videoId) } }
+            }
         }
         details.description?.takeIf { it.isNotBlank() }?.let { Description(it) }
         HorizontalDivider(color = DesignColors.Divider)
@@ -523,6 +529,19 @@ private fun RatingPill(state: VideoDetailsState, details: YtVideoDetails) {
                 tint = ink,
             )
         }
+    }
+}
+
+@Composable
+private fun SharePill(onClick: () -> Unit) {
+    Box(
+        Modifier
+            .clip(RoundedCornerShape(999.dp))
+            .background(DesignColors.SurfaceDim)
+            .clickable(onClick = onClick)
+            .padding(horizontal = DesignSpacing.Space16, vertical = DesignSpacing.Space8),
+    ) {
+        Icon(Icons.Outlined.Share, stringResource(Res.string.cd_share), Modifier.size(18.dp), tint = DesignColors.Ink)
     }
 }
 
