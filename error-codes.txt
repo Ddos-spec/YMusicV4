@@ -97,6 +97,7 @@ E20160 D edit_playlist answered a non-success status when saving an owned playli
 E20161 - subscribing/unsubscribing from a channel row menu failed with an uncoded error (commonUi Feed.kt rememberChannelSubscriber)
 E20162 - player/setAudioTrack: the video has no audio track with the requested id, or base.js lacks setAudioTrack (engine-js logic/player/boot.ts)
 E20163 - player/setAudioTrack called without an id (engine-js logic/player.ts)
+E20164 - player/setAudioTrack before Application.create (no movie_player) (engine-js logic/player/boot.ts)
 E24242 - (example) dynamic-engine HostCommandTest fixture
 E29999 - (example) EngineErrorDecodeTest / HOST_PROTOCOLS.md fixture
 

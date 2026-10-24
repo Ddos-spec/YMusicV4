@@ -1503,7 +1503,7 @@ class Player {
 
   setAudioTrack(id: string): void {
     const player = moviePlayer();
-    if (!player) throw new JsEngineErrorImpl("setAudioTrack: no movie_player", "E20085");
+    if (!player) throw new JsEngineErrorImpl("setAudioTrack: no movie_player", "E20164");
     const tracks = availableAudioTracks(player);
     for (let i = 0; i < tracks.length; i++) {
       const track = tracks[i]!;
