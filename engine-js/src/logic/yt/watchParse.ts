@@ -2,7 +2,7 @@
 // comment / reply pages (entity-backed commentViewModels). Commands: videoDetails.ts.
 
 import { channelUrl } from "./parse";
-import { asString, get, isObj, textOf, thumbsOf, walk } from "./scan";
+import { absImageUrl, asString, get, isObj, textOf, thumbsOf, walk } from "./scan";
 import type { WireChip, WireComment, WireCommentPage, WireFactoid, WireVideoDetails } from "./wire";
 
 /** The token a continuation item (an auto-trigger or a "Show more" button) carries. */
@@ -210,7 +210,7 @@ function commentOf(
   const name = asString(get(author, "displayName"));
   if (name !== undefined) comment["author"] = name;
   const avatar = asString(get(author, "avatarThumbnailUrl"));
-  if (avatar !== undefined) comment["authorThumbs"] = [{ "url": avatar }];
+  if (avatar !== undefined) comment["authorThumbs"] = [{ "url": absImageUrl(avatar) }];
   const authorId = asString(get(author, "channelId"));
   if (authorId !== undefined) comment["authorChannelUrl"] = channelUrl(authorId);
   if (get(author, "isCreator") === true) comment["byCreator"] = true;

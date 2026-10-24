@@ -72,6 +72,11 @@ export function textOf(node: unknown): string | undefined {
   return undefined;
 }
 
+/** YouTube serves some image urls scheme-relative (`//yt3.ggpht.com/…`); the app's loader needs a scheme. */
+export function absImageUrl(url: string): string {
+  return url.indexOf("//") === 0 ? "https:" + url : url;
+}
+
 /**
  * Map a list of `{url,width,height}` nodes (a renderer `thumbnails` array or a viewModel `sources`
  * array — both ascend in size) to wire thumbs; undefined when nothing usable.
@@ -82,7 +87,7 @@ export function thumbVariants(list: unknown): WireThumb[] | undefined {
   for (const v of list) {
     const url = asString(get(v, "url"));
     if (url === undefined) continue;
-    const t: WireThumb = { "url": url };
+    const t: WireThumb = { "url": absImageUrl(url) };
     const w = get(v, "width");
     const h = get(v, "height");
     if (typeof w === "number") t["w"] = w;
