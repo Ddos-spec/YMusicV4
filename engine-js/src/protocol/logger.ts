@@ -5,10 +5,15 @@
 // logger so host birth-site logs join the caller's story. There is no log() here — console output
 // already crosses on its own channel.
 
-// One trail hop: [tag] or [tag, props]. Tags are STABLE names (crash grouping keys are built from
-// tag paths); anything variable (ids, params) goes in the props object, values JSON primitives.
-// Wire keys quoted — these cross to Kotlin as JSON (LogContext.kt).
-export type LogCrumb = [string] | [string, Record<string, unknown>];
+// One trail hop: [tag, props | null, enteredAtMillis]. Tags are STABLE names (crash grouping keys are
+// built from tag paths); anything variable (ids, params) goes in the props object, values JSON
+// primitives. Hosts before 4.0.12 read only [0] and an object [1]. Wire keys quoted — these cross
+// to Kotlin as JSON (LogContext.kt).
+export type LogCrumb = [string, Record<string, unknown> | null, number];
+
+function crumb(tag: string, prop?: Record<string, unknown>): LogCrumb {
+  return [tag, prop === undefined ? null : prop, Date.now()];
+}
 
 // Every JS-side tag is "js:"-prefixed (JS hops stay distinguishable from Kotlin ones in a trail)
 // and slash-free ("/" is the rendered path separator — a slash inside a tag would fake two hops).
@@ -21,6 +26,11 @@ function jsTag(tag: string): string {
 // player:<version>/…) so a report names the bundle that produced it. Baked here, not host-side:
 // the version is the bundle's fact.
 export const VERSION_TAG: string = BUNDLE_NAME + ":" + BACKEND_VERSION;
+
+// The trail of a request made without a logger: just the bundle-revision root.
+export function rootTrail(): LogWire {
+  return { "trail": [crumb(VERSION_TAG)] };
+}
 
 export interface LogWire {
   "key"?: number;
@@ -38,8 +48,7 @@ export class JsLogger {
 
   fork(tag: string, prop?: Record<string, unknown>): JsLogger {
     const t = this.trail.slice();
-    const name = jsTag(tag);
-    t.push(prop === undefined ? [name] : [name, prop]);
+    t.push(crumb(jsTag(tag), prop));
     return new JsLogger(this.key, t);
   }
 
@@ -56,11 +65,11 @@ export class JsLogger {
 // BUNDLE's (remotely updatable, free to diverge from the app-side function).
 export function hostLogger(args: Record<string, unknown>, tag: string): JsLogger {
   const k = args["logKey"];
-  return new JsLogger(typeof k === "number" ? k : null, [[VERSION_TAG], [jsTag(tag)]]);
+  return new JsLogger(typeof k === "number" ? k : null, [crumb(VERSION_TAG), crumb(jsTag(tag))]);
 }
 
 // A keyless logger for JS-initiated work (session bootstrap, crons) — resolves to the engine's
 // root logger host-side.
 export function jsLogger(tag: string): JsLogger {
-  return new JsLogger(null, [[VERSION_TAG], [jsTag(tag)]]);
+  return new JsLogger(null, [crumb(VERSION_TAG), crumb(jsTag(tag))]);
 }

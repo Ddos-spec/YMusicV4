@@ -124,14 +124,15 @@ present → show it verbatim + code; else → generic "Something went wrong (cod
 The value channel above goes **up**; the logging channel goes **down** (AGENTS.md "Error
 Handling"). A Kotlin task call (`jsonCommand`) **parks** its caller's `kmpcommon.log.Logger` for
 exactly the command's lifetime and sends the key in the args head as `"logKey": <int>`; the bundle
-mints a `JsLogger` from it (`engine-js/src/protocol/logger.ts`), forks its own hops (`[tag]` or
-`[tag, {props}]` — tags are STABLE names, `js:`-prefixed and slash-free, anything variable goes
+mints a `JsLogger` from it (`engine-js/src/protocol/logger.ts`), forks its own hops
+(`[tag, {props}|null, enteredAtMillis]` — the host stamps a hop without a time, from an older
+bundle, at graft time; tags are STABLE names, `js:`-prefixed and slash-free, anything variable goes
 in props), and attaches it to every host call as a head field. The trail always opens with the
 bundle's own revision (`js:<BACKEND_VERSION>`, baked in at logger construction — the version is
 the bundle's fact, not the host's), so every report names the bundle that produced it:
 
 ```
-"log": {"key": 3, "trail": [["js:20"], ["js:yt-home"], ["js:browse"]]}
+"log": {"key": 3, "trail": [["js:20", null, 1793000000000], ["js:yt-home", null, 1793000000000], ["js:browse", {"page": 2}, 1793000000412]]}
 ```
 
 The host protocol resolves the key back to the parked logger (absent/unknown/late → the engine

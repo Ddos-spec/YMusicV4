@@ -13,10 +13,12 @@ import projectcommon.json.arrayOrNull
 import projectcommon.json.intOrNull
 import projectcommon.json.objectOrNull
 import projectcommon.json.stringOrNull
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 /**
  * The caller's logger for one host-protocol serve: the head's `log` field —
- * `{"key": <parked>, "trail": [["tag", {prop}?], …]}` — resolves the parked Kotlin caller (absent →
+ * `{"key": <parked>, "trail": [["tag", {prop}|null?, enteredAtMillis?], …]}` — resolves the parked Kotlin caller (absent →
  * the engine root), gets the JS-side trail grafted on by value, and this protocol's [tag] hop
  * appended.
  */
@@ -40,15 +42,19 @@ internal fun protocolLogger(
 internal fun JsonObject.propOf(field: String): Map<String, Any>? =
     stringOrNull(field)?.substringBefore('?')?.let { mapOf(field to it) }
 
+@OptIn(ExperimentalTime::class)
 private fun readTrail(wire: JsonObject?): List<Crumb> {
     val trail = wire?.arrayOrNull("trail") ?: return emptyList()
+    val graftedAt = Clock.System.now().toEpochMilliseconds()
     return trail.mapNotNull { entry ->
         val arr = entry as? JsonArray ?: return@mapNotNull null
         val tag = (arr.getOrNull(0) as? JsonPrimitive)?.contentOrNull ?: return@mapNotNull null
         val prop = (arr.getOrNull(1) as? JsonObject)
             ?.mapNotNull { (k, v) -> (v as? JsonPrimitive)?.toPropValue()?.let { k to it } }
             ?.toMap()
-        Crumb(tag, prop?.takeIf { it.isNotEmpty() })
+        // Bundles before engine 85 / player 96 send no time; a time past the graft is a skewed JS clock.
+        val enteredAt = (arr.getOrNull(2) as? JsonPrimitive)?.longOrNull?.takeIf { it in 1..graftedAt } ?: graftedAt
+        Crumb(tag, prop?.takeIf { it.isNotEmpty() }, enteredAt)
     }
 }
 

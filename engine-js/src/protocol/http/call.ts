@@ -4,8 +4,8 @@ import { dispatchHttp } from "./intercept";
 import type { HttpReq } from "./intercept";
 import { Response } from "./response";
 import type { BodyKind, RequestHead, RequestOpts } from "./wire";
-import type { JsLogger, LogCrumb } from "../logger";
-import { VERSION_TAG } from "../logger";
+import type { JsLogger } from "../logger";
+import { rootTrail } from "../logger";
 
 // One request execution. execute() resolves the Response (once); cancel() aborts at ANY stage:
 // before execute() (it refuses to start), mid-flight (a RESET of the control pipe's request
@@ -147,7 +147,7 @@ export class HttpCallImpl implements HttpCall {
     // Threads the caller's logging context to the host so a transport failure (request/response
     // body) logs at its birth site with the full trail (HOST_PROTOCOLS "Logging context"). Even a
     // logger-less request carries the bundle-revision root — every serve names its bundle.
-    head["log"] = this._log ? this._log.wire() : { "trail": [[VERSION_TAG] as LogCrumb] };
+    head["log"] = this._log ? this._log.wire() : rootTrail();
     try {
       // control pipe: the JSON head (self-framing), then NOTHING outbound except a possible -1
       // cancel — the channel stays unobstructed at every stage.
