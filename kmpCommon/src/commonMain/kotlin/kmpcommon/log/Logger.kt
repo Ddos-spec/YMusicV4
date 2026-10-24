@@ -1,11 +1,22 @@
 package kmpcommon.log
 
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+
 /**
  * One scope hop in a logger's trail. [tag] is a stable, code-location-like name (`fetch`, `http`)
  * a sink can group by; anything variable (ids, urls, params) goes in [prop], whose values should be
- * JSON primitives (String/Number/Boolean) so any sink can serialize them.
+ * JSON primitives (String/Number/Boolean) so any sink can serialize them. [atMillis] is when the hop
+ * was entered (epoch ms).
  */
-data class Crumb(val tag: String, val prop: Map<String, Any>? = null)
+data class Crumb(
+    val tag: String,
+    val prop: Map<String, Any>? = null,
+    val atMillis: Long = nowMillis(),
+)
+
+@OptIn(ExperimentalTime::class)
+private fun nowMillis(): Long = Clock.System.now().toEpochMilliseconds()
 
 /**
  * An immutable scope-trail logger the host application wires to its sink. Library code logs

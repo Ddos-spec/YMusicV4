@@ -256,7 +256,7 @@ fun main() {
             scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
             consent = settings.flow(AppSettings.crashReports),
         ) {
-            Sentry.init {
+            Sentry.initWithPlatformOptions {
                 it.applyYMusicTelemetry()
                 it.dsn = SENTRY_DSN
                 // The commit in the release traces an event to git history (no source upload).

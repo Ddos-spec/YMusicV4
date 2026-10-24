@@ -35,5 +35,11 @@ kotlin {
         commonTest.dependencies {
             implementation(kotlin("test"))
         }
+
+        // Both targets run sentry-java underneath: the event hooks and timed breadcrumbs go through
+        // it directly, since the KMP wrapper's beforeSend round-trip re-stamps every breadcrumb.
+        val jvmSharedMain by creating { dependsOn(commonMain.get()) }
+        jvmMain.get().dependsOn(jvmSharedMain)
+        androidMain.get().dependsOn(jvmSharedMain)
     }
 }
