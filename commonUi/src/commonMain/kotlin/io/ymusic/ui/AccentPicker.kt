@@ -131,7 +131,7 @@ private fun AccentPickerDialog(initial: Color, onDismiss: () -> Unit, onPick: (C
                     textStyle = TextStyle(fontSize = 16.sp, color = DesignColors.Ink, fontFamily = FontFamily.Monospace),
                     cursorBrush = SolidColor(picked),
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
-                    modifier = Modifier.width(96.dp),
+                    modifier = Modifier.width(96.dp).trackTextInputFocus(),
                 )
             }
         }

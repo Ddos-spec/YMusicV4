@@ -286,7 +286,7 @@ private fun CatalogueList() {
                 onValueChange = { query = it },
                 placeholder = { Text("Search YouTube") },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp).trackTextInputFocus(),
                 leadingIcon = { Icon(Icons.Default.Search, null) },
                 trailingIcon = {
                     if (query.isNotEmpty()) {

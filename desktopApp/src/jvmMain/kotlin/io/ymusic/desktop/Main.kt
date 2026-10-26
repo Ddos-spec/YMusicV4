@@ -124,7 +124,9 @@ import io.ymusic.ui.AppHttpClients
 import io.ymusic.ui.CatalogueScreen
 import io.ymusic.ui.FolderWriteProblem
 import io.ymusic.ui.IncomingLinks
+import io.ymusic.ui.LocalTextInputFocus
 import io.ymusic.ui.ScanResult
+import io.ymusic.ui.TextInputFocus
 import io.ymusic.ui.VideoOverlayNative
 import io.ymusic.ui.YtEngineSabrSpecResolver
 import io.ymusic.ui.bundleConfig
@@ -308,6 +310,7 @@ fun main() {
         val windowState = rememberWindowState(size = initialSize, position = initialPosition)
         var unmuteTo by remember { mutableStateOf(1f) }
         val frame = remember { DesktopFrame(windowState, initialSize, initialPosition) }
+        val textInputFocus = remember { TextInputFocus() }
         fun quit() {
             if (!frame.fullscreen) {
                 saveWindowPrefs(frame.persistSize(), frame.persistPosition())
@@ -351,6 +354,7 @@ fun main() {
             transparent = true,
             onPreviewKeyEvent = preview@{ event ->
                 if (event.type != KeyEventType.KeyDown) return@preview false
+                if (textInputFocus.isFocused && event.key.keyCode != KEY_F11) return@preview false
                 when {
                     (event.key == Key.Escape && frame.fullscreen) ||
                         event.key.keyCode == KEY_F11 ||
@@ -376,12 +380,12 @@ fun main() {
                 }
             },
             onKeyEvent = onKey@{ event ->
+                if (textInputFocus.isFocused) return@onKey false
                 val player = graph?.player ?: return@onKey false
                 val down = event.type == KeyEventType.KeyDown
                 val up = event.type == KeyEventType.KeyUp
                 when {
-                    // Key up so a held space doesn't toggle twice, and a focused search box
-                    // consumes the key before it reaches here.
+                    // Key up so a held space doesn't toggle twice.
                     event.key == Key.Spacebar && up -> {
                         player.togglePlay(); true
                     }
@@ -431,7 +435,7 @@ fun main() {
             val palette = designPaletteFor(themePref, isSystemInDarkTheme())
             val frameBorder =
                 if (darkBar) Color.White.copy(alpha = 0.14f) else palette.OutlineSoft
-            CompositionLocalProvider(LocalAppWindow provides window) {
+            CompositionLocalProvider(LocalAppWindow provides window, LocalTextInputFocus provides textInputFocus) {
                 DisposableEffect(window) {
                     frame.host = window
                     FileAvNative.onFullScreen = { on ->

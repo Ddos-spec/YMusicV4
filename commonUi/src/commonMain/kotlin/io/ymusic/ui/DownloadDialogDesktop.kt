@@ -197,7 +197,7 @@ private fun FileNameField(state: DownloadOptionsState) {
         },
         singleLine = true,
         textStyle = TextStyle(fontSize = 13.sp, color = DesignColors.Ink),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().trackTextInputFocus(),
     )
 }
 

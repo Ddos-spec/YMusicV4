@@ -382,7 +382,7 @@ internal fun SearchInputBar(
                 cursorBrush = SolidColor(DesignColors.Accent),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(onSearch = { onSubmit(value.text) }),
-                modifier = Modifier.weight(1f).fillMaxHeight().focusRequester(focusRequester),
+                modifier = Modifier.weight(1f).fillMaxHeight().focusRequester(focusRequester).trackTextInputFocus(),
                 decorationBox = { inner ->
                     Box(Modifier.fillMaxHeight(), contentAlignment = Alignment.CenterStart) {
                         if (value.text.isEmpty()) {
