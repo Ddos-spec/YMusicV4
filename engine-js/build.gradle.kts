@@ -63,37 +63,24 @@ fun Exec.unixPath() {
     )
 }
 
-/** Windows has npx.cmd, which CreateProcess will not start. Run the JS entry through node.exe. */
-fun Exec.npx(vararg args: String) {
+fun Exec.nodeTool(tool: String, vararg args: String) {
+    unixPath()
     val win = System.getProperty("os.name").lowercase().contains("win")
-    if (!win) {
-        commandLine(listOf("npx") + args)
-        return
-    }
-    val nodeHome = File(System.getenv("ProgramFiles") ?: "C:\\Program Files", "nodejs")
-    val node = File(nodeHome, "node.exe")
-    val cli = File(nodeHome, "node_modules/npm/bin/npx-cli.js")
-    commandLine(listOf(node.absolutePath, cli.absolutePath) + args)
+    // Windows npm/npx are .cmd wrappers; cmd resolves them from PATH.
+    val command = if (win) listOf("cmd.exe", "/d", "/c", "$tool.cmd") else listOf(tool)
+    commandLine(command + args)
 }
+
+fun Exec.npx(vararg args: String) = nodeTool("npx", *args)
 
 val jsToolsDir = layout.buildDirectory.dir("js-tools")
 
 val installEsbuild by tasks.registering(Exec::class) {
     outputs.file(jsToolsDir.map { it.file("node_modules/esbuild/package.json") })
     inputs.property("esbuild", Versions.esbuild)
-    val win = System.getProperty("os.name").lowercase().contains("win")
     val dest = jsToolsDir.get().asFile
     doFirst { dest.mkdirs() }
-    if (win) {
-        val nodeHome = File(System.getenv("ProgramFiles") ?: "C:\\Program Files", "nodejs")
-        commandLine(
-            File(nodeHome, "node.exe").absolutePath,
-            File(nodeHome, "node_modules/npm/bin/npm-cli.js").absolutePath,
-            "install", "--prefix", dest.absolutePath, "esbuild@${Versions.esbuild}",
-        )
-    } else {
-        commandLine("npm", "install", "--prefix", dest.absolutePath, "esbuild@${Versions.esbuild}")
-    }
+    nodeTool("npm", "install", "--prefix", dest.absolutePath, "esbuild@${Versions.esbuild}")
 }
 
 fun Exec.esbuildBundle(
@@ -105,16 +92,13 @@ fun Exec.esbuildBundle(
 ) {
     dependsOn(typecheckJs, installEsbuild)
     inputs.dir(srcDir)
+    inputs.file(layout.projectDirectory.file("bundle-host.mjs"))
     inputs.property("bundle", "$bundleName|$version|$production")
+    inputs.property("esbuild", Versions.esbuild)
     outputs.files(out, meta)
     workingDir = projectDir
-    val win = System.getProperty("os.name").lowercase().contains("win")
-    val node = if (win) {
-        File(System.getenv("ProgramFiles") ?: "C:\\Program Files", "nodejs/node.exe").absolutePath
-    } else {
-        "node"
-    }
-    commandLine(node, projectDir.resolve("bundle-host.mjs").absolutePath)
+    unixPath()
+    commandLine("node", projectDir.resolve("bundle-host.mjs").absolutePath)
     doFirst {
         environment("ESBUILD_PREFIX", jsToolsDir.get().asFile.absolutePath)
         environment("ENTRY", entry)
@@ -129,9 +113,9 @@ fun Exec.esbuildBundle(
 val typecheckJs by tasks.registering(Exec::class) {
     inputs.dir(srcDir)
     inputs.file(tsconfig)
+    inputs.property("typescript", Versions.typescript)
     outputs.file(layout.buildDirectory.file("typecheck.ok"))
     workingDir = projectDir
-    unixPath()
     npx("-y", "-p", "typescript@${Versions.typescript}", "tsc", "--noEmit", "-p", ".")
     doLast { outputs.files.singleFile.writeText("ok") }
 }
