@@ -44,9 +44,8 @@ interface MediaSessionCommands {
 /**
  * The desktop counterpart of Android's MediaSession: publishes playback state to the OS media
  * surface and receives its transport commands. Per-OS backends — macOS is implemented
- * (MPNowPlayingInfoCenter + MPRemoteCommandCenter → Control Center, media keys); Linux (MPRIS over
- * D-Bus) and Windows (SystemMediaTransportControls) have no backend yet, where [create] returns
- * null and the app simply has no OS media surface.
+ * (MPNowPlayingInfoCenter + MPRemoteCommandCenter → Control Center, media keys) and Windows
+ * (SystemMediaTransportControls → volume flyout and headset buttons). Linux MPRIS has no backend.
  */
 interface DesktopMediaSession {
     fun update(state: MediaSessionState)
@@ -61,6 +60,11 @@ interface DesktopMediaSession {
                 "mac" in os -> runCatching { MacNowPlayingSession(commands, logger) }
                     .onFailure {
                         logger?.log(Logger.Level.WARN, "macOS Now Playing bridge unavailable — media keys dead", it)
+                    }
+                    .getOrNull()
+                "win" in os -> runCatching { WindowsNowPlayingSession(commands, logger) }
+                    .onFailure {
+                        logger?.log(Logger.Level.WARN, "Windows media session unavailable", it)
                     }
                     .getOrNull()
                 else -> null

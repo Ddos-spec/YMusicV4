@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -36,7 +34,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toArgb
@@ -46,9 +43,9 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.isMetaPressed
+import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
@@ -227,6 +224,7 @@ private val rootLogger: Logger =
 private val showWindowRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
 fun main() {
+    installWindowsProcess()
     defaultLinuxSoftwareRendering()
     useBundledMseNatives()
     // macOS delivers ymusic:// opens (Info.plist CFBundleURLTypes) as Apple Events to the running
@@ -308,6 +306,7 @@ fun main() {
         var windowVisible by remember { mutableStateOf(true) }
         val (initialSize, initialPosition) = remember { loadWindowPrefs() }
         val windowState = rememberWindowState(size = initialSize, position = initialPosition)
+        var unmuteTo by remember { mutableStateOf(1f) }
         val frame = remember { DesktopFrame(windowState, initialSize, initialPosition) }
         fun quit() {
             if (!frame.fullscreen) {
@@ -354,9 +353,19 @@ fun main() {
                 if (event.type != KeyEventType.KeyDown) return@preview false
                 when {
                     (event.key == Key.Escape && frame.fullscreen) ||
+                        event.key.keyCode == KEY_F11 ||
                         (event.isMetaPressed && event.isCtrlPressed && event.key == Key.F) -> {
                         frame.toggleFullscreen()
                         true
+                    }
+                    event.key.keyCode == KEY_MEDIA_PLAY_PAUSE && !io.ymusic.desktop.media.WinSmtc.ownsTransport -> {
+                        graph?.player?.togglePlay(); true
+                    }
+                    event.key.keyCode == KEY_MEDIA_NEXT && !io.ymusic.desktop.media.WinSmtc.ownsTransport -> {
+                        graph?.player?.skipNext(); true
+                    }
+                    event.key.keyCode == KEY_MEDIA_PREV && !io.ymusic.desktop.media.WinSmtc.ownsTransport -> {
+                        graph?.player?.skipPrev(); true
                     }
                     else -> {
                         val refresh = event.key == Key.F5 ||
@@ -364,6 +373,52 @@ fun main() {
                         if (refresh) graph?.requestRefresh()
                         refresh
                     }
+                }
+            },
+            onKeyEvent = onKey@{ event ->
+                val player = graph?.player ?: return@onKey false
+                val down = event.type == KeyEventType.KeyDown
+                val up = event.type == KeyEventType.KeyUp
+                when {
+                    // Key up so a held space doesn't toggle twice, and a focused search box
+                    // consumes the key before it reaches here.
+                    event.key == Key.Spacebar && up -> {
+                        player.togglePlay(); true
+                    }
+                    down && event.key == Key.N -> {
+                        player.skipNext(); true
+                    }
+                    down && event.key == Key.P -> {
+                        player.skipPrev(); true
+                    }
+                    down && event.key.keyCode == KEY_M -> {
+                        if (player.volume > 0.001f) {
+                            unmuteTo = player.volume
+                            player.volume = 0f
+                        } else {
+                            player.volume = unmuteTo.coerceIn(0.05f, 1f)
+                        }
+                        true
+                    }
+                    down && event.isCtrlPressed && event.key == Key.DirectionRight -> {
+                        player.skipNext(); true
+                    }
+                    down && event.isCtrlPressed && event.key == Key.DirectionLeft -> {
+                        player.skipPrev(); true
+                    }
+                    down && event.key == Key.DirectionRight -> {
+                        seekBy(player, if (event.isShiftPressed) 30_000L else 10_000L); true
+                    }
+                    down && event.key == Key.DirectionLeft -> {
+                        seekBy(player, if (event.isShiftPressed) -30_000L else -10_000L); true
+                    }
+                    down && event.key == Key.DirectionUp -> {
+                        player.volume = (player.volume + 0.05f).coerceIn(0f, 1f); true
+                    }
+                    down && event.key == Key.DirectionDown -> {
+                        player.volume = (player.volume - 0.05f).coerceIn(0f, 1f); true
+                    }
+                    else -> false
                 }
             },
         ) {
@@ -383,50 +438,99 @@ fun main() {
                         SwingUtilities.invokeLater { frame.onNativeFullscreen(on) }
                     }
                     SwingUtilities.invokeLater { FileAvNative.prepareFullscreen(window) }
-                    onDispose { FileAvNative.onFullScreen = null }
+                    val restored = object : java.awt.event.WindowAdapter() {
+                        override fun windowDeiconified(e: java.awt.event.WindowEvent) {
+                            frame.restoreAfterMinimize()
+                        }
+                    }
+                    window.addWindowListener(restored)
+                    frame.followMoves(window)
+                    val captionClick = object : java.awt.event.MouseAdapter() {
+                        override fun mouseClicked(e: java.awt.event.MouseEvent) {
+                            if (e.button != java.awt.event.MouseEvent.BUTTON1 || e.clickCount < 2) return
+                            val scale = window.graphicsConfiguration.defaultTransform.scaleX.coerceAtLeast(1.0)
+                            val captionPx = (40 * scale).toInt()
+                            val buttonsPx = (150 * scale).toInt()
+                            if (e.y in 0..captionPx && e.x < window.width - buttonsPx) frame.toggleFullscreen()
+                        }
+                    }
+                    window.addMouseListener(captionClick)
+                    windowHwnd(window)?.let { hwnd ->
+                        runCatching {
+                            if (io.ymusic.desktop.media.WinSmtc.bind(hwnd) == 0) {
+                                io.ymusic.desktop.media.WinSmtc.ownsTransport = true
+                            }
+                        }
+                    }
+                    onDispose {
+                        window.removeMouseListener(captionClick)
+                        window.removeWindowListener(restored)
+                        FileAvNative.onFullScreen = null
+                    }
                 }
                 Column(
                     Modifier.fillMaxSize().then(if (frame.fullscreen) Modifier else Modifier.border(1.dp, frameBorder)),
                 ) {
-                    if (!frame.fullscreen) Box(
+                    val captionInk = if (darkBar) Color.White else palette.InkStrong
+                    Box(
                         Modifier
                             .fillMaxWidth()
                             .height(36.dp)
-                            .background(palette.SurfaceElevated)
-                            .pointerInput(Unit) {
-                                detectTapGestures(onDoubleTap = { frame.toggleZoom() })
-                            },
+                            .background(palette.SurfaceElevated),
                     ) {
-                        WindowDraggableArea(Modifier.fillMaxSize()) { Box(Modifier.fillMaxSize()) }
+                        WindowDraggableArea(Modifier.fillMaxSize())
                         Row(
                             Modifier.align(Alignment.CenterStart).padding(start = 10.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            MacTrafficLight(Color(0xFFFF5F57), stringResource(Res.string.cd_close), "✕", closeApp)
-                            MacTrafficLight(
-                                Color(0xFFFEBC2E),
-                                stringResource(Res.string.cd_minimize),
-                                "─",
-                            ) { window.extendedState = java.awt.Frame.ICONIFIED }
-                            MacTrafficLight(
-                                Color(0xFF28C840),
-                                stringResource(Res.string.cd_fullscreen),
-                                "＋",
-                                onClick = { frame.toggleFullscreen() },
+                            Image(
+                                painterResource(Res.drawable.ymusic_logo),
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                            )
+                            Text(
+                                "YMusic",
+                                color = captionInk,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium,
                             )
                         }
-                        Text(
-                            "YMusic",
-                            color = if (darkBar) Color.White else palette.InkStrong,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.align(Alignment.Center),
-                        )
+                        Row(Modifier.align(Alignment.CenterEnd)) {
+                            CaptionButton("—", stringResource(Res.string.cd_minimize), captionInk) {
+                                frame.minimize()
+                            }
+                            CaptionButton(
+                                if (frame.fullscreen || frame.zoomed) "❐" else "□",
+                                stringResource(Res.string.cd_fullscreen),
+                                captionInk,
+                            ) {
+                                frame.toggleFullscreen()
+                            }
+                            CaptionButton("✕", stringResource(Res.string.cd_close), captionInk, danger = true, onClick = ::quit)
+                        }
                     }
 
                     val g = graph
                     val resizePulse = remember { MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST) }
+                    LaunchedEffect(window, dockTile) {
+                        val images = intArrayOf(16, 24, 32, 48, 64, 256).map { px ->
+                            dockTile.toAwtImage(
+                                Density(px / 192f),
+                                LayoutDirection.Ltr,
+                                androidx.compose.ui.geometry.Size(192f, 192f),
+                            )
+                        }
+                        window.iconImages = images
+                        runCatching {
+                            if (java.awt.Taskbar.isTaskbarSupported()) {
+                                val taskbar = java.awt.Taskbar.getTaskbar()
+                                if (taskbar.isSupported(java.awt.Taskbar.Feature.ICON_IMAGE)) {
+                                    taskbar.iconImage = images.last()
+                                }
+                            }
+                        }
+                    }
                     DisposableEffect(window) {
                         VideoOverlayNative.onOverlayPress = { videoUnderlay.orderJustBehind(window) }
                         val stack = object : java.awt.event.WindowAdapter() {
@@ -761,8 +865,7 @@ private suspend fun buildGraph(settings: AppStoreSettings, session: CookieSessio
         )
     }
 
-    // OS media surface — macOS Now Playing widget + media keys (Linux MPRIS / Windows SMTC have no
-    // backend yet). Commands come back on the Main dispatcher, where the player is driven.
+    // OS media surface. Commands come back on the Main dispatcher, where the player is driven.
     connectMediaSession(player, CoroutineScope(Dispatchers.Main), rootLogger.fork("now-playing"))
 
     // Offline downloads: SABR stack over ffmpeg. Spec comes from the MSE engine's cached
@@ -1391,6 +1494,7 @@ private fun isOnScreen(x: Float, y: Float): Boolean = runCatching {
 }.getOrDefault(true) // can't enumerate screens → don't block the restore
 
 private fun saveWindowPrefs(size: DpSize, position: WindowPosition) {
+    if (size.width.value < 320f || size.height.value < 480f) return
     val p = java.util.Properties()
     p.setProperty("width", size.width.value.toString())
     p.setProperty("height", size.height.value.toString())
@@ -1561,24 +1665,54 @@ private fun readAppResource(name: String): String =
     checkNotNull(object {}.javaClass.getResourceAsStream("/" + name)) { name + " missing from app resources" }
         .readBytes().decodeToString()
 
+/** Windows caption button. Flat, on the right. Close turns red on hover. */
 @Composable
-private fun MacTrafficLight(color: Color, label: String, glyph: String, onClick: () -> Unit) {
+private fun CaptionButton(
+    glyph: String,
+    label: String,
+    ink: Color,
+    danger: Boolean = false,
+    onClick: () -> Unit,
+) {
     val hover = remember { MutableInteractionSource() }
     val hovered by hover.collectIsHoveredAsState()
     Box(
         Modifier
-            .size(12.dp)
-            .clip(CircleShape)
-            .background(color)
+            .size(width = 46.dp, height = 36.dp)
+            .background(
+                when {
+                    hovered && danger -> Color(0xFFE81123)
+                    hovered -> Color.White.copy(alpha = 0.08f)
+                    else -> Color.Transparent
+                },
+            )
             .semantics { contentDescription = label }
             .hoverable(hover)
             .clickable(indication = null, interactionSource = hover, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        if (hovered) {
-            Text(glyph, color = Color(0x99000000), fontSize = 8.sp, fontWeight = FontWeight.Bold)
-        }
+        Text(
+            glyph,
+            color = if (hovered && danger) Color.White else ink,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Medium,
+        )
     }
+}
+
+// ProGuard dropped Key.F11 from the packaged Compose jar. VK_F11 is 122, and the
+// desktop Key packs it as (1L shl 32) or the native code.
+private const val KEY_F11 = (1L shl 32) or 122L
+private const val KEY_M = (1L shl 32) or 77L
+private const val KEY_MEDIA_NEXT = (1L shl 32) or 176L
+private const val KEY_MEDIA_PREV = (1L shl 32) or 177L
+private const val KEY_MEDIA_PLAY_PAUSE = (1L shl 32) or 179L
+
+private fun seekBy(player: io.ymusic.player.Player, deltaMs: Long) {
+    val progress = player.progress.value
+    val next = (progress.positionMs + deltaMs).coerceAtLeast(0L)
+    val capped = if (progress.durationMs > 0L) next.coerceAtMost(progress.durationMs) else next
+    player.seekTo(capped)
 }
 
 @Composable

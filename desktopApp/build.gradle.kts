@@ -301,7 +301,9 @@ compose.desktop {
         // InitialHeapSize=Xmx. Live use was ~50–97m objects / ~38m JIT code.
         // Skia GPU cache default is 256m.
         jvmArgs(
+            "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
             "--add-opens=java.desktop/sun.awt=ALL-UNNAMED",
+            "--add-opens=java.desktop/sun.awt.windows=ALL-UNNAMED",
             "--add-opens=java.desktop/sun.lwawt=ALL-UNNAMED",
             "--add-opens=java.desktop/sun.lwawt.macosx=ALL-UNNAMED",
             "--add-opens=java.desktop/sun.awt.X11=ALL-UNNAMED",
@@ -373,6 +375,7 @@ compose.desktop {
                 perUserInstall = false
                 menu = true
                 shortcut = true
+                iconFile.set(project.file("ymusic.ico"))
             }
             // jlink modules the default set misses but the runtime graph uses: java.sql
             // (sqlite-jdbc), jdk.unsupported (Unsafe — JNA/coroutines/okio),
