@@ -18,8 +18,8 @@ import java.awt.Window
 /**
  * Floating, zoom (fit the work area), and fullscreen.
  *
- * macOS uses [NSWindow.toggleFullScreen]. Windows and Linux size the undecorated
- * window to the display. Never uses [WindowPlacement.Maximized]: AWT's maximized
+ * Windows sizes the undecorated window to the display; other platforms use the native bridge.
+ * Never uses [WindowPlacement.Maximized]: AWT's maximized
  * flag fights the macOS fullscreen animation and forgets the floating size.
  */
 internal class DesktopFrame(
@@ -66,13 +66,11 @@ internal class DesktopFrame(
 
     fun toggleFullscreen() {
         val w = host ?: return
-        if (isMacOs) {
+        if (!isWindows) {
             FileAvNative.toggleFullScreen(w)
             return
         }
-        val device = w.graphicsConfiguration.device
         if (fullscreen) {
-            if (!isWindows && device.fullScreenWindow == w) device.fullScreenWindow = null
             stopEnforcer(w)
             if (zoomed) {
                 val (size, position) = workArea(w)
@@ -89,34 +87,23 @@ internal class DesktopFrame(
         }
         fullscreen = true
         // AWT exclusive fullscreen iconifies on focus loss, including input-method windows.
-        if (!isWindows) runCatching { device.fullScreenWindow = w }
         startEnforcer(w)
         applyMonitorBounds(w)
     }
 
     fun minimize() {
+        if (!isWindows) return
         val w = host ?: return
-        if (!isMacOs && !isWindows && fullscreen) {
-            val device = w.graphicsConfiguration.device
-            if (device.fullScreenWindow == w) device.fullScreenWindow = null
-        }
         state.isMinimized = true
-        if (isWindows) winMinimize(w)
+        winMinimize(w)
     }
 
     /** Clicking the taskbar icon should come back to the same fullscreen, not a floating window. */
     fun restoreAfterMinimize() {
         val w = host ?: return
-        if (!fullscreen || isMacOs) return
+        if (!isWindows || !fullscreen) return
         state.isMinimized = false
-        if (isWindows) {
-            startEnforcer(w)
-            applyMonitorBounds(w)
-            return
-        }
-        val device = w.graphicsConfiguration.device
-        if (device.fullScreenWindow == w) return
-        runCatching { device.fullScreenWindow = w }
+        startEnforcer(w)
         applyMonitorBounds(w)
     }
 
@@ -126,6 +113,7 @@ internal class DesktopFrame(
      * including onto another monitor. Fullscreen stays pinned to that monitor.
      */
     fun followMoves(window: Window) {
+        if (!isWindows) return
         window.addComponentListener(object : java.awt.event.ComponentAdapter() {
             override fun componentMoved(e: java.awt.event.ComponentEvent) {
                 if (fullscreen || zoomed) return
@@ -184,7 +172,7 @@ internal class DesktopFrame(
     }
 
     private fun enforceMonitor(w: Window) {
-        if (!fullscreen || state.isMinimized || enforcePasses > 6) return
+        if (!isWindows || !fullscreen || state.isMinimized || enforcePasses > 6) return
         val target = w.graphicsConfiguration.bounds
         val b = w.bounds
         val covered = kotlin.math.abs(b.width - target.width) <= 2 &&
@@ -211,7 +199,6 @@ internal class DesktopFrame(
 }
 
 private val osName = System.getProperty("os.name").orEmpty().lowercase()
-private val isMacOs = "mac" in osName
 private val isWindows = "win" in osName
 
 private fun winMinimize(window: Window) {

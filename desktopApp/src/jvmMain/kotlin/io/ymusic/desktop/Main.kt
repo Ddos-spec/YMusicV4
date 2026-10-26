@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -34,6 +36,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toArgb
@@ -46,6 +49,7 @@ import androidx.compose.ui.input.key.isMetaPressed
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
@@ -224,6 +228,7 @@ private val rootLogger: Logger =
 
 /** Ticks when the OS hands over a link or the app icon is clicked, so a window hidden to the tray comes back. */
 private val showWindowRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+private val isWindowsDesktop = System.getProperty("os.name").orEmpty().lowercase().contains("win")
 
 fun main() {
     installWindowsProcess()
@@ -343,9 +348,7 @@ fun main() {
             // already coloured it by the time it appears.
             visible = windowVisible && (graph != null || bootError != null || lockedCookies != null),
             onCloseRequest = {
-                // A non-empty queue → the close button minimizes to the system tray and playback
-                // carries on; an empty queue → quit.
-                if (graph?.player?.queue?.value?.items?.isNotEmpty() == true) windowVisible = false else quit()
+                if (!isWindowsDesktop && graph?.player?.queue?.value?.items?.isNotEmpty() == true) windowVisible = false else quit()
             },
             title = "YMusic",
             icon = painterResource(Res.drawable.ymusic_logo),
@@ -354,21 +357,21 @@ fun main() {
             transparent = true,
             onPreviewKeyEvent = preview@{ event ->
                 if (event.type != KeyEventType.KeyDown) return@preview false
-                if (textInputFocus.isFocused && event.key.keyCode != KEY_F11) return@preview false
+                if (isWindowsDesktop && textInputFocus.isFocused && event.key.keyCode != KEY_F11) return@preview false
                 when {
                     (event.key == Key.Escape && frame.fullscreen) ||
-                        event.key.keyCode == KEY_F11 ||
+                        (isWindowsDesktop && event.key.keyCode == KEY_F11) ||
                         (event.isMetaPressed && event.isCtrlPressed && event.key == Key.F) -> {
                         frame.toggleFullscreen()
                         true
                     }
-                    event.key.keyCode == KEY_MEDIA_PLAY_PAUSE && !io.ymusic.desktop.media.WinSmtc.ownsTransport -> {
+                    isWindowsDesktop && event.key.keyCode == KEY_MEDIA_PLAY_PAUSE && !io.ymusic.desktop.media.WinSmtc.ownsTransport -> {
                         graph?.player?.togglePlay(); true
                     }
-                    event.key.keyCode == KEY_MEDIA_NEXT && !io.ymusic.desktop.media.WinSmtc.ownsTransport -> {
+                    isWindowsDesktop && event.key.keyCode == KEY_MEDIA_NEXT && !io.ymusic.desktop.media.WinSmtc.ownsTransport -> {
                         graph?.player?.skipNext(); true
                     }
-                    event.key.keyCode == KEY_MEDIA_PREV && !io.ymusic.desktop.media.WinSmtc.ownsTransport -> {
+                    isWindowsDesktop && event.key.keyCode == KEY_MEDIA_PREV && !io.ymusic.desktop.media.WinSmtc.ownsTransport -> {
                         graph?.player?.skipPrev(); true
                     }
                     else -> {
@@ -380,7 +383,7 @@ fun main() {
                 }
             },
             onKeyEvent = onKey@{ event ->
-                if (textInputFocus.isFocused) return@onKey false
+                if (!isWindowsDesktop || textInputFocus.isFocused) return@onKey false
                 val player = graph?.player ?: return@onKey false
                 val down = event.type == KeyEventType.KeyDown
                 val up = event.type == KeyEventType.KeyUp
@@ -435,13 +438,16 @@ fun main() {
             val palette = designPaletteFor(themePref, isSystemInDarkTheme())
             val frameBorder =
                 if (darkBar) Color.White.copy(alpha = 0.14f) else palette.OutlineSoft
-            CompositionLocalProvider(LocalAppWindow provides window, LocalTextInputFocus provides textInputFocus) {
+            CompositionLocalProvider(LocalAppWindow provides window, LocalTextInputFocus provides if (isWindowsDesktop) textInputFocus else null) {
                 DisposableEffect(window) {
                     frame.host = window
                     FileAvNative.onFullScreen = { on ->
                         SwingUtilities.invokeLater { frame.onNativeFullscreen(on) }
                     }
                     SwingUtilities.invokeLater { FileAvNative.prepareFullscreen(window) }
+                    onDispose { FileAvNative.onFullScreen = null }
+                }
+                if (isWindowsDesktop) DisposableEffect(window) {
                     val restored = object : java.awt.event.WindowAdapter() {
                         override fun windowDeiconified(e: java.awt.event.WindowEvent) {
                             frame.restoreAfterMinimize()
@@ -452,10 +458,7 @@ fun main() {
                     val captionClick = object : java.awt.event.MouseAdapter() {
                         override fun mouseClicked(e: java.awt.event.MouseEvent) {
                             if (e.button != java.awt.event.MouseEvent.BUTTON1 || e.clickCount < 2) return
-                            val scale = window.graphicsConfiguration.defaultTransform.scaleX.coerceAtLeast(1.0)
-                            val captionPx = (40 * scale).toInt()
-                            val buttonsPx = (150 * scale).toInt()
-                            if (e.y in 0..captionPx && e.x < window.width - buttonsPx) frame.toggleFullscreen()
+                            if (e.y in 0 until 36 && e.x in 0 until window.width - 3 * 46) frame.toggleFullscreen()
                         }
                     }
                     window.addMouseListener(captionClick)
@@ -469,55 +472,93 @@ fun main() {
                     onDispose {
                         window.removeMouseListener(captionClick)
                         window.removeWindowListener(restored)
-                        FileAvNative.onFullScreen = null
                     }
                 }
                 Column(
                     Modifier.fillMaxSize().then(if (frame.fullscreen) Modifier else Modifier.border(1.dp, frameBorder)),
                 ) {
-                    val captionInk = if (darkBar) Color.White else palette.InkStrong
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(36.dp)
-                            .background(palette.SurfaceElevated),
-                    ) {
-                        WindowDraggableArea(Modifier.fillMaxSize())
-                        Row(
-                            Modifier.align(Alignment.CenterStart).padding(start = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    if (isWindowsDesktop) {
+                        val captionInk = if (darkBar) Color.White else palette.InkStrong
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(36.dp)
+                                .background(palette.SurfaceElevated),
                         ) {
-                            Image(
-                                painterResource(Res.drawable.ymusic_logo),
-                                contentDescription = null,
-                                modifier = Modifier.size(16.dp),
-                            )
+                            WindowDraggableArea(Modifier.fillMaxSize())
+                            Row(
+                                Modifier.align(Alignment.CenterStart).padding(start = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                Image(
+                                    painterResource(Res.drawable.ymusic_logo),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp),
+                                )
+                                Text(
+                                    "YMusic",
+                                    color = captionInk,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Medium,
+                                )
+                            }
+                            Row(Modifier.align(Alignment.CenterEnd)) {
+                                CaptionButton("—", stringResource(Res.string.cd_minimize), captionInk) {
+                                    frame.minimize()
+                                }
+                                CaptionButton(
+                                    if (frame.fullscreen || frame.zoomed) "❐" else "□",
+                                    stringResource(Res.string.cd_fullscreen),
+                                    captionInk,
+                                ) {
+                                    frame.toggleFullscreen()
+                                }
+                                CaptionButton("✕", stringResource(Res.string.cd_close), captionInk, danger = true, onClick = ::quit)
+                            }
+                        }
+                    } else {
+                        if (!frame.fullscreen) Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(36.dp)
+                                .background(palette.SurfaceElevated)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onDoubleTap = { frame.toggleZoom() })
+                                },
+                        ) {
+                            WindowDraggableArea(Modifier.fillMaxSize()) { Box(Modifier.fillMaxSize()) }
+                            Row(
+                                Modifier.align(Alignment.CenterStart).padding(start = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                MacTrafficLight(Color(0xFFFF5F57), stringResource(Res.string.cd_close), "✕", closeApp)
+                                MacTrafficLight(
+                                    Color(0xFFFEBC2E),
+                                    stringResource(Res.string.cd_minimize),
+                                    "─",
+                                ) { window.extendedState = java.awt.Frame.ICONIFIED }
+                                MacTrafficLight(
+                                    Color(0xFF28C840),
+                                    stringResource(Res.string.cd_fullscreen),
+                                    "＋",
+                                    onClick = { frame.toggleFullscreen() },
+                                )
+                            }
                             Text(
                                 "YMusic",
-                                color = captionInk,
+                                color = if (darkBar) Color.White else palette.InkStrong,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium,
+                                modifier = Modifier.align(Alignment.Center),
                             )
-                        }
-                        Row(Modifier.align(Alignment.CenterEnd)) {
-                            CaptionButton("—", stringResource(Res.string.cd_minimize), captionInk) {
-                                frame.minimize()
-                            }
-                            CaptionButton(
-                                if (frame.fullscreen || frame.zoomed) "❐" else "□",
-                                stringResource(Res.string.cd_fullscreen),
-                                captionInk,
-                            ) {
-                                frame.toggleFullscreen()
-                            }
-                            CaptionButton("✕", stringResource(Res.string.cd_close), captionInk, danger = true, onClick = ::quit)
                         }
                     }
 
                     val g = graph
                     val resizePulse = remember { MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST) }
-                    LaunchedEffect(window, dockTile) {
+                    if (isWindowsDesktop) LaunchedEffect(window, dockTile) {
                         val images = intArrayOf(16, 24, 32, 48, 64, 256).map { px ->
                             dockTile.toAwtImage(
                                 Density(px / 192f),
@@ -1668,6 +1709,26 @@ private const val DESKTOP_CHROME_UA =
 private fun readAppResource(name: String): String =
     checkNotNull(object {}.javaClass.getResourceAsStream("/" + name)) { name + " missing from app resources" }
         .readBytes().decodeToString()
+
+@Composable
+private fun MacTrafficLight(color: Color, label: String, glyph: String, onClick: () -> Unit) {
+    val hover = remember { MutableInteractionSource() }
+    val hovered by hover.collectIsHoveredAsState()
+    Box(
+        Modifier
+            .size(12.dp)
+            .clip(CircleShape)
+            .background(color)
+            .semantics { contentDescription = label }
+            .hoverable(hover)
+            .clickable(indication = null, interactionSource = hover, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (hovered) {
+            Text(glyph, color = Color(0x99000000), fontSize = 8.sp, fontWeight = FontWeight.Bold)
+        }
+    }
+}
 
 /** Windows caption button. Flat, on the right. Close turns red on hover. */
 @Composable
