@@ -49,9 +49,7 @@ kotlin {
             api(Libs.SqlDelight.runtime)
         }
 
-        val nativeMain by getting {
-            dependencies { implementation(Libs.SqlDelight.nativeDriver) }
-        }
+        findByName("nativeMain")?.dependencies { implementation(Libs.SqlDelight.nativeDriver) }
         jvmMain.dependencies { implementation(Libs.SqlDelight.sqliteDriver) }
         androidMain.dependencies { implementation(Libs.SqlDelight.androidDriver) }
 
@@ -61,8 +59,6 @@ kotlin {
         }
 
         jvmTest.dependencies { implementation(Libs.SqlDelight.sqliteDriver) }
-        val nativeTest by getting {
-            dependencies { implementation(Libs.SqlDelight.nativeDriver) }
-        }
+        findByName("nativeTest")?.dependencies { implementation(Libs.SqlDelight.nativeDriver) }
     }
 }

@@ -195,7 +195,8 @@ kotlin {
                 implementation(Libs.Okio.core)
             }
         }
-        val nativeMain by getting
+        // nativeMain exists only when this host configured a native target. Windows host mode has none.
+        val nativeMain = findByName("nativeMain")
 
         // Shared by desktop JVM + Android: the ProcessBuilder-based runner (works on both).
         val jvmCommonMain by creating {
@@ -204,20 +205,28 @@ kotlin {
         jvmMain.get().dependsOn(jvmCommonMain)
         androidMain.get().dependsOn(jvmCommonMain)
 
-        // Desktop-native (macOS + Linux): one fork/execve-based implementation.
-        val posixMain by creating { dependsOn(nativeMain) }
-        listOf("macosX64Main", "macosArm64Main", "linuxX64Main", "linuxArm64Main").forEach { name ->
-            findByName(name)?.dependsOn(posixMain)
-        }
+        if (nativeMain != null) {
+            // Desktop-native (macOS + Linux): one fork/execve-based implementation.
+            val posixLeaves = listOf("macosX64Main", "macosArm64Main", "linuxX64Main", "linuxArm64Main")
+            if (posixLeaves.any { findByName(it) != null }) {
+                val posixMain by creating { dependsOn(nativeMain) }
+                posixLeaves.forEach { name ->
+                    findByName(name)?.dependsOn(posixMain)
+                }
+            }
 
-        // Every non-macOS Apple target: child processes are not permitted, so startProcess() throws.
-        // (macOS is Apple too but gets the real posixMain impl above, so this can't live in appleMain.)
-        val appleNoProcessMain by creating { dependsOn(nativeMain) }
-        listOf(
-            "iosArm64Main", "iosSimulatorArm64Main", "iosX64Main",
-            "tvosArm64Main", "tvosSimulatorArm64Main", "tvosX64Main",
-            "watchosArm64Main", "watchosDeviceArm64Main", "watchosSimulatorArm64Main", "watchosX64Main",
-        ).forEach { name -> findByName(name)?.dependsOn(appleNoProcessMain) }
+            // Every non-macOS Apple target: child processes are not permitted, so startProcess() throws.
+            // (macOS is Apple too but gets the real posixMain impl above, so this can't live in appleMain.)
+            val appleNoProcessLeaves = listOf(
+                "iosArm64Main", "iosSimulatorArm64Main", "iosX64Main",
+                "tvosArm64Main", "tvosSimulatorArm64Main", "tvosX64Main",
+                "watchosArm64Main", "watchosDeviceArm64Main", "watchosSimulatorArm64Main", "watchosX64Main",
+            )
+            if (appleNoProcessLeaves.any { findByName(it) != null }) {
+                val appleNoProcessMain by creating { dependsOn(nativeMain) }
+                appleNoProcessLeaves.forEach { name -> findByName(name)?.dependsOn(appleNoProcessMain) }
+            }
+        }
 
         val commonTest by getting {
             dependencies {
@@ -240,13 +249,16 @@ kotlin {
             kotlin.srcDir(generateFfmpegTestConfig)
         }
 
-        // Shared desktop-native test source set (mirrors posixMain).
-        val posixTest by creating {
-            dependsOn(processTest)
-            kotlin.srcDir(generateFfmpegTestConfig)
-        }
-        listOf("macosX64Test", "macosArm64Test", "linuxX64Test", "linuxArm64Test").forEach { name ->
-            findByName(name)?.dependsOn(posixTest)
+        // Shared desktop-native test source set (mirrors posixMain). Absent on Windows host mode.
+        val posixTestLeaves = listOf("macosX64Test", "macosArm64Test", "linuxX64Test", "linuxArm64Test")
+        if (posixTestLeaves.any { findByName(it) != null }) {
+            val posixTest by creating {
+                dependsOn(processTest)
+                kotlin.srcDir(generateFfmpegTestConfig)
+            }
+            posixTestLeaves.forEach { name ->
+                findByName(name)?.dependsOn(posixTest)
+            }
         }
 
         // Instrumented (on-device) tests: the packaged binary per ABI and the ymix server

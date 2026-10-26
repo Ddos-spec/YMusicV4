@@ -116,28 +116,30 @@ kotlin {
             }
         }
 
-        // Shared non-JVM code (native targets)
-        val nonJvmMain by creating {
-            dependsOn(commonMain)
-            dependencies {
-                implementation(Libs.Doist.normalizer)
+        // Shared non-JVM code. Windows host mode configures no native target, so the default
+        // hierarchy never creates nativeMain — creating these intermediates anyway makes them
+        // orphans (not part of any compilation).
+        val nativeMain = findByName("nativeMain")
+        if (nativeMain != null) {
+            val nonJvmMain by creating {
+                dependsOn(commonMain)
+                dependencies {
+                    implementation(Libs.Doist.normalizer)
+                }
             }
-        }
+            nativeMain.dependsOn(nonJvmMain)
 
-        val nativeMain by getting {
-            dependsOn(nonJvmMain)
-        }
-
-        // Desktop-native (linux + macos): the libcurl HTTP engine, built on the :curl wrapper.
-        val desktopMain by creating {
-            dependsOn(nativeMain)
-            dependencies {
-                implementation(project(":kmpHttp:curl"))
+            // Desktop-native (linux + macos): the libcurl HTTP engine, built on the :curl wrapper.
+            val desktopMain by creating {
+                dependsOn(nativeMain)
+                dependencies {
+                    implementation(project(":kmpHttp:curl"))
+                }
             }
-        }
-        // Wire whichever desktop intermediates exist (depends on -PkmpTargets / host).
-        listOf("macosMain", "linuxMain").forEach { name ->
-            findByName(name)?.dependsOn(desktopMain)
+            // Wire whichever desktop intermediates exist (depends on -PkmpTargets / host).
+            listOf("macosMain", "linuxMain").forEach { name ->
+                findByName(name)?.dependsOn(desktopMain)
+            }
         }
 
         commonMain.dependencies {
@@ -153,14 +155,20 @@ kotlin {
         }
 
         // Shared non-JVM test code (mirrors nonJvmMain: commonTest <- nonJvmTest <- nativeTest).
-        val nonJvmTest by creating { dependsOn(commonTest) }
-        val nativeTest by getting { dependsOn(nonJvmTest) }
+        val nativeTest = findByName("nativeTest")
+        if (nativeTest != null) {
+            val nonJvmTest by creating { dependsOn(commonTest) }
+            nativeTest.dependsOn(nonJvmTest)
+        }
 
         // Desktop-native test source set: re-runs the shared SslTest against the explicit
         // CurlKmpHttpClient (so curl SSL is exercised on macOS too, not just Linux).
-        val desktopTest by creating { dependsOn(commonTest) }
-        listOf("macosTest", "linuxTest").forEach { name ->
-            findByName(name)?.dependsOn(desktopTest)
+        val desktopTestLeaves = listOf("macosTest", "linuxTest")
+        if (desktopTestLeaves.any { findByName(it) != null }) {
+            val desktopTest by creating { dependsOn(commonTest) }
+            desktopTestLeaves.forEach { name ->
+                findByName(name)?.dependsOn(desktopTest)
+            }
         }
 
         jvmMain.dependencies {

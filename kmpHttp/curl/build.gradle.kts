@@ -24,6 +24,11 @@ kotlin {
     // Desktop-native targets (macOS + Linux), host-gated so each host only configures what it can
     // build. Matches :kmpHttp:core's desktop targets, which depend on this module.
     withDesktopTargets()
+    // Windows host mode configures no libcurl target. Kotlin rejects a module with zero
+    // targets if this project is pulled into the graph. The desktop JVM does not depend on it.
+    if (targets.withType<KotlinNativeTarget>().isEmpty()) {
+        jvm()
+    }
 
     // Attach the libcurl cinterop to every configured native target. Headers + libs come from the
     // host's system/Homebrew libcurl via the .def — no vendored files. The openssl cinterop binds a
@@ -47,11 +52,15 @@ kotlin {
         val commonMain by getting
 
         // Desktop source set shared by whichever desktop targets exist on this host.
-        val desktopMain by creating {
-            dependsOn(commonMain)
-        }
-        listOf("linuxX64Main", "linuxArm64Main", "macosX64Main", "macosArm64Main").forEach { name ->
-            findByName(name)?.dependsOn(desktopMain)
+        // Skip it when none do (Windows host mode): an unreferenced source set is an error.
+        val desktopLeaves = listOf("linuxX64Main", "linuxArm64Main", "macosX64Main", "macosArm64Main")
+        if (desktopLeaves.any { findByName(it) != null }) {
+            val desktopMain by creating {
+                dependsOn(commonMain)
+            }
+            desktopLeaves.forEach { name ->
+                findByName(name)?.dependsOn(desktopMain)
+            }
         }
 
         commonMain.dependencies {
