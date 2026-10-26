@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.toAwtImage
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isAltPressed
 import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.isMetaPressed
 import androidx.compose.ui.input.key.isShiftPressed
@@ -314,6 +315,7 @@ fun main() {
         val (initialSize, initialPosition) = remember { loadWindowPrefs() }
         val windowState = rememberWindowState(size = initialSize, position = initialPosition)
         var unmuteTo by remember { mutableStateOf(1f) }
+        var playbackSpaceHeld by remember { mutableStateOf(false) }
         val frame = remember { DesktopFrame(windowState, initialSize, initialPosition) }
         val textInputFocus = remember { TextInputFocus() }
         fun quit() {
@@ -356,8 +358,24 @@ fun main() {
             undecorated = true,
             transparent = true,
             onPreviewKeyEvent = preview@{ event ->
+                if (isWindowsDesktop && textInputFocus.isFocused && event.key.keyCode != KEY_F11) {
+                    playbackSpaceHeld = false
+                    return@preview false
+                }
+                val player = graph?.player
+                if (isWindowsDesktop && event.key == Key.Spacebar && !event.isCtrlPressed && !event.isAltPressed && !event.isMetaPressed && player != null) {
+                    when (event.type) {
+                        KeyEventType.KeyDown -> playbackSpaceHeld = true
+                        KeyEventType.KeyUp -> {
+                            val toggle = playbackSpaceHeld
+                            playbackSpaceHeld = false
+                            if (toggle) player.togglePlay()
+                        }
+                        else -> return@preview false
+                    }
+                    return@preview true
+                }
                 if (event.type != KeyEventType.KeyDown) return@preview false
-                if (isWindowsDesktop && textInputFocus.isFocused && event.key.keyCode != KEY_F11) return@preview false
                 when {
                     (event.key == Key.Escape && frame.fullscreen) ||
                         (isWindowsDesktop && event.key.keyCode == KEY_F11) ||
@@ -386,12 +404,7 @@ fun main() {
                 if (!isWindowsDesktop || textInputFocus.isFocused) return@onKey false
                 val player = graph?.player ?: return@onKey false
                 val down = event.type == KeyEventType.KeyDown
-                val up = event.type == KeyEventType.KeyUp
                 when {
-                    // Key up so a held space doesn't toggle twice.
-                    event.key == Key.Spacebar && up -> {
-                        player.togglePlay(); true
-                    }
                     down && event.key == Key.N -> {
                         player.skipNext(); true
                     }
@@ -579,6 +592,10 @@ fun main() {
                     DisposableEffect(window) {
                         VideoOverlayNative.onOverlayPress = { videoUnderlay.orderJustBehind(window) }
                         val stack = object : java.awt.event.WindowAdapter() {
+                            override fun windowDeactivated(e: java.awt.event.WindowEvent) {
+                                playbackSpaceHeld = false
+                            }
+
                             override fun windowActivated(e: java.awt.event.WindowEvent) {
                                 videoUnderlay.orderJustBehind(window)
                             }
