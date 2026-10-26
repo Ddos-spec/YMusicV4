@@ -98,7 +98,9 @@ actual object MseHostNative {
         val name = "mseffmpegjni"
         val libFileName = System.mapLibraryName(name)
         System.getProperty("mse.native.dir")?.let { dir ->
-            System.load(File(dir, libFileName).absolutePath)
+            val folder = File(dir)
+            if (isWindows()) loadWinSiblings(folder, libFileName)
+            System.load(File(folder, libFileName).absolutePath)
             return
         }
         val libraryPathError = try {
@@ -132,7 +134,38 @@ actual object MseHostNative {
                 Files.copy(inp, dest.toPath(), StandardCopyOption.REPLACE_EXISTING)
             }
         }
+        if (isWindows()) loadWinSiblings(tmpDir, libFileName)
         System.load(File(tmpDir, libFileName).absolutePath)
+    }
+
+    private fun isWindows(): Boolean =
+        System.getProperty("os.name").lowercase(Locale.US).contains("win")
+
+    /**
+     * Windows has no `$ORIGIN`. `System.load` of the JNI library does not search its own
+     * folder for avcodec/zlib/winpthread. Load those siblings by absolute path first, leaves
+     * before the libraries that import them. A failed attempt is retried once its own
+     * dependencies are already mapped.
+     */
+    private fun loadWinSiblings(folder: File, libFileName: String) {
+        val pending = folder.listFiles()
+            ?.filter { it.isFile && it.name.endsWith(".dll", ignoreCase = true) && !it.name.equals(libFileName, ignoreCase = true) }
+            ?.toMutableList()
+            ?: return
+        var progressed = true
+        while (pending.isNotEmpty() && progressed) {
+            progressed = false
+            val iter = pending.iterator()
+            while (iter.hasNext()) {
+                val dll = iter.next()
+                try {
+                    System.load(dll.absolutePath)
+                    iter.remove()
+                    progressed = true
+                } catch (_: UnsatisfiedLinkError) {
+                }
+            }
+        }
     }
 
     private fun hostJniFolder(): String {

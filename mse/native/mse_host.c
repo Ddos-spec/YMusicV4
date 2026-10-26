@@ -17,6 +17,9 @@
 #elif defined(__linux__) && !defined(__ANDROID__)
 #include "aq_pulse.h"
 #define MSE_AQ 1
+#elif defined(_WIN32)
+#include "aq_pulse.h"
+#define MSE_AQ 1
 #endif
 #ifdef __APPLE__
 #include <mach/mach_time.h>
@@ -27,6 +30,9 @@
 #endif
 #ifdef __ANDROID__
 #include <android/native_window.h>
+#endif
+#ifdef _WIN32
+#include <windows.h>
 #endif
 
 #if defined(MSE_AQ) || defined(__ANDROID__)
@@ -1886,6 +1892,12 @@ static size_t phys_mib(void)
     if (sysctlbyname("hw.memsize", &mem, &len, NULL, 0) != 0 || mem == 0)
         return 8192;
     return (size_t)(mem / MSE_MIB);
+#elif defined(_WIN32)
+    MEMORYSTATUSEX st;
+    st.dwLength = sizeof(st);
+    if (!GlobalMemoryStatusEx(&st) || st.ullTotalPhys == 0)
+        return 4096;
+    return (size_t)(st.ullTotalPhys / MSE_MIB);
 #else
     long pages = sysconf(_SC_PHYS_PAGES);
     long psz = sysconf(_SC_PAGE_SIZE);

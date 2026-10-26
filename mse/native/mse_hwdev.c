@@ -26,6 +26,10 @@ static void hwdev_init(void)
         enum AVPixelFormat pix;
         const char *name;
     } kinds[] = {
+#ifdef _WIN32
+        /* Desktop Windows: the ffmpeg pack has d3d11va. CUDA/Vulkan are not in that pack. */
+        { AV_HWDEVICE_TYPE_D3D11VA, AV_PIX_FMT_D3D11, "d3d11va" },
+#endif
         { AV_HWDEVICE_TYPE_CUDA, AV_PIX_FMT_CUDA, "cuda" },
         { AV_HWDEVICE_TYPE_VULKAN, AV_PIX_FMT_VULKAN, "vulkan" },
     };

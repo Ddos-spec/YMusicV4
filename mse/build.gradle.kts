@@ -224,15 +224,20 @@ val mseCmakeBuild by tasks.registering(Exec::class) {
     doLast {
         // Siblings of libmseffmpegjni so @loader_path / $ORIGIN resolves in tests (mse.native.dir).
         val prefix = ffmpegDesktopPrefix ?: return@doLast
-        val lib = File(prefix, "lib")
-        lib.listFiles()?.forEach { f ->
+        val dest = mseJniDir.get().asFile
+        fun take(f: File) {
+            if (!f.isFile) return
             val n = f.name
-            if (n.endsWith(".a") || n.endsWith(".pc") || n.endsWith(".la")) return@forEach
+            if (n.endsWith(".a") || n.endsWith(".pc") || n.endsWith(".la") || n.endsWith(".dll.a")) return
             val sharedAv = n.startsWith("libav") || n.startsWith("libsw")
-            val winDll = (n.startsWith("av") || n.startsWith("sw")) && n.endsWith(".dll")
-            if (sharedAv || winDll) {
-                f.copyTo(File(mseJniDir.get().asFile, n), overwrite = true)
-            }
+            val winDll = n.endsWith(".dll", ignoreCase = true) && (
+                n.startsWith("av") || n.startsWith("sw") || n.startsWith("libav") || n.startsWith("libsw")
+                    || n.equals("zlib1.dll", ignoreCase = true) || n.startsWith("libwinpthread")
+                )
+            if (sharedAv || winDll) f.copyTo(File(dest, n), overwrite = true)
+        }
+        listOf(File(prefix, "lib"), File(prefix, "bin"), File(prefix, "pack")).forEach { dir ->
+            dir.listFiles()?.forEach(::take)
         }
     }
 }

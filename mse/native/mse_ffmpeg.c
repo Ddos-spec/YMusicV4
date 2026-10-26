@@ -24,7 +24,7 @@
 #include "mse_vt_present.h"
 #include "mse_vt_blit.h"
 #endif
-#if defined(__linux__) && !defined(__ANDROID__)
+#if (defined(__linux__) && !defined(__ANDROID__)) || defined(_WIN32)
 #define MSE_LINUX_HW 1
 #include "mse_hwdev.h"
 #endif

@@ -20,6 +20,17 @@ foreach(_n libavformat.so libavformat.dylib avformat.dll libavformat.dll)
     endif()
   endforeach()
 endforeach()
+# MinGW ffmpeg installs versioned DLL names (avformat-63.dll), not avformat.dll.
+if(NOT _avformat_shared)
+  file(GLOB _avformat_candidates
+    "${FFMPEG_ROOT}/bin/avformat-*.dll"
+    "${FFMPEG_ROOT}/bin/libavformat-*.dll"
+    "${FFMPEG_ROOT}/lib/avformat-*.dll"
+    "${FFMPEG_ROOT}/lib/libavformat-*.dll")
+  if(_avformat_candidates)
+    list(GET _avformat_candidates 0 _avformat_shared)
+  endif()
+endif()
 if(NOT _avformat_shared)
   message(FATAL_ERROR
     "FFMPEG_ROOT=${FFMPEG_ROOT} has no shared libavformat (.so/.dylib/.dll). "
@@ -33,6 +44,11 @@ endif()
 
 set(MSE_SOURCES mse_ffmpeg.c mse_host.c mse_vt.c mse_host_jni.c file_av.c file_av_jni.c audio_fx.c audio_fx_jni.c)
 add_library(mseffmpegjni SHARED ${MSE_SOURCES})
+# MinGW prefixes shared libraries with "lib", but System.mapLibraryName on
+# Windows looks up mseffmpegjni.dll.
+if(WIN32)
+  set_target_properties(mseffmpegjni PROPERTIES PREFIX "")
+endif()
 target_compile_definitions(mseffmpegjni PRIVATE PRODUCTION=${PRODUCTION})
 target_include_directories(mseffmpegjni PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/../../quickjs/native
@@ -81,6 +97,11 @@ elseif(UNIX)
   target_sources(mseffmpegjni PRIVATE aq_pulse.c mse_hwdev.c)
   target_include_directories(mseffmpegjni PRIVATE ${PULSE_INCLUDE_DIR})
   target_link_libraries(mseffmpegjni PRIVATE dl m pthread)
+endif()
+
+if(WIN32)
+  target_sources(mseffmpegjni PRIVATE aq_winmm.c mse_hwdev.c win_smtc.c)
+  target_link_libraries(mseffmpegjni PRIVATE winmm ole32 uuid avrt propsys runtimeobject)
 endif()
 
 if(APPLE)
