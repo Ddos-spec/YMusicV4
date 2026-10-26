@@ -22,6 +22,11 @@ add_library(quickjsjni SHARED
   ${QJS_DIR}/libunicode.c
   ${QJS_DIR}/dtoa.c
 )
+# MinGW prefixes shared libraries with "lib", but System.mapLibraryName on
+# Windows looks up quickjsjni.dll.
+if(WIN32)
+  set_target_properties(quickjsjni PROPERTIES PREFIX "")
+endif()
 
 target_include_directories(quickjsjni PRIVATE ${QJS_DIR})
 
@@ -48,6 +53,15 @@ target_compile_options(quickjsjni PRIVATE -w -O2 -funsigned-char)
 target_compile_options(quickjsjni PRIVATE -fvisibility=hidden -ffunction-sections -fdata-sections)
 if(APPLE)
   target_link_options(quickjsjni PRIVATE "-Wl,-dead_strip")
+elseif(WIN32)
+  # MinGW otherwise leaves a dynamic libwinpthread-1.dll import. Fold it in so the
+  # JNI library loads without a sibling runtime DLL.
+  target_link_options(quickjsjni PRIVATE
+    "-Wl,--gc-sections"
+    "-static-libgcc"
+    "-Wl,-Bstatic"
+    "-lwinpthread"
+    "-Wl,-Bdynamic")
 else()
   target_link_options(quickjsjni PRIVATE "-Wl,--gc-sections")
 endif()

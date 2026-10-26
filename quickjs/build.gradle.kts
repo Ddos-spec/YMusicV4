@@ -264,6 +264,8 @@ val ndkDir: File? = System.getenv("ANDROID_NDK_ROOT")?.let(::File)?.takeIf { it.
 }
 
 val stageAndroidJni by tasks.registering {
+    // Desktop packaging does not have an NDK. Skip rather than fail the host build.
+    onlyIf { ndkDir != null }
     // Staged into the library jniLibs (for consumers) and the device-test jniLibs (for our emulator run).
     val jniLibsDirs = listOf(
         projectDir.resolve("src/androidMain/jniLibs"),

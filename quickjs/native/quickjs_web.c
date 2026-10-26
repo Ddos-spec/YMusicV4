@@ -16,6 +16,9 @@
 #ifdef __APPLE__
 #include <TargetConditionals.h>
 #endif
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 /* Flat-string access (BEGIN/END patch at the end of vendored quickjs.c). */
 JSValue JS_ToFlatString(JSContext *ctx, JSValueConst v);
@@ -1190,6 +1193,37 @@ static JSValue js_time_zone(JSContext *ctx, JSValueConst this_val, int argc, JSV
             return JS_NewString(ctx, prop);
     }
 #endif
+#ifdef _WIN32
+    /* No /etc/localtime. Windows icu.dll returns the IANA id (Asia/Jakarta, …). */
+    {
+        HMODULE icu = LoadLibraryA("icu.dll");
+        typedef int32_t (__cdecl *tzfn)(uint16_t *, int32_t, int32_t *);
+        tzfn fn = icu ? (tzfn)GetProcAddress(icu, "ucal_getDefaultTimeZone") : NULL;
+        if (fn) {
+            uint16_t wide[128];
+            char iana[128];
+            int32_t status = 0;
+            int32_t nch = fn(wide, 128, &status);
+            int i;
+            if (nch > 0 && nch < 128 && status <= 0) {
+                for (i = 0; i < nch; i++) {
+                    if (wide[i] > 127)
+                        break;
+                    iana[i] = (char)wide[i];
+                }
+                if (i == nch) {
+                    iana[nch] = 0;
+                    if (tz_looks_iana(iana)) {
+                        FreeLibrary(icu);
+                        return JS_NewString(ctx, iana);
+                    }
+                }
+            }
+        }
+        if (icu)
+            FreeLibrary(icu);
+    }
+#else
     n = readlink("/etc/localtime", path, sizeof(path) - 1);
     if (n > 0) {
         path[n] = 0;
@@ -1197,6 +1231,7 @@ static JSValue js_time_zone(JSContext *ctx, JSValueConst this_val, int argc, JSV
         if (tz_looks_iana(tail))
             return JS_NewString(ctx, tail);
     }
+#endif
     return JS_NewString(ctx, "UTC");
 }
 
