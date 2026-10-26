@@ -37,13 +37,6 @@ plugins {
 // BuildFlags.PRODUCTION: `debug(function () { return concat; })` does not call the thunk
 // when true (esbuild inlines; Closure DCE drops the dead branch).
 val production = isProductionBuild()
-fun esbuildDefines(bundleName: String, backendVersion: Long) = arrayOf(
-    "--define:BUNDLE_NAME=\"$bundleName\"",
-    "--define:BACKEND_VERSION=$backendVersion",
-    "--define:PRODUCTION=$production",
-)
-val engineDefines = esbuildDefines("engine", Versions.engineJsVersion)
-val playerDefines = esbuildDefines("player", Versions.playerJsVersion)
 
 val srcDir = layout.projectDirectory.dir("src")
 val tsconfig = layout.projectDirectory.file("tsconfig.json")
@@ -61,10 +54,76 @@ val playerBundleMapFile = layout.buildDirectory.file("dist/player.js.map")
 val testBundleFile = layout.buildDirectory.file("dist/engine-test.js")
 
 fun Exec.unixPath() {
+    // Windows PATH uses ';'. Prepending Unix dirs with ':' glues them onto the first
+    // real entry and hides node. Leave the process PATH alone there.
+    if (System.getProperty("os.name").lowercase().contains("win")) return
     environment(
         "PATH",
         "/opt/homebrew/bin:/usr/local/bin:" + (System.getenv("PATH") ?: "/usr/bin:/bin"),
     )
+}
+
+/** Windows has npx.cmd, which CreateProcess will not start. Run the JS entry through node.exe. */
+fun Exec.npx(vararg args: String) {
+    val win = System.getProperty("os.name").lowercase().contains("win")
+    if (!win) {
+        commandLine(listOf("npx") + args)
+        return
+    }
+    val nodeHome = File(System.getenv("ProgramFiles") ?: "C:\\Program Files", "nodejs")
+    val node = File(nodeHome, "node.exe")
+    val cli = File(nodeHome, "node_modules/npm/bin/npx-cli.js")
+    commandLine(listOf(node.absolutePath, cli.absolutePath) + args)
+}
+
+val jsToolsDir = layout.buildDirectory.dir("js-tools")
+
+val installEsbuild by tasks.registering(Exec::class) {
+    outputs.file(jsToolsDir.map { it.file("node_modules/esbuild/package.json") })
+    inputs.property("esbuild", Versions.esbuild)
+    val win = System.getProperty("os.name").lowercase().contains("win")
+    val dest = jsToolsDir.get().asFile
+    doFirst { dest.mkdirs() }
+    if (win) {
+        val nodeHome = File(System.getenv("ProgramFiles") ?: "C:\\Program Files", "nodejs")
+        commandLine(
+            File(nodeHome, "node.exe").absolutePath,
+            File(nodeHome, "node_modules/npm/bin/npm-cli.js").absolutePath,
+            "install", "--prefix", dest.absolutePath, "esbuild@${Versions.esbuild}",
+        )
+    } else {
+        commandLine("npm", "install", "--prefix", dest.absolutePath, "esbuild@${Versions.esbuild}")
+    }
+}
+
+fun Exec.esbuildBundle(
+    entry: String,
+    out: Provider<org.gradle.api.file.RegularFile>,
+    meta: Provider<org.gradle.api.file.RegularFile>,
+    bundleName: String,
+    version: Long,
+) {
+    dependsOn(typecheckJs, installEsbuild)
+    inputs.dir(srcDir)
+    inputs.property("bundle", "$bundleName|$version|$production")
+    outputs.files(out, meta)
+    workingDir = projectDir
+    val win = System.getProperty("os.name").lowercase().contains("win")
+    val node = if (win) {
+        File(System.getenv("ProgramFiles") ?: "C:\\Program Files", "nodejs/node.exe").absolutePath
+    } else {
+        "node"
+    }
+    commandLine(node, projectDir.resolve("bundle-host.mjs").absolutePath)
+    doFirst {
+        environment("ESBUILD_PREFIX", jsToolsDir.get().asFile.absolutePath)
+        environment("ENTRY", entry)
+        environment("OUTFILE", out.get().asFile.absolutePath)
+        environment("METAFILE", meta.get().asFile.absolutePath)
+        environment("BUNDLE_NAME", bundleName)
+        environment("BACKEND_VERSION", version.toString())
+        environment("PRODUCTION", production.toString())
+    }
 }
 
 val typecheckJs by tasks.registering(Exec::class) {
@@ -73,7 +132,7 @@ val typecheckJs by tasks.registering(Exec::class) {
     outputs.file(layout.buildDirectory.file("typecheck.ok"))
     workingDir = projectDir
     unixPath()
-    commandLine("npx", "-y", "-p", "typescript@${Versions.typescript}", "tsc", "--noEmit", "-p", ".")
+    npx("-y", "-p", "typescript@${Versions.typescript}", "tsc", "--noEmit", "-p", ".")
     doLast { outputs.files.singleFile.writeText("ok") }
 }
 
@@ -82,21 +141,7 @@ val typecheckJs by tasks.registering(Exec::class) {
 // Closure then renames apart (a split property = undefined at runtime). Closure parses the native
 // syntax fine. No minification here — Closure owns that.
 val bundleRawJs by tasks.registering(Exec::class) {
-    dependsOn(typecheckJs)
-    inputs.dir(srcDir)
-    inputs.property("defines", engineDefines.joinToString(" ")) // Exec doesn't track commandLine
-    outputs.files(rawBundleFile, rawBundleMeta)
-    workingDir = projectDir
-    unixPath()
-    commandLine(
-        "npx", "-y", "esbuild@${Versions.esbuild}",
-        "src/index.ts", "--bundle",
-        "--format=iife", "--target=esnext", "--charset=utf8",
-        "--loader:.raw.js=text",
-        *engineDefines,
-        "--metafile=${rawBundleMeta.get().asFile.absolutePath}",
-        "--outfile=${rawBundleFile.get().asFile.absolutePath}",
-    )
+    esbuildBundle("src/index.ts", rawBundleFile, rawBundleMeta, "engine", Versions.engineJsVersion)
 }
 
 // One Closure invocation, shared by both artifacts. Level ADVANCED = full mangling (production);
@@ -191,21 +236,7 @@ val closureJs by tasks.registering {
 }
 
 val bundleRawPlayerJs by tasks.registering(Exec::class) {
-    dependsOn(typecheckJs)
-    inputs.dir(srcDir)
-    inputs.property("defines", playerDefines.joinToString(" "))
-    outputs.files(rawPlayerBundleFile, rawPlayerBundleMeta)
-    workingDir = projectDir
-    unixPath()
-    commandLine(
-        "npx", "-y", "esbuild@${Versions.esbuild}",
-        "src/player-index.ts", "--bundle",
-        "--format=iife", "--target=esnext", "--charset=utf8",
-        "--loader:.raw.js=text",
-        *playerDefines,
-        "--metafile=${rawPlayerBundleMeta.get().asFile.absolutePath}",
-        "--outfile=${rawPlayerBundleFile.get().asFile.absolutePath}",
-    )
+    esbuildBundle("src/player-index.ts", rawPlayerBundleFile, rawPlayerBundleMeta, "player", Versions.playerJsVersion)
 }
 
 val closurePlayerJs by tasks.registering {
@@ -231,21 +262,7 @@ val rawTestBundleFile = layout.buildDirectory.file("raw/engine-test.raw.js")
 val testBundleMapFile = layout.buildDirectory.file("dist/engine-test.js.map")
 
 val bundleRawTestJs by tasks.registering(Exec::class) {
-    dependsOn(typecheckJs)
-    inputs.dir(srcDir)
-    inputs.property("defines", engineDefines.joinToString(" ")) // Exec doesn't track commandLine
-    outputs.files(rawTestBundleFile, rawTestBundleMeta)
-    workingDir = projectDir
-    unixPath()
-    commandLine(
-        "npx", "-y", "esbuild@${Versions.esbuild}",
-        "src/test/index.ts", "--bundle",
-        "--format=iife", "--target=esnext", "--charset=utf8",
-        "--loader:.raw.js=text",
-        *engineDefines,
-        "--metafile=${rawTestBundleMeta.get().asFile.absolutePath}",
-        "--outfile=${rawTestBundleFile.get().asFile.absolutePath}",
-    )
+    esbuildBundle("src/test/index.ts", rawTestBundleFile, rawTestBundleMeta, "engine", Versions.engineJsVersion)
 }
 
 val bundleTestJs by tasks.registering {
